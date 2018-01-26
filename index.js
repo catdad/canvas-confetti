@@ -7,6 +7,7 @@
     spread: 45,
     startVelocity: 45,
     decay: 0.9,
+    ticks: 200,
     colors: [
       '#26ccff',
       '#a25afd',
@@ -17,6 +18,8 @@
       '#ff36ff'
     ]
   };
+
+  var animationObj;
 
   function prop(options, name) {
     return options ? options[name] || defaults[name] : defaults[name];
@@ -58,27 +61,32 @@
     return canvas;
   }
 
-  function randomPhysics(x, y, angle, spread, startVelocity, color) {
-    var radAngle = angle * (Math.PI / 180);
-    var radSpread = spread * (Math.PI / 180);
+  function randomPhysics(opts) {
+    var radAngle = opts.angle * (Math.PI / 180);
+    var radSpread = opts.spread * (Math.PI / 180);
 
     return {
-      x: x,
-      y: y,
+      x: opts.x,
+      y: opts.y,
       wobble: Math.random() * 10,
-      velocity: (startVelocity * 0.5) + (Math.random() * startVelocity),
+      velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: Math.random() * Math.PI,
-      color: hexToRgb(color)
+      color: hexToRgb(opts.color),
+      tick: 0,
+      totalTicks: opts.ticks,
+      decay: opts.decay
     };
   }
 
-  function updateFetti(context, fetti, progress, decay) {
+  function updateFetti(context, fetti) {
     fetti.x += Math.cos(fetti.angle2D) * fetti.velocity;
     fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + 3; // + gravity
     fetti.wobble += 0.1;
-    fetti.velocity *= decay;
+    fetti.velocity *= fetti.decay;
     fetti.tiltAngle += 0.1;
+
+    var progress = (fetti.tick++) / fetti.totalTicks;
 
     var wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
     var wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
@@ -100,20 +108,23 @@
     context.fill();
   }
 
-  function animate(context, fettis, decay, width, height, done) {
-    var totalTicks = 200;
-    var tick = 0;
+  function animate(canvas, fettis, done) {
+    var animatingFettis = fettis.slice();
+    var context = canvas.getContext('2d');
+    var width = canvas.width;
+    var height = canvas.height;
 
     function update() {
+      console.log(animatingFettis.length);
       context.clearRect(0, 0, width, height);
 
-      fettis.forEach(function (fetti) {
-        return updateFetti(context, fetti, tick / totalTicks, decay);
+      animatingFettis = animatingFettis.filter(function (fetti) {
+        updateFetti(context, fetti);
+
+        return fetti.tick < fetti.totalTicks;
       });
 
-      tick += 1;
-
-      if (tick < totalTicks) {
+      if (animatingFettis.length) {
         requestAnimationFrame(update);
       } else {
         done();
@@ -121,6 +132,13 @@
     }
 
     requestAnimationFrame(update);
+
+    return {
+      addFettis: function (fettis) {
+        animatingFettis = animatingFettis.concat(fettis);
+      },
+      canvas: canvas
+    };
   }
 
   window.confetti = function confetti(options) {
@@ -130,24 +148,41 @@
     var startVelocity = prop(options, 'startVelocity');
     var decay = prop(options, 'decay');
     var colors = prop(options, 'colors');
-
-    var canvas = getCanvas(options ? options.zIndex : null);
-
-    var context = canvas.getContext('2d');
-
-    document.body.appendChild(canvas);
+    var ticks = prop(options, 'ticks');
 
     var temp = particleCount;
     var fettis = [];
+    var canvas = animationObj ? animationObj.canvas : getCanvas(options ? options.zIndex : null);
 
     while (temp--) {
       fettis.push(
-        randomPhysics(canvas.width / 2, canvas.height / 2, angle, spread, startVelocity, colors[temp % colors.length])
+        randomPhysics({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          angle: angle,
+          spread: spread,
+          startVelocity: startVelocity,
+          color: colors[temp % colors.length],
+          ticks: ticks,
+          decay: decay
+        })
       );
     }
 
-    animate(context, fettis, decay, canvas.width, canvas.height, function () {
+    // if we have a previous canvas already animating,
+    // add to it
+    if (animationObj) {
+      animationObj.addFettis(fettis);
+
+      return;
+    }
+
+    document.body.appendChild(canvas);
+
+    animationObj = animate(canvas, fettis, function () {
+      animationObj = null;
       document.body.removeChild(canvas);
+
       console.log('done!');
     });
   };
