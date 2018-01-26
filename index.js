@@ -13,7 +13,7 @@
   }());
 
   var defaults = {
-    particalCount: 50,
+    particleCount: 50,
     angle: 90,
     spread: 45,
     startVelocity: 45,
