@@ -47,6 +47,7 @@
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
     canvas.style.left = '0px';
+    canvas.style.pointerEvents = 'none';
 
     if (Number(zIndex)) {
       canvas.style.zIndex = zIndex;
