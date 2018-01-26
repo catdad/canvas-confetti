@@ -7,6 +7,7 @@
     spread: 45,
     startVelocity: 45,
     decay: 0.9,
+    ticks: 200,
     colors: [
       '#26ccff',
       '#a25afd',
@@ -130,6 +131,7 @@
     var startVelocity = prop(options, 'startVelocity');
     var decay = prop(options, 'decay');
     var colors = prop(options, 'colors');
+    var ticks = prop(options, 'ticks');
 
     var canvas = getCanvas(options ? options.zIndex : null);
 
@@ -142,7 +144,14 @@
 
     while (temp--) {
       fettis.push(
-        randomPhysics(canvas.width / 2, canvas.height / 2, angle, spread, startVelocity, colors[temp % colors.length])
+        randomPhysics(
+          canvas.width / 2,
+          canvas.height / 2,
+          angle,
+          spread,
+          startVelocity,
+          colors[temp % colors.length]
+        )
       );
     }
 
