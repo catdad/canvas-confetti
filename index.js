@@ -145,4 +145,4 @@
       console.log('done!');
     });
   };
-}(window, document));
+}(window, document)); // jshint ignore:line
