@@ -1,6 +1,17 @@
 /* jshint browser: true */
 
 !(function (window, document) {
+  var frame = (function(){
+    return window.requestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame ||
+      window.oRequestAnimationFrame ||
+      window.msRequestAnimationFrame ||
+      function (cb) {
+        window.setTimeout(cb, 1000 / 60);
+      };
+  }());
+
   var defaults = {
     particalCount: 50,
     angle: 90,
@@ -113,6 +124,8 @@
     context.lineTo(x, wobbleY);
     context.closePath();
     context.fill();
+
+    return fetti.tick < fetti.totalTicks;
   }
 
   function animate(canvas, fettis, done) {
@@ -125,19 +138,17 @@
       context.clearRect(0, 0, width, height);
 
       animatingFettis = animatingFettis.filter(function (fetti) {
-        updateFetti(context, fetti);
-
-        return fetti.tick < fetti.totalTicks;
+        return updateFetti(context, fetti);
       });
 
       if (animatingFettis.length) {
-        requestAnimationFrame(update);
+        frame(update);
       } else {
         done();
       }
     }
 
-    requestAnimationFrame(update);
+    frame(update);
 
     return {
       addFettis: function (fettis) {
