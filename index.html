@@ -41,15 +41,26 @@
 <body>
   <div>
     <button>🎊🎉🎊</button>
-
-    <script>
-      document.querySelector('button').onclick = function (ev) {
-        // clicking fast on mobile zoom... stop that
-        ev.preventDefault();
-
-        confetti({ particalCount: 100, spread: 70 });
-      };
-    </script>
   </div>
+
+
+  <script>
+    document.querySelector('button').onclick = function (ev) {
+      // clicking fast on mobile zoom... stop that
+      ev.preventDefault();
+
+//      function r(min, max) {
+//        return Math.random() * (max - min) + min;
+//      }
+//
+//      confetti({
+//        angle: r(55, 125),
+//        spread: r(40, 80),
+//        particalCount: r(50, 100)
+//      });
+
+      confetti({ particleCount: 100, spread: 70 });
+    };
+  </script>
 </body>
 </html>
