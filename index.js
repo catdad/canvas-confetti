@@ -173,8 +173,6 @@
 
       var remainingFetti = 0;
 
-//      console.log(batches.length);
-
       batches = batches.map(function (batch) {
         if (!batch.length) {
           return batch;
