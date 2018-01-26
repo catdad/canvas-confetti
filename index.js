@@ -122,10 +122,11 @@
     var y2 =      wobbleY + (fetti.random * fetti.tiltSin);
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
-    context.moveTo(fetti.x, fetti.y);
-    context.lineTo(wobbleX, y);
-    context.lineTo(x2, y2);
-    context.lineTo(x, wobbleY);
+    context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
+    context.lineTo(Math.floor(wobbleX), Math.floor(y));
+    context.lineTo(Math.floor(x2), Math.floor(y2));
+    context.lineTo(Math.floor(x), Math.floor(wobbleY));
+
 
     return fetti.tick < fetti.totalTicks;
   }
