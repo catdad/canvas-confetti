@@ -107,19 +107,18 @@
   }
 
   function animate(context, fettis, width, height, done) {
-    var totalTicks = 200;
-    var tick = 0;
+    var animatingFettis = fettis.slice();
 
     function update() {
       context.clearRect(0, 0, width, height);
 
-      fettis.forEach(function (fetti) {
-        return updateFetti(context, fetti);
+      animatingFettis = animatingFettis.filter(function (fetti) {
+        updateFetti(context, fetti);
+
+        return fetti.tick < fetti.totalTicks;
       });
 
-      tick += 1;
-
-      if (tick < totalTicks) {
+      if (animatingFettis.length) {
         requestAnimationFrame(update);
       } else {
         done();
@@ -127,6 +126,12 @@
     }
 
     requestAnimationFrame(update);
+
+    return {
+      addFettis: function (fettis) {
+        animatingFettis = animatingFettis.concat(fettis);
+      }
+    };
   }
 
   window.confetti = function confetti(options) {
