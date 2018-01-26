@@ -93,7 +93,10 @@
       color: hexToRgb(opts.color),
       tick: 0,
       totalTicks: opts.ticks,
-      decay: opts.decay
+      decay: opts.decay,
+      random: Math.random() + 5,
+      tiltSin: 0,
+      tiltCos: 0
     };
   }
 
@@ -103,18 +106,19 @@
     fetti.wobble += 0.1;
     fetti.velocity *= fetti.decay;
     fetti.tiltAngle += 0.1;
+    fetti.tiltSin = Math.sin(fetti.tiltAngle);
+    fetti.tiltCos = Math.cos(fetti.tiltAngle);
+    fetti.random = Math.random() + 5;
 
     var progress = (fetti.tick++) / fetti.totalTicks;
 
     var wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
     var wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
 
-    var r = Math.random() + 5;
-
-    var x =       fetti.x + (r * Math.cos(fetti.tiltAngle));
-    var y =       fetti.y + (r * Math.sin(fetti.tiltAngle));
-    var x2 =      wobbleX + (r * Math.cos(fetti.tiltAngle));
-    var y2 =      wobbleY + (r * Math.sin(fetti.tiltAngle));
+    var x =       fetti.x + (fetti.random * fetti.tiltCos);
+    var y =       fetti.y + (fetti.random * fetti.tiltSin);
+    var x2 =      wobbleX + (fetti.random * fetti.tiltCos);
+    var y2 =      wobbleY + (fetti.random * fetti.tiltSin);
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
     context.beginPath();
