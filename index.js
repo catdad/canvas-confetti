@@ -66,8 +66,7 @@
     var x2 = wobbleX + (10 * Math.cos(fetti.tiltAngle));
     var y2 = wobbleY + (10 * Math.sin(fetti.tiltAngle));
 
-//    context.fillStyle = 'rgba(255, 0, 0, ' + (1 - progress) + ')';
-    context.fillStyle = 'red';
+    context.fillStyle = 'rgba(255, 0, 0, ' + (1 - progress) + ')';
     context.beginPath();
     context.moveTo(fetti.x, fetti.y);
     context.lineTo(wobbleX, y);
