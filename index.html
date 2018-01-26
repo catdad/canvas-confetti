@@ -45,6 +45,22 @@
 
 
   <script>
+    function once() {
+      confetti({ particleCount: 100, spread: 70 });
+    }
+
+    function auto(count, time) {
+      count = count || 10;
+
+      var interval = setInterval(function () {
+        if (count--) {
+          return once();
+        }
+
+        clearInterval(interval);
+      }, time || 200);
+    }
+
     document.querySelector('button').onclick = function (ev) {
       // clicking fast on mobile zoom... stop that
       ev.preventDefault();
@@ -59,7 +75,8 @@
 //        particalCount: r(50, 100)
 //      });
 
-      confetti({ particleCount: 100, spread: 70 });
+//      auto();
+      once();
     };
   </script>
 </body>
