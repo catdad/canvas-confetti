@@ -73,10 +73,9 @@
 
   function updateFetti(context, fetti, progress, decay) {
     fetti.x += Math.cos(fetti.angle2D) * fetti.velocity;
-    fetti.y += Math.sin(fetti.angle2D) * fetti.velocity;
+    fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + 3; // + gravity
     fetti.wobble += 0.1;
     fetti.velocity *= decay;
-    fetti.y += 3; // gravity
     fetti.tiltAngle += 0.1;
 
     var wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
