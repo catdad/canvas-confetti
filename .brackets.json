@@ -1,0 +1,18 @@
+{
+    "spaceUnits": 2,
+    "useTabChar": false,
+    "language": {
+        "javascript": {
+            "linting.prefer": [
+                "JSHint"
+            ],
+            "linting.usePreferredOnly": true
+        },
+        "markdown": {
+            "wordWrap": true
+        }
+    },
+    "language.fileNames": {
+        "Jenkinsfile": "groovy"
+    }
+}
