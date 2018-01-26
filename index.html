@@ -44,45 +44,43 @@
   </div>
 
   <script>
-    function rain() {
-      var spread = 1000 * document.body.clientWidth;
-      var velocity = document.body.clientWidth / 25;
+    var modes = {
+      cannon: function cannon() {
+        confetti({
+          particleCount: 100,
+          spread: 70
+        });
+      },
+      rain: function rain() {
+        var spread = 1000 * document.body.clientWidth;
+        var velocity = document.body.clientWidth / 25;
 
-      confetti({
-        angle: 270,
-        spread: spread,
-        particleCount: 100,
-        startVelocity: velocity
-      });
-    }
+        confetti({
+          angle: 270,
+          spread: spread,
+          particleCount: 100,
+          startVelocity: velocity
+        });
+      },
+      party: function party() {
+        function r(min, max) {
+          return Math.random() * (max - min) + min;
+        }
 
-    function party() {
-      function r(min, max) {
-        return Math.random() * (max - min) + min;
+        confetti({
+          angle: r(55, 125),
+          spread: r(50, 70),
+          particleCount: r(50, 100)
+        });
       }
+    };
 
-      confetti({
-        angle: r(55, 125),
-        spread: r(50, 70),
-        particleCount: r(50, 100)
-      });
-    }
-
-    function cannon() {
-      confetti({
-        particleCount: 100,
-        spread: 70
-      });
-    }
-
-    function auto(count, time) {
+    function auto(mode, count, time) {
       count = count || 10;
 
       var interval = setInterval(function () {
         if (count--) {
-          return cannon();
-//          return rain();
-//          return party();
+          return modes[mode]();
         }
 
         clearInterval(interval);
@@ -93,8 +91,8 @@
       // clicking fast on mobile zoom... stop that
       ev.preventDefault();
 
-//      auto(20, 100);
-      cannon();
+//      auto('cannon', 20, 100);
+      modes.cannon();
     };
   </script>
 </body>
