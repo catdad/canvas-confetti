@@ -147,6 +147,7 @@
     }
 
     animate(context, fettis, decay, canvas.width, canvas.height, function () {
+      document.body.removeChild(canvas);
       console.log('done!');
     });
   };
