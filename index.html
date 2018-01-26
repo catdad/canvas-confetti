@@ -43,10 +43,36 @@
     <button>🎊🎉🎊</button>
   </div>
 
-
   <script>
-    function once() {
-      confetti({ particleCount: 100, spread: 70 });
+    function rain() {
+      var spread = 1000 * document.body.clientWidth;
+      var velocity = document.body.clientWidth / 25;
+
+      confetti({
+        angle: 270,
+        spread: spread,
+        particleCount: 100,
+        startVelocity: velocity
+      });
+    }
+
+    function party() {
+      function r(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      confetti({
+        angle: r(55, 125),
+        spread: r(50, 70),
+        particleCount: r(50, 100)
+      });
+    }
+
+    function cannon() {
+      confetti({
+        particleCount: 100,
+        spread: 70
+      });
     }
 
     function auto(count, time) {
@@ -54,7 +80,9 @@
 
       var interval = setInterval(function () {
         if (count--) {
-          return once();
+          return cannon();
+//          return rain();
+//          return party();
         }
 
         clearInterval(interval);
@@ -65,18 +93,8 @@
       // clicking fast on mobile zoom... stop that
       ev.preventDefault();
 
-//      function r(min, max) {
-//        return Math.random() * (max - min) + min;
-//      }
-//
-//      confetti({
-//        angle: r(55, 125),
-//        spread: r(40, 80),
-//        particalCount: r(50, 100)
-//      });
-
-//      auto();
-      once();
+//      auto(20, 100);
+      cannon();
     };
   </script>
 </body>
