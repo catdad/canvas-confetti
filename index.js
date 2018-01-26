@@ -83,7 +83,7 @@
     var wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
     var wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
 
-    var r = Math.random() * 5;
+    var r = Math.random() + 5;
 
     var x =       fetti.x + (r * Math.cos(fetti.tiltAngle));
     var y =       fetti.y + (r * Math.sin(fetti.tiltAngle));
