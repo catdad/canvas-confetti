@@ -148,7 +148,7 @@
   }
 
   function confetti(options) {
-    var particleCount = prop(options, 'particalCount', Math.floor);
+    var particleCount = prop(options, 'particleCount', Math.floor);
     var angle = prop(options, 'angle', Number);
     var spread = prop(options, 'spread', Number);
     var startVelocity = prop(options, 'startVelocity', Number);
