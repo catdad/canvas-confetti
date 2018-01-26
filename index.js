@@ -20,6 +20,24 @@
     return options ? options[name] || defaults[name] : defaults[name];
   }
 
+  function toDecimal(str) {
+    return parseInt(str, 16);
+  }
+
+  function hexToRgb(str) {
+    var val = String(str).replace(/[^0-9a-f]/gi, '');
+
+    if (val.length < 6) {
+        val = val[0]+val[0]+val[1]+val[1]+val[2]+val[2];
+    }
+
+    return {
+      r: toDecimal(val.substring(0,2)),
+      g: toDecimal(val.substring(2,4)),
+      b: toDecimal(val.substring(4,6))
+    };
+  }
+
   function getCanvas(zIndex) {
     var canvas = document.createElement('canvas');
     var rect = document.body.getBoundingClientRect();
@@ -37,7 +55,7 @@
     return canvas;
   }
 
-  function randomPhysics(x, y, angle, spread, startVelocity) {
+  function randomPhysics(x, y, angle, spread, startVelocity, color) {
     var radAngle = angle * (Math.PI / 180);
     var radSpread = spread * (Math.PI / 180);
 
@@ -47,7 +65,8 @@
       wobble: Math.random() * 10,
       velocity: (startVelocity * 0.5) + (Math.random() * startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
-      tiltAngle: Math.random() * Math.PI
+      tiltAngle: Math.random() * Math.PI,
+      color: hexToRgb(color)
     };
   }
 
@@ -66,7 +85,7 @@
     var x2 = wobbleX + (10 * Math.cos(fetti.tiltAngle));
     var y2 = wobbleY + (10 * Math.sin(fetti.tiltAngle));
 
-    context.fillStyle = 'rgba(255, 0, 0, ' + (1 - progress) + ')';
+    context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
     context.beginPath();
     context.moveTo(fetti.x, fetti.y);
     context.lineTo(wobbleX, y);
@@ -105,6 +124,7 @@
     var spread = prop(options, 'spread');
     var startVelocity = prop(options, 'startVelocity');
     var decay = prop(options, 'decay');
+    var colors = prop(options, 'colors');
 
     var canvas = getCanvas(options ? options.zIndex : null);
 
@@ -117,7 +137,7 @@
 
     while (temp--) {
       fettis.push(
-        randomPhysics(canvas.width / 2, canvas.height / 2, angle, spread, startVelocity)
+        randomPhysics(canvas.width / 2, canvas.height / 2, angle, spread, startVelocity, colors[temp % colors.length])
       );
     }
 
