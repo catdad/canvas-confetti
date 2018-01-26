@@ -115,7 +115,6 @@
     var height = canvas.height;
 
     function update() {
-      console.log(animatingFettis.length);
       context.clearRect(0, 0, width, height);
 
       animatingFettis = animatingFettis.filter(function (fetti) {
