@@ -131,7 +131,7 @@
   }
 
   function batchColors(fettis) {
-    return fettis.reduce(function (memo, fetti) {
+    var map = fettis.reduce(function (memo, fetti) {
       if (!memo[fetti.colorHex]) {
         memo[fetti.colorHex] = [];
       }
@@ -140,10 +140,14 @@
 
       return memo;
     }, {});
+
+    return Object.keys(map).map(function (key) {
+      return map[key];
+    });
   }
 
   function animate(canvas, fettis, done) {
-    var animatingFettis = batchColors(fettis.slice());
+    var batches = batchColors(fettis.slice());
     var context = canvas.getContext('2d');
     var width = canvas.width;
     var height = canvas.height;
@@ -154,7 +158,7 @@
 
     // it's much cheaper to paint multiple particles all at once,
     // but since we have different colors, we need to batch them
-    function animateSingleColor(fettis) {
+    function animateBatch(fettis) {
       context.beginPath();
       var remaining = fettis.filter(filterFetti);
       context.closePath();
@@ -163,18 +167,20 @@
       return remaining;
     }
 
-    var colors = Object.keys(animatingFettis);
-
     function update() {
       context.clearRect(0, 0, width, height);
 
       var remainingFetti = 0;
 
-      colors.forEach(function (color) {
-        remainingFetti += animateSingleColor(animatingFettis[color]).length;
+//      console.log(batches.length);
+
+      batches = batches.map(function (batch) {
+        return animateBatch(batch);
+      }).filter(function (batch) {
+        return !!batch.length;
       });
 
-      if (remainingFetti) {
+      if (batches.length) {
         frame(update);
       } else {
         done();
@@ -185,15 +191,7 @@
 
     return {
       addFettis: function (fettis) {
-        var newFettis = batchColors(fettis);
-
-        Object.keys(newFettis).forEach(function (color) {
-          if (animatingFettis[color]) {
-            animatingFettis[color] = animatingFettis[color].concat(newFettis[color]);
-          } else {
-            animatingFettis[color] = newFettis[color];
-          }
-        });
+        batches = batches.concat(batchColors(fettis));
       },
       canvas: canvas
     };
