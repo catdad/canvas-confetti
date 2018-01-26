@@ -59,27 +59,32 @@
     return canvas;
   }
 
-  function randomPhysics(x, y, angle, spread, startVelocity, color) {
-    var radAngle = angle * (Math.PI / 180);
-    var radSpread = spread * (Math.PI / 180);
+  function randomPhysics(opts) {
+    var radAngle = opts.angle * (Math.PI / 180);
+    var radSpread = opts.spread * (Math.PI / 180);
 
     return {
-      x: x,
-      y: y,
+      x: opts.x,
+      y: opts.y,
       wobble: Math.random() * 10,
-      velocity: (startVelocity * 0.5) + (Math.random() * startVelocity),
+      velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: Math.random() * Math.PI,
-      color: hexToRgb(color)
+      color: hexToRgb(opts.color),
+      tick: 0,
+      totalTicks: opts.ticks,
+      decay: opts.decay
     };
   }
 
-  function updateFetti(context, fetti, progress, decay) {
+  function updateFetti(context, fetti) {
     fetti.x += Math.cos(fetti.angle2D) * fetti.velocity;
     fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + 3; // + gravity
     fetti.wobble += 0.1;
-    fetti.velocity *= decay;
+    fetti.velocity *= fetti.decay;
     fetti.tiltAngle += 0.1;
+
+    var progress = (fetti.tick++) / fetti.totalTicks;
 
     var wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
     var wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
@@ -101,7 +106,7 @@
     context.fill();
   }
 
-  function animate(context, fettis, decay, width, height, done) {
+  function animate(context, fettis, width, height, done) {
     var totalTicks = 200;
     var tick = 0;
 
@@ -109,7 +114,7 @@
       context.clearRect(0, 0, width, height);
 
       fettis.forEach(function (fetti) {
-        return updateFetti(context, fetti, tick / totalTicks, decay);
+        return updateFetti(context, fetti);
       });
 
       tick += 1;
@@ -144,18 +149,20 @@
 
     while (temp--) {
       fettis.push(
-        randomPhysics(
-          canvas.width / 2,
-          canvas.height / 2,
-          angle,
-          spread,
-          startVelocity,
-          colors[temp % colors.length]
-        )
+        randomPhysics({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          angle: angle,
+          spread: spread,
+          startVelocity: startVelocity,
+          color: colors[temp % colors.length],
+          ticks: ticks,
+          decay: decay
+        })
       );
     }
 
-    animate(context, fettis, decay, canvas.width, canvas.height, function () {
+    animate(context, fettis, canvas.width, canvas.height, function () {
       document.body.removeChild(canvas);
       console.log('done!');
     });
