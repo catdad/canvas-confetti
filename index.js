@@ -90,6 +90,7 @@
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: Math.random() * Math.PI,
+      colorHex: opts.color,
       color: hexToRgb(opts.color),
       tick: 0,
       totalTicks: opts.ticks,
@@ -121,31 +122,59 @@
     var y2 =      wobbleY + (fetti.random * fetti.tiltSin);
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
-    context.beginPath();
     context.moveTo(fetti.x, fetti.y);
     context.lineTo(wobbleX, y);
     context.lineTo(x2, y2);
     context.lineTo(x, wobbleY);
-    context.closePath();
-    context.fill();
 
     return fetti.tick < fetti.totalTicks;
   }
 
+  function batchColors(fettis) {
+    return fettis.reduce(function (memo, fetti) {
+      if (!memo[fetti.colorHex]) {
+        memo[fetti.colorHex] = [];
+      }
+
+      memo[fetti.colorHex].push(fetti);
+
+      return memo;
+    }, {});
+  }
+
   function animate(canvas, fettis, done) {
-    var animatingFettis = fettis.slice();
+    var animatingFettis = batchColors(fettis.slice());
     var context = canvas.getContext('2d');
     var width = canvas.width;
     var height = canvas.height;
 
+    function filterFetti(fetti) {
+      return updateFetti(context, fetti);
+    }
+
+    // it's much cheaper to paint multiple particles all at once,
+    // but since we have different colors, we need to batch them
+    function animateSingleColor(fettis) {
+      context.beginPath();
+      var remaining = fettis.filter(filterFetti);
+      context.closePath();
+      context.fill();
+
+      return remaining;
+    }
+
+    var colors = Object.keys(animatingFettis);
+
     function update() {
       context.clearRect(0, 0, width, height);
 
-      animatingFettis = animatingFettis.filter(function (fetti) {
-        return updateFetti(context, fetti);
+      var remainingFetti = 0;
+
+      colors.forEach(function (color) {
+        remainingFetti += animateSingleColor(animatingFettis[color]).length;
       });
 
-      if (animatingFettis.length) {
+      if (remainingFetti) {
         frame(update);
       } else {
         done();
@@ -156,7 +185,15 @@
 
     return {
       addFettis: function (fettis) {
-        animatingFettis = animatingFettis.concat(fettis);
+        var newFettis = batchColors(fettis);
+
+        Object.keys(newFettis).forEach(function (color) {
+          if (animatingFettis[color]) {
+            animatingFettis[color] = animatingFettis[color].concat(newFettis[color]);
+          } else {
+            animatingFettis[color] = newFettis[color];
+          }
+        });
       },
       canvas: canvas
     };
