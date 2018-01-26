@@ -40,7 +40,16 @@
 </head>
 <body>
   <div>
-    <button onclick="confetti({ particleCount: 100, spread: 70 })">🎊🎉🎊</button>
+    <button>🎊🎉🎊</button>
+
+    <script>
+      document.querySelector('button').onclick = function (ev) {
+        // clicking fast on mobile zoom... stop that
+        ev.preventDefault();
+
+        confetti({ particalCount: 100, spread: 70 });
+      };
+    </script>
   </div>
 </body>
 </html>
