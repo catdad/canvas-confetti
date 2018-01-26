@@ -82,8 +82,8 @@
     var wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
     var x =       fetti.x + (10 * Math.cos(fetti.tiltAngle));
     var y =       fetti.y + (10 * Math.sin(fetti.tiltAngle));
-    var x2 = wobbleX + (10 * Math.cos(fetti.tiltAngle));
-    var y2 = wobbleY + (10 * Math.sin(fetti.tiltAngle));
+    var x2 =      wobbleX + (10 * Math.cos(fetti.tiltAngle));
+    var y2 =      wobbleY + (10 * Math.sin(fetti.tiltAngle));
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
     context.beginPath();
