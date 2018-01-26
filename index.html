@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#393939">
   <title>🎊</title>
+
+  <script src="index.js"></script>
 
   <style>
     html, body {
@@ -11,17 +14,33 @@
       padding: 0;
       width: 100%;
       height: 100%;
+      background: #4b4b4b;
+      text-align: center;
+    }
+
+    div {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    button {
+      position: relative;
+      top: 60%;
+      border: none;
+      outline: none;
       background: #e5e5e5;
+      padding: 10px;
+      border-radius: 3px;
+      color: white;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <script src="index.js"></script>
-  <script>
-    window.onload = function () {
-      confetti();
-    };
-  </script>
-
+  <div>
+    <button onclick="confetti({ particleCount: 100, spread: 70 })">🎊🎉🎊</button>
+  </div>
 </body>
 </html>
