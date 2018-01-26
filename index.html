@@ -73,18 +73,26 @@
           particleCount: r(50, 100)
         });
       },
-      business: function business() {
+      wide: function business() {
+        var velocity = Math.max(
+          document.body.clientWidth / 24,
+          20
+        );
+
         confetti({
           angle: 90,
-          particleCount: 33
+          particleCount: 33,
+          startVelocity: velocity
         });
         confetti({
           angle: 135,
-          particleCount: 33
+          particleCount: 33,
+          startVelocity: velocity
         });
         confetti({
           angle: 45,
-          particleCount: 33
+          particleCount: 33,
+          startVelocity: velocity
         });
       }
     };
