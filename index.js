@@ -19,6 +19,8 @@
     ]
   };
 
+  var animationObj;
+
   function prop(options, name) {
     return options ? options[name] || defaults[name] : defaults[name];
   }
@@ -106,10 +108,14 @@
     context.fill();
   }
 
-  function animate(context, fettis, width, height, done) {
+  function animate(canvas, fettis, done) {
     var animatingFettis = fettis.slice();
+    var context = canvas.getContext('2d');
+    var width = canvas.width;
+    var height = canvas.height;
 
     function update() {
+      console.log(animatingFettis.length);
       context.clearRect(0, 0, width, height);
 
       animatingFettis = animatingFettis.filter(function (fetti) {
@@ -130,7 +136,8 @@
     return {
       addFettis: function (fettis) {
         animatingFettis = animatingFettis.concat(fettis);
-      }
+      },
+      canvas: canvas
     };
   }
 
@@ -143,14 +150,9 @@
     var colors = prop(options, 'colors');
     var ticks = prop(options, 'ticks');
 
-    var canvas = getCanvas(options ? options.zIndex : null);
-
-    var context = canvas.getContext('2d');
-
-    document.body.appendChild(canvas);
-
     var temp = particleCount;
     var fettis = [];
+    var canvas = animationObj ? animationObj.canvas : getCanvas(options ? options.zIndex : null);
 
     while (temp--) {
       fettis.push(
@@ -167,8 +169,20 @@
       );
     }
 
-    animate(context, fettis, canvas.width, canvas.height, function () {
+    // if we have a previous canvas already animating,
+    // add to it
+    if (animationObj) {
+      animationObj.addFettis(fettis);
+
+      return;
+    }
+
+    document.body.appendChild(canvas);
+
+    animationObj = animate(canvas, fettis, function () {
+      animationObj = null;
       document.body.removeChild(canvas);
+
       console.log('done!');
     });
   };
