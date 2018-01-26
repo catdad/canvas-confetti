@@ -175,12 +175,16 @@
 //      console.log(batches.length);
 
       batches = batches.map(function (batch) {
+        if (!batch.length) {
+          return batch;
+        }
+
+        remainingFetti += 1;
+
         return animateBatch(batch);
-      }).filter(function (batch) {
-        return !!batch.length;
       });
 
-      if (batches.length) {
+      if (remainingFetti) {
         frame(update);
       } else {
         done();
