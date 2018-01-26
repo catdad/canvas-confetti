@@ -21,8 +21,15 @@
 
   var animationObj;
 
-  function prop(options, name) {
-    return options ? options[name] || defaults[name] : defaults[name];
+  function convert(val, transform) {
+    return transform ? transform(val) : val;
+  }
+
+  function prop(options, name, transform) {
+    return convert(
+      options ? options[name] || defaults[name] : defaults[name],
+      transform
+    );
   }
 
   function toDecimal(str) {
@@ -140,14 +147,14 @@
     };
   }
 
-  window.confetti = function confetti(options) {
-    var particleCount = prop(options, 'particalCount');
-    var angle = prop(options, 'angle');
-    var spread = prop(options, 'spread');
-    var startVelocity = prop(options, 'startVelocity');
-    var decay = prop(options, 'decay');
+  function confetti(options) {
+    var particleCount = prop(options, 'particalCount', Math.floor);
+    var angle = prop(options, 'angle', Number);
+    var spread = prop(options, 'spread', Number);
+    var startVelocity = prop(options, 'startVelocity', Number);
+    var decay = prop(options, 'decay', Number);
     var colors = prop(options, 'colors');
-    var ticks = prop(options, 'ticks');
+    var ticks = prop(options, 'ticks', Number);
 
     var temp = particleCount;
     var fettis = [];
@@ -184,5 +191,7 @@
 
       console.log('done!');
     });
-  };
+  }
+
+  window.confetti = confetti;
 }(window, document)); // jshint ignore:line
