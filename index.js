@@ -1,6 +1,6 @@
 /* jshint browser: true */
 
-!(function (window, document) {
+!(function (context, module) {
   var frame = (function(){
     return window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
@@ -210,5 +210,9 @@
     });
   }
 
-  window.confetti = confetti;
-}(window, document)); // jshint ignore:line
+  if (module !== undefined) {
+    module.exports = confetti;
+  } else {
+    context.confetti = confetti;
+  }
+}(this, this.module)); // jshint ignore:line
