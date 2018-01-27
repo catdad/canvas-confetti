@@ -75,14 +75,14 @@
         });
       },
       rain: function rain() {
-        var spread = 1000 * document.body.clientWidth;
         var velocity = document.body.clientWidth / 24;
 
         confetti({
           angle: 270,
-          spread: spread,
+          spread: 220,
           particleCount: 100,
-          startVelocity: velocity
+          startVelocity: velocity,
+          origin: { y: -0.2 }
         });
       },
       party: function party() {
