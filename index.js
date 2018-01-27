@@ -36,9 +36,13 @@
     return transform ? transform(val) : val;
   }
 
+  function isOk(val) {
+    return !(val === null || val === undefined);
+  }
+
   function prop(options, name, transform) {
     return convert(
-      options ? options[name] || defaults[name] : defaults[name],
+      options && isOk(options[name]) ? options[name] : defaults[name],
       transform
     );
   }
