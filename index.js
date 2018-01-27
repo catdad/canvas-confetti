@@ -19,6 +19,8 @@
     startVelocity: 45,
     decay: 0.9,
     ticks: 200,
+    x: 0.5,
+    y: 0.5,
     colors: [
       '#26ccff',
       '#a25afd',
@@ -36,9 +38,13 @@
     return transform ? transform(val) : val;
   }
 
+  function isOk(val) {
+    return !(val === null || val === undefined);
+  }
+
   function prop(options, name, transform) {
     return convert(
-      options ? options[name] || defaults[name] : defaults[name],
+      options && isOk(options[name]) ? options[name] : defaults[name],
       transform
     );
   }
@@ -59,6 +65,14 @@
       g: toDecimal(val.substring(2,4)),
       b: toDecimal(val.substring(4,6))
     };
+  }
+
+  function getOrigin(options) {
+    var origin = prop(options, 'origin', Object);
+    origin.x = prop(origin, 'x', Number);
+    origin.y = prop(origin, 'y', Number);
+
+    return origin;
   }
 
   function getCanvas(zIndex) {
@@ -172,16 +186,20 @@
     var decay = prop(options, 'decay', Number);
     var colors = prop(options, 'colors');
     var ticks = prop(options, 'ticks', Number);
+    var origin = getOrigin(options);
 
     var temp = particleCount;
     var fettis = [];
     var canvas = animationObj ? animationObj.canvas : getCanvas(options ? options.zIndex : null);
 
+    var startX = canvas.width * origin.x;
+    var startY = canvas.height * origin.y;
+
     while (temp--) {
       fettis.push(
         randomPhysics({
-          x: canvas.width / 2,
-          y: canvas.height / 2,
+          x: startX,
+          y: startY,
           angle: angle,
           spread: spread,
           startVelocity: startVelocity,

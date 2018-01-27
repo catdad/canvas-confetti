@@ -48,35 +48,39 @@
       cannon: function cannon() {
         confetti({
           particleCount: 100,
-          spread: 70
+          spread: 70,
+          origin: { y: 0.6 }
         });
       },
       cannon3: function cannon() {
         confetti({
           particleCount: 40,
           spread: 25,
-          angle: 30
+          angle: 30,
+          origin: { y: 0.6 }
         });
         confetti({
           particleCount: 40,
           spread: 25,
-          angle: 150
+          angle: 150,
+          origin: { y: 0.6 }
         });
         confetti({
           particleCount: 40,
           spread: 25,
-          angle: 90
+          angle: 90,
+          origin: { y: 0.6 }
         });
       },
       rain: function rain() {
-        var spread = 1000 * document.body.clientWidth;
         var velocity = document.body.clientWidth / 24;
 
         confetti({
           angle: 270,
-          spread: spread,
+          spread: 220,
           particleCount: 100,
-          startVelocity: velocity
+          startVelocity: velocity,
+          origin: { y: -0.2 }
         });
       },
       party: function party() {
@@ -87,7 +91,8 @@
         confetti({
           angle: r(55, 125),
           spread: r(50, 70),
-          particleCount: r(50, 100)
+          particleCount: r(50, 100),
+          origin: { y: 0.6 }
         });
       },
       wide: function business() {
@@ -100,7 +105,21 @@
           angle: 90,
           particleCount: 100,
           startVelocity: velocity,
-          spread: 170
+          spread: 170,
+          origin: { y: 0.6 }
+        });
+      },
+      random: function random() {
+        confetti({
+          angle: 90,
+          particleCount: 100,
+          startVelocity: 30,
+          spread: 360,
+          origin: {
+            x: Math.random(),
+            // since they fall down, start a bit higher than random
+            y: Math.random() - 0.2
+          }
         });
       }
     };
