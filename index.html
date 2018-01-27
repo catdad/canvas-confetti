@@ -51,6 +51,23 @@
           spread: 70
         });
       },
+      cannon3: function cannon() {
+        confetti({
+          particleCount: 40,
+          spread: 25,
+          angle: 30
+        });
+        confetti({
+          particleCount: 40,
+          spread: 25,
+          angle: 150
+        });
+        confetti({
+          particleCount: 40,
+          spread: 25,
+          angle: 90
+        });
+      },
       rain: function rain() {
         var spread = 1000 * document.body.clientWidth;
         var velocity = document.body.clientWidth / 24;
