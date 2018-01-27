@@ -18,3 +18,42 @@ This library is exposed as a `confetti` function on `window`. It takes a single 
   - `origin.x` _Number (default: 0.5)_: The `x` position on the page, with `0` being the left edge and `1` being the right edge.
   - `origin.y` _Number (default: 0.5)_: The `y` position on the page, with `0` being the top edge and `1` being the bottom edge.
 - `colors` _Array&lt;String&gt;_: An array of color strings, in the HEX format... you know, like `#bada55`.
+
+## Examples
+
+Launch some confetti the default way:
+
+```javascript
+confetti();
+```
+
+Launch a bunch of confetti:
+
+```javascript
+confetti({
+  particleCount: 150
+});
+```
+
+Launch some confetti really wide:
+
+```javascript
+confetti({
+  spread: 180
+});
+```
+
+Get creative. Launch a small poof of confetti from a random part of the page:
+
+```javascript
+confetti({
+  particleCount: 100,
+  startVelocity: 30,
+  spread: 360,
+  origin: {
+    x: Math.random(),
+    // since they fall down, start a bit higher than random
+    y: Math.random() - 0.2
+  }
+});
+```
