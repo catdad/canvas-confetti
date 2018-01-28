@@ -95,6 +95,13 @@
   </div>
 
   <div class="container">
+    <div class="group" data-name="snow">
+      <button class="run">Run ▶</button>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
     <div class="group" data-name="continuous">
       <button class="run">Run ▶</button>
       <div class="editor"></div>
@@ -143,7 +150,28 @@
             }
           });
         }, 200);
+      },
+      snow: function snow() {
+        var duration = 15 * 1000;
+        var end = Date.now() + duration;
 
+        (function frame() {
+          confetti({
+            particleCount: 1,
+            startVelocity: 0,
+            ticks: 300,
+            origin: {
+              x: Math.random(),
+              // since they fall down, start a bit higher than random
+              y: Math.random() - 0.2
+            },
+            colors: ['#ffffff']
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        }());
       },
       continuous: function continuous() {
         var duration = 15 * 1000;
