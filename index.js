@@ -1,13 +1,27 @@
 /* jshint browser: true */
 
-!(function (window, document) {
+!(function (context, module) {
+  var frame = (function(){
+    return window.requestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
+      window.mozRequestAnimationFrame ||
+      window.oRequestAnimationFrame ||
+      window.msRequestAnimationFrame ||
+      function (cb) {
+        window.setTimeout(cb, 1000 / 60);
+      };
+  }());
+
   var defaults = {
-    particalCount: 50,
+    particleCount: 50,
     angle: 90,
     spread: 45,
     startVelocity: 45,
     decay: 0.9,
     ticks: 200,
+    x: 0.5,
+    y: 0.5,
+    zIndex: 100,
     colors: [
       '#26ccff',
       '#a25afd',
@@ -21,8 +35,19 @@
 
   var animationObj;
 
-  function prop(options, name) {
-    return options ? options[name] || defaults[name] : defaults[name];
+  function convert(val, transform) {
+    return transform ? transform(val) : val;
+  }
+
+  function isOk(val) {
+    return !(val === null || val === undefined);
+  }
+
+  function prop(options, name, transform) {
+    return convert(
+      options && isOk(options[name]) ? options[name] : defaults[name],
+      transform
+    );
   }
 
   function toDecimal(str) {
@@ -43,6 +68,14 @@
     };
   }
 
+  function getOrigin(options) {
+    var origin = prop(options, 'origin', Object);
+    origin.x = prop(origin, 'x', Number);
+    origin.y = prop(origin, 'y', Number);
+
+    return origin;
+  }
+
   function getCanvas(zIndex) {
     var canvas = document.createElement('canvas');
     var rect = document.body.getBoundingClientRect();
@@ -53,10 +86,7 @@
     canvas.style.top = '0px';
     canvas.style.left = '0px';
     canvas.style.pointerEvents = 'none';
-
-    if (Number(zIndex)) {
-      canvas.style.zIndex = zIndex;
-    }
+    canvas.style.zIndex = zIndex;
 
     return canvas;
   }
@@ -75,7 +105,10 @@
       color: hexToRgb(opts.color),
       tick: 0,
       totalTicks: opts.ticks,
-      decay: opts.decay
+      decay: opts.decay,
+      random: Math.random() + 5,
+      tiltSin: 0,
+      tiltCos: 0
     };
   }
 
@@ -85,27 +118,32 @@
     fetti.wobble += 0.1;
     fetti.velocity *= fetti.decay;
     fetti.tiltAngle += 0.1;
+    fetti.tiltSin = Math.sin(fetti.tiltAngle);
+    fetti.tiltCos = Math.cos(fetti.tiltAngle);
+    fetti.random = Math.random() + 5;
 
     var progress = (fetti.tick++) / fetti.totalTicks;
 
     var wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
     var wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
 
-    var r = Math.random() + 5;
-
-    var x =       fetti.x + (r * Math.cos(fetti.tiltAngle));
-    var y =       fetti.y + (r * Math.sin(fetti.tiltAngle));
-    var x2 =      wobbleX + (r * Math.cos(fetti.tiltAngle));
-    var y2 =      wobbleY + (r * Math.sin(fetti.tiltAngle));
+    var x =       fetti.x + (fetti.random * fetti.tiltCos);
+    var y =       fetti.y + (fetti.random * fetti.tiltSin);
+    var x2 =      wobbleX + (fetti.random * fetti.tiltCos);
+    var y2 =      wobbleY + (fetti.random * fetti.tiltSin);
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
     context.beginPath();
-    context.moveTo(fetti.x, fetti.y);
-    context.lineTo(wobbleX, y);
-    context.lineTo(x2, y2);
-    context.lineTo(x, wobbleY);
+
+    context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
+    context.lineTo(Math.floor(wobbleX), Math.floor(y));
+    context.lineTo(Math.floor(x2), Math.floor(y2));
+    context.lineTo(Math.floor(x), Math.floor(wobbleY));
+
     context.closePath();
     context.fill();
+
+    return fetti.tick < fetti.totalTicks;
   }
 
   function animate(canvas, fettis, done) {
@@ -115,23 +153,20 @@
     var height = canvas.height;
 
     function update() {
-      console.log(animatingFettis.length);
       context.clearRect(0, 0, width, height);
 
       animatingFettis = animatingFettis.filter(function (fetti) {
-        updateFetti(context, fetti);
-
-        return fetti.tick < fetti.totalTicks;
+        return updateFetti(context, fetti);
       });
 
       if (animatingFettis.length) {
-        requestAnimationFrame(update);
+        frame(update);
       } else {
         done();
       }
     }
 
-    requestAnimationFrame(update);
+    frame(update);
 
     return {
       addFettis: function (fettis) {
@@ -141,24 +176,29 @@
     };
   }
 
-  window.confetti = function confetti(options) {
-    var particleCount = prop(options, 'particalCount');
-    var angle = prop(options, 'angle');
-    var spread = prop(options, 'spread');
-    var startVelocity = prop(options, 'startVelocity');
-    var decay = prop(options, 'decay');
+  function confetti(options) {
+    var particleCount = prop(options, 'particleCount', Math.floor);
+    var angle = prop(options, 'angle', Number);
+    var spread = prop(options, 'spread', Number);
+    var startVelocity = prop(options, 'startVelocity', Number);
+    var decay = prop(options, 'decay', Number);
     var colors = prop(options, 'colors');
-    var ticks = prop(options, 'ticks');
+    var ticks = prop(options, 'ticks', Number);
+    var zIndex = prop(options, 'zIndex', Number);
+    var origin = getOrigin(options);
 
     var temp = particleCount;
     var fettis = [];
-    var canvas = animationObj ? animationObj.canvas : getCanvas(options ? options.zIndex : null);
+    var canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
+
+    var startX = canvas.width * origin.x;
+    var startY = canvas.height * origin.y;
 
     while (temp--) {
       fettis.push(
         randomPhysics({
-          x: canvas.width / 2,
-          y: canvas.height / 2,
+          x: startX,
+          y: startY,
           angle: angle,
           spread: spread,
           startVelocity: startVelocity,
@@ -185,5 +225,11 @@
 
       console.log('done!');
     });
-  };
-}(window, document)); // jshint ignore:line
+  }
+
+  if (module !== undefined) {
+    module.exports = confetti;
+  } else {
+    context.confetti = confetti;
+  }
+}(this, this.module)); // jshint ignore:line
