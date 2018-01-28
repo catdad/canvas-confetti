@@ -110,17 +110,6 @@
           origin: { y: 0.6 }
         });
       },
-      rain: function rain() {
-        var velocity = document.body.clientWidth / 24;
-
-        confetti({
-          angle: 270,
-          spread: 220,
-          particleCount: 100,
-          startVelocity: velocity,
-          origin: { y: -0.2 }
-        });
-      },
       party: function party() {
         function r(min, max) {
           return Math.random() * (max - min) + min;
@@ -130,20 +119,6 @@
           angle: r(55, 125),
           spread: r(50, 70),
           particleCount: r(50, 100),
-          origin: { y: 0.6 }
-        });
-      },
-      wide: function business() {
-        var velocity = Math.max(
-          document.body.clientWidth / 24,
-          20
-        );
-
-        confetti({
-          angle: 90,
-          particleCount: 100,
-          startVelocity: velocity,
-          spread: 170,
           origin: { y: 0.6 }
         });
       },
