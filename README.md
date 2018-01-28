@@ -18,6 +18,7 @@ This library is exposed as a `confetti` function on `window`. It takes a single 
   - `origin.x` _Number (default: 0.5)_: The `x` position on the page, with `0` being the left edge and `1` being the right edge.
   - `origin.y` _Number (default: 0.5)_: The `y` position on the page, with `0` being the top edge and `1` being the bottom edge.
 - `colors` _Array&lt;String&gt;_: An array of color strings, in the HEX format... you know, like `#bada55`.
+- `zIndex` _Integer (default: 100)_: The confetti should be on top, after all. But if you have a crazy high page, you can set it even higher.
 
 ## Examples
 
