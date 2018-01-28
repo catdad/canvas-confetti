@@ -12,7 +12,7 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      background: #2e2e2e;
+      background: #212121;
 
       color: #eee;
       font-size: 1em;
@@ -43,7 +43,7 @@
     .run {
       padding: 6px;
 
-      background: rgba(0,0,0,0.6);
+      background: rgba(255,255,255,0.1);
       border: none;
       outline: none;
 
@@ -66,6 +66,14 @@
       width: 100%;
     }
 
+    .editor.ace_dark.ace_editor {
+      background-color: #363636;
+    }
+    .editor.ace_dark .ace_gutter {
+      color: #8b8b8b;
+      background: #272727;
+    }
+
     .flex-rows {
       position: relative;
       display: flex;
@@ -76,7 +84,6 @@
 
     .description {
       display: flex;
-      outline: 1px solid red;
       width: 66%;
       padding: 0 0 0 1em;
       align-items: center;
@@ -84,7 +91,6 @@
 
     .left {
       flex-grow: 1;
-      outline: 1px solid blue;
       display: flex;
       flex-direction: column;
     }
