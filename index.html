@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#393939">
   <title>🎊</title>
 
-  <script src="index.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
 
   <style>
     html, body {
@@ -14,34 +14,317 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      background: #4b4b4b;
+      background: #212121;
+
+      color: #eee;
+      font-size: 1em;
+      font-family: 'Noto Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .sprite {
+      display: none;
+    }
+
+    h1, h2 {
       text-align: center;
     }
 
-    div {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
+    p {
+      margin: 0.5em;
     }
 
-    button {
+    .container {
       position: relative;
-      top: 60%;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .group {
+      position: relative;
+      width: 100%;
+      margin: 40px 0;
+      padding-top: 16px;
+
+      border-top: 1px solid #3e3e3e;
+      border-radius: 20px;
+    }
+
+    .run {
+      padding: 10px 6px;
+
+      background: rgba(255,255,255,0.1);
       border: none;
       outline: none;
-      background: #e5e5e5;
-      padding: 10px;
-      border-radius: 3px;
-      color: white;
+
+      color: #eee;
       font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+
+      opacity: 0.6;
+      transition: opacity 100ms ease;
+    }
+
+    .group .run:hover {
+      opacity: 1;
+    }
+
+    .editor {
+      position: relative;
+      min-height: 100px;
+      width: 100%;
+    }
+
+    .editor.ace_dark.ace_editor {
+      background-color: #363636;
+    }
+    .editor.ace_dark .ace_gutter {
+      color: #8b8b8b;
+      background: #272727;
+    }
+
+    .flex-rows {
+      position: relative;
+      display: block;
+      width: 100%;
+      padding-bottom: 1em;
+    }
+
+    .description {
+      display: flex;
+      flex-direction: column;
+
+      width: 94%;
+      margin: 10px auto;
+      padding: 0;
+
+      align-items: center;
+      line-height: 1.5;
+    }
+
+    .left {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    footer {
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 2;
+
+      background: rgba(255,255,255,0.1);
+    }
+
+    footer span {
+      vertical-align: middle;
+    }
+
+    span.icon {
+      position: relative;
+      display: inline-block;
+      height: 1em;
+      width: 1em;
+    }
+    svg.icon {
+      position: absolute;
+      pointer-events: none;
+      left: 0;
+      width: 100%;
+      height: 100%;
+
+      fill: #e5e5e5;
+    }
+
+    footer a {
+      text-decoration: none;
+      color: white;
+      opacity: 0.85;
+      will-change: opacity;
+    }
+
+    footer a:hover {
+      opacity: 1;
+    }
+
+    @media (min-width: 44em) {
+      .container {
+        width: 95%;
+      }
+
+      .flex-rows {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .description {
+        width: 66%;
+        padding: 0 0 0 1em;
+      }
     }
   </style>
+
+  <script src="index.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify.min.js"></script>
 </head>
 <body>
-  <div>
-    <button>🎊🎉🎊</button>
+
+  <svg class="sprite" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="code" viewBox="0 0 14 16">
+        <!-- Icon from GitHub Octicons - https://github.com/primer/octicons/ -->
+        <path d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3 9.5 3ZM4.5 3L0 8 4.5 13 6 11.5 2.5 8 6 4.5 4.5 3 4.5 3Z"/>
+      </symbol>
+
+      <symbol id="heart" viewBox="0 0 12 16">
+        <!-- Icon from GitHub Octicons - https://github.com/primer/octicons/ -->
+        <path d="M11.2 3C10.68 2.37 9.95 2.05 9 2 8.03 2 7.31 2.42 6.8 3 6.29 3.58 6.02 3.92 6 4 5.98 3.92 5.72 3.58 5.2 3 4.68 2.42 4.03 2 3 2 2.05 2.05 1.31 2.38 0.8 3 0.28 3.61 0.02 4.28 0 5 0 5.52 0.09 6.52 0.67 7.67 1.25 8.82 3.01 10.61 6 13 8.98 10.61 10.77 8.83 11.34 7.67 11.91 6.51 12 5.5 12 5 11.98 4.28 11.72 3.61 11.2 2.98L11.2 3Z"/>
+      </symbol>
+
+      <symbol id="run" viewBox="0 0 10 10">
+        <path d="M2 2L8 6L2 10" />
+      </symbol>
+    </defs>
+  </svg>
+
+  <h1>Canvas Confetti</h1>
+
+  <div class="container">
+    <div class="group" data-name="cannon">
+      <div class="flex-rows">
+        <div class="left">
+          <h2>Basic Cannon</h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            The default mode... just your regular basic average blast of confetti. But it's still
+            a little cool, right?
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
   </div>
+
+  <div class="container">
+    <div class="group" data-name="party">
+      <div class="flex-rows">
+        <div class="left">
+          <h2>Party Mode</h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            Go crazy with some randomness. Shoot a random amount of confetti in random directions.
+            (Go ahead... you know you want to click that button more than once.)
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="group" data-name="fireworks">
+      <div class="flex-rows">
+        <div class="left">
+          <h2>Fireworks</h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            Why click a button repeatedly when you can have code do it for you? Shoot a firework
+            of confetti from a random location on the page 5 times per second.
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="group" data-name="snow">
+      <div class="flex-rows">
+        <div class="left">
+          <h2>Snow</h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            The effect is not limited to crazy rapid fire of confetti though. You can create a
+            wintery mood with gently falling particles across the entire page.
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="group" data-name="continuous">
+      <div class="flex-rows">
+        <div class="left">
+          <h2>School Pride</h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            But if you are into crazy rapid fire of confetti, what could be a better use than
+            to show everyone what you are all about? Tell people where you are from with two
+            confetti cannons from either side of the page.
+          </p>
+          <p>🌰 Go Buckeyes! 🌰</p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <footer>
+    <a href="https://github.com/catdad">
+      <span class="icon">
+        <svg class="icon"><use xlink:href="#code"></use></svg>
+      </span>
+      <span> with </span>
+      <span class="icon">
+        <svg class="icon"><use xlink:href="#heart"></use></svg>
+      </span>
+      <span> by <b>catdad</b></span>
+    </a>
+  </footer>
 
   <script>
     var modes = {
@@ -50,37 +333,6 @@
           particleCount: 100,
           spread: 70,
           origin: { y: 0.6 }
-        });
-      },
-      cannon3: function cannon() {
-        confetti({
-          particleCount: 40,
-          spread: 25,
-          angle: 30,
-          origin: { y: 0.6 }
-        });
-        confetti({
-          particleCount: 40,
-          spread: 25,
-          angle: 150,
-          origin: { y: 0.6 }
-        });
-        confetti({
-          particleCount: 40,
-          spread: 25,
-          angle: 90,
-          origin: { y: 0.6 }
-        });
-      },
-      rain: function rain() {
-        var velocity = document.body.clientWidth / 24;
-
-        confetti({
-          angle: 270,
-          spread: 220,
-          particleCount: 100,
-          startVelocity: velocity,
-          origin: { y: -0.2 }
         });
       },
       party: function party() {
@@ -95,32 +347,75 @@
           origin: { y: 0.6 }
         });
       },
-      wide: function business() {
-        var velocity = Math.max(
-          document.body.clientWidth / 24,
-          20
-        );
+      fireworks: function random() {
+        var end = Date.now() + (15 * 1000);
 
-        confetti({
-          angle: 90,
-          particleCount: 100,
-          startVelocity: velocity,
-          spread: 170,
-          origin: { y: 0.6 }
-        });
-      },
-      random: function random() {
-        confetti({
-          angle: 90,
-          particleCount: 100,
-          startVelocity: 30,
-          spread: 360,
-          origin: {
-            x: Math.random(),
-            // since they fall down, start a bit higher than random
-            y: Math.random() - 0.2
+        var interval = setInterval(function () {
+          if (Date.now() > end) {
+            return clearInterval(interval);
           }
-        });
+
+          confetti({
+            angle: 90,
+            particleCount: 50,
+            startVelocity: 30,
+            spread: 360,
+            ticks: 60,
+            origin: {
+              x: Math.random(),
+              // since they fall down, start a bit higher than random
+              y: Math.random() - 0.2
+            }
+          });
+        }, 200);
+      },
+      snow: function snow() {
+        var end = Date.now() + (15 * 1000);
+
+        (function frame() {
+          confetti({
+            particleCount: 1,
+            startVelocity: 0,
+            ticks: 300,
+            origin: {
+              x: Math.random(),
+              // since they fall down, start a bit higher than random
+              y: Math.random() - 0.2
+            },
+            colors: ['#ffffff']
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        }());
+      },
+      continuous: function continuous() {
+        var end = Date.now() + (15 * 1000);
+
+        // go Buckeyes!
+        var colors = ['#ff0000', '#ffffff'];
+
+        (function frame() {
+          confetti({
+            particleCount: 2,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: colors
+          });
+          confetti({
+            particleCount: 2,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: colors
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        }());
       }
     };
 
@@ -136,13 +431,50 @@
       }, time || 200);
     }
 
-    document.querySelector('button').onclick = function (ev) {
-      // clicking fast on mobile zoom... stop that
-      ev.preventDefault();
+    function pretty(val) {
+      return js_beautify(val);
+    }
 
-//      auto('cannon', 20, 100);
-      modes.cannon();
-    };
+    function getCode(name) {
+      // pretty-print the code, since we will use minified code in production
+      var code = pretty(modes[name].toString());
+      // take out the function wrapper, trim all whitespace
+      code = code.split('\n').slice(1).slice(0, -1).map(function (s) {
+        return s.trim();
+      }).join('\n');
+      // pretty-print again
+      return pretty(code);
+    }
+
+    [].forEach.call(document.querySelectorAll('.group'), function (group) {
+      var name = group.getAttribute('data-name');
+      var button = group.querySelector('.run');
+      var codeElem = group.querySelector('.editor');
+
+      var editor = ace.edit(codeElem);
+      editor.setTheme('ace/theme/monokai');
+      editor.session.setMode('ace/mode/javascript');
+
+      editor.session.setValue(getCode(name));
+
+      var count = editor.session.getLength();
+
+      // set height so that all code is visible
+      codeElem.style.minHeight = (14 * count) + 1 + 'px';
+      codeElem.style.height = (count) + 'rem';
+
+      button.onclick = function (ev) {
+        // stop mobile browsers from zooming when clicking
+        // buttons repeatedly really fast
+        ev.preventDefault();
+
+        try {
+          eval(editor.getValue());
+        } catch (e) {
+          console.error(e);
+        }
+      };
+    });
   </script>
 </body>
 </html>
