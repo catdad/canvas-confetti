@@ -27,7 +27,27 @@
     .group {
       position: relative;
       width: 100%;
-      padding: 30px 0;
+      margin: 50px 0;
+    }
+
+    .group .run {
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: white;
+      font-weight: bold;
+      z-index: 3;
+      background: none;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      opacity: 0.6;
+
+      transition: opacity 100ms ease;
+    }
+
+    .group .run:hover {
+      opacity: 1;
     }
 
     .editor {
@@ -211,8 +231,12 @@
 
       editor.session.setValue(getCode(name));
 
+      var count = editor.session.getLength();
+
+      // set height so that all code is visible
+      codeElem.style.height = (14 * count) + 1 + 'px';
+
       button.onclick = function () {
-        console.log('clicked');
         try {
           eval(editor.getValue());
         } catch (e) {
