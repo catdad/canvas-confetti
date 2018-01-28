@@ -85,6 +85,13 @@
     </div>
   </div>
 
+  <div class="container">
+    <div class="group" data-name="continuous">
+      <button class="run">Run ▶</button>
+      <div class="editor"></div>
+    </div>
+  </div>
+
   <script>
     var modes = {
       cannon: function cannon() {
@@ -163,6 +170,35 @@
             y: Math.random() - 0.2
           }
         });
+      },
+      continuous: function continuous() {
+        var duration = 15 * 1000;
+        var end = Date.now() + duration;
+
+        // red white and blue, #america
+        var colors = ['#ff0000', '#ffffff', '#0000ff'];
+        var n = 0;
+
+        (function frame() {
+          confetti({
+            particleCount: 3,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: [colors[n++ % colors.length]]
+          });
+          confetti({
+            particleCount: 3,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: [colors[n++ % colors.length]]
+          });
+
+          if (Date.now() < end) {
+            requestAnimationFrame(frame);
+          }
+        }());
       }
     };
 
@@ -176,36 +212,6 @@
 
         clearInterval(interval);
       }, time || 200);
-    }
-
-    function continuous() {
-      // do this for 30 seconds
-      var duration = 30 * 1000;
-      var end = Date.now() + duration;
-
-      var colors = ['#ff0000', '#ffffff', '#0000ff'];
-      var n = 0;
-
-      (function frame() {
-        confetti({
-          particleCount: 7,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 },
-          colors: [colors[n++ % colors.length]]
-        });
-        confetti({
-          particleCount: 7,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 },
-          colors: [colors[n++ % colors.length]]
-        });
-
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      }());
     }
 
     function pretty(val) {
