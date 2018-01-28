@@ -30,14 +30,18 @@
     .container {
       position: relative;
       max-width: 1000px;
-      width: 95%;
+      width: 100%;
       margin: 0 auto;
     }
 
     .group {
       position: relative;
       width: 100%;
-      margin: 50px 0;
+      margin: 40px 0;
+      padding-top: 16px;
+
+      border-top: 1px solid #3e3e3e;
+      border-radius: 20px;
     }
 
     .run {
@@ -76,16 +80,19 @@
 
     .flex-rows {
       position: relative;
-      display: flex;
-      flex-direction: row;
+      display: block;
       width: 100%;
       padding-bottom: 1em;
     }
 
     .description {
       display: flex;
-      width: 66%;
-      padding: 0 0 0 1em;
+      flex-direction: column;
+
+      width: 94%;
+      margin: 10px auto;
+      padding: 0;
+
       align-items: center;
       line-height: 1.5em;
     }
@@ -96,9 +103,19 @@
       flex-direction: column;
     }
 
-    @media (max-width: 44em) {
+    @media (min-width: 44em) {
       .container {
-        width: 100%;
+        width: 95%;
+      }
+
+      .flex-rows {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .description {
+        width: 66%;
+        padding: 0 0 0 1em;
       }
     }
   </style>
@@ -183,7 +200,8 @@
         <div class="description">
           But if you are into crazy rapid fire of confetti, what could be a better use than
           to show everyone what you are all about? Tell people where you are from with two
-          confetti cannons from either side of the page. 🌰 Go Buckeyes! 🌰
+          confetti cannons from either side of the page.
+          <p>🌰 Go Buckeyes! 🌰</p>
         </div>
       </div>
       <div class="editor"></div>
