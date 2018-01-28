@@ -12,13 +12,19 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      background: #4b4b4b;
+      background: #2e2e2e;
 
+      color: #eee;
       font-size: 1em;
+      font-family: sans-serif;
     }
 
     * {
       box-sizing: border-box;
+    }
+
+    h2 {
+      text-align: center;
     }
 
     .container {
@@ -34,14 +40,10 @@
       margin: 50px 0;
     }
 
-    .group .not-run {
-      position: absolute;
-      top: 0;
-      right: 0;
-      z-index: 3;
+    .run {
       padding: 6px;
 
-      background: none;
+      background: rgba(0,0,0,0.6);
       border: none;
       outline: none;
 
@@ -69,11 +71,11 @@
       display: flex;
       flex-direction: row;
       width: 100%;
+      padding-bottom: 1em;
     }
 
     .description {
       display: flex;
-      color: white;
       outline: 1px solid red;
       width: 66%;
       padding: 0 0 0 1em;
