@@ -152,8 +152,7 @@
         }, 200);
       },
       snow: function snow() {
-        var duration = 15 * 1000;
-        var end = Date.now() + duration;
+        var end = Date.now() + (15 * 1000);
 
         (function frame() {
           confetti({
@@ -174,8 +173,7 @@
         }());
       },
       continuous: function continuous() {
-        var duration = 15 * 1000;
-        var end = Date.now() + duration;
+        var end = Date.now() + (15 * 1000);
 
         // red white and blue, #america
         var colors = ['#ff0000', '#ffffff', '#0000ff'];
