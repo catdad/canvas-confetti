@@ -57,3 +57,33 @@ confetti({
   }
 });
 ```
+
+I said creative... we can do better. Since it doesn't matter how many times we call `confetti` (just the total number of confetti in the air), we can do some fun things, like continuously launch more and more confetti for 30 seconds, from multiple directions:
+
+```javascript
+// do this for 30 seconds
+var duration = 30 * 1000;
+var end = Date.now() + duration;
+
+(function frame() {
+  // launch a few confetti from the left edge
+  confetti({
+    particleCount: 7,
+    angle: 60,
+    spread: 55,
+    origin: { x: 0 }
+  });
+  // and launch a few from the right edge
+  confetti({
+    particleCount: 7,
+    angle: 120,
+    spread: 55,
+    origin: { x: 1 }
+  });
+
+  // keep going until we are out of time
+  if (Date.now() < end) {
+    requestAnimationFrame(frame);
+  }
+}());
+```
