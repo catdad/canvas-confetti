@@ -88,7 +88,7 @@
   </div>
 
   <div class="container">
-    <div class="group" data-name="random">
+    <div class="group" data-name="fireworks">
       <button class="run">Run ▶</button>
       <div class="editor"></div>
     </div>
@@ -107,26 +107,6 @@
         confetti({
           particleCount: 100,
           spread: 70,
-          origin: { y: 0.6 }
-        });
-      },
-      cannon3: function cannon() {
-        confetti({
-          particleCount: 40,
-          spread: 25,
-          angle: 30,
-          origin: { y: 0.6 }
-        });
-        confetti({
-          particleCount: 40,
-          spread: 25,
-          angle: 150,
-          origin: { y: 0.6 }
-        });
-        confetti({
-          particleCount: 40,
-          spread: 25,
-          angle: 90,
           origin: { y: 0.6 }
         });
       },
@@ -167,18 +147,28 @@
           origin: { y: 0.6 }
         });
       },
-      random: function random() {
-        confetti({
-          angle: 90,
-          particleCount: 100,
-          startVelocity: 30,
-          spread: 360,
-          origin: {
-            x: Math.random(),
-            // since they fall down, start a bit higher than random
-            y: Math.random() - 0.2
+      fireworks: function random() {
+        var end = Date.now() + (15 * 1000);
+
+        var interval = setInterval(function () {
+          if (Date.now() > end) {
+            return clearInterval(interval);
           }
-        });
+
+          confetti({
+            angle: 90,
+            particleCount: 50,
+            startVelocity: 30,
+            spread: 360,
+            ticks: 60,
+            origin: {
+              x: Math.random(),
+              // since they fall down, start a bit higher than random
+              y: Math.random() - 0.2
+            }
+          });
+        }, 200);
+
       },
       continuous: function continuous() {
         var duration = 15 * 1000;
