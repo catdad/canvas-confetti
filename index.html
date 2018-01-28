@@ -15,32 +15,54 @@
       width: 100%;
       height: 100%;
       background: #4b4b4b;
-      text-align: center;
     }
 
-    div {
+    .container {
+      position: relative;
+      max-width: 1000px;
+      width: 95%;
+      margin: 0 auto;
+    }
+
+    .group {
       position: relative;
       width: 100%;
-      height: 100%;
-      overflow: hidden;
+      padding: 30px 0;
     }
 
-    button {
+    .editor {
       position: relative;
-      top: 60%;
-      border: none;
-      outline: none;
-      background: #e5e5e5;
-      padding: 10px;
-      border-radius: 3px;
-      color: white;
-      font-weight: bold;
+      min-height: 100px;
     }
   </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify-css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify-html.min.js"></script>
 </head>
 <body>
-  <div>
-    <button>🎊🎉🎊</button>
+
+  <div class="container">
+    <div class="group" data-name="cannon">
+      <button class="run">Run ▶</button>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="group" data-name="party">
+      <button class="run">Run ▶</button>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="group" data-name="random">
+      <button class="run">Run ▶</button>
+      <div class="editor"></div>
+    </div>
   </div>
 
   <script>
@@ -136,13 +158,71 @@
       }, time || 200);
     }
 
-    document.querySelector('button').onclick = function (ev) {
-      // clicking fast on mobile zoom... stop that
-      ev.preventDefault();
+    function continuous() {
+      // do this for 30 seconds
+      var duration = 30 * 1000;
+      var end = Date.now() + duration;
 
-//      auto('cannon', 20, 100);
-      modes.cannon();
-    };
+      var colors = ['#ff0000', '#ffffff', '#0000ff'];
+      var n = 0;
+
+      (function frame() {
+        confetti({
+          particleCount: 7,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: [colors[n++ % colors.length]]
+        });
+        confetti({
+          particleCount: 7,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: [colors[n++ % colors.length]]
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+    }
+
+    function pretty(val) {
+      return js_beautify(val);
+    }
+
+    function getCode(name) {
+      // pretty-print the code, since we will use minified code in production
+      var code = pretty(modes[name].toString());
+      // take out the function wrapper, trim all whitespace
+      code = code.split('\n').slice(1).slice(0, -1).map(function (s) {
+        return s.trim();
+      }).join('\n');
+      // pretty-print again
+      return pretty(code);
+    }
+
+    [].forEach.call(document.querySelectorAll('.group'), function (group) {
+      var name = group.getAttribute('data-name');
+      var button = group.querySelector('.run');
+      var codeElem = group.querySelector('.editor');
+
+      var editor = ace.edit(codeElem);
+      editor.setTheme('ace/theme/monokai');
+      editor.session.setMode('ace/mode/javascript');
+
+      editor.session.setValue(getCode(name));
+
+      button.onclick = function () {
+        console.log('clicked');
+        try {
+          eval(editor.getValue());
+        } catch (e) {
+          console.error(e);
+        }
+      };
+    });
   </script>
 </body>
 </html>
