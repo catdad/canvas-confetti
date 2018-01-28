@@ -23,6 +23,10 @@
       box-sizing: border-box;
     }
 
+    .sprite {
+      display: none;
+    }
+
     h2 {
       text-align: center;
     }
@@ -94,13 +98,51 @@
       padding: 0;
 
       align-items: center;
-      line-height: 1.5em;
+      line-height: 1.5;
     }
 
     .left {
       flex-grow: 1;
       display: flex;
       flex-direction: column;
+    }
+
+    footer {
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 2;
+
+      background: rgba(255,255,255,0.1);
+    }
+
+    footer span {
+      vertical-align: middle;
+    }
+
+    span.icon {
+      position: relative;
+      display: inline-block;
+      height: 1.1em;
+      width: 1.1em;
+    }
+    svg.icon {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 100%;
+
+      fill: #e5e5e5;
+    }
+
+    footer a {
+      text-decoration: none;
+      color: white;
+      opacity: 0.85;
+      will-change: opacity;
+    }
+
+    footer a:hover {
+      opacity: 1;
     }
 
     @media (min-width: 44em) {
@@ -127,11 +169,25 @@
 </head>
 <body>
 
+  <svg class="sprite" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="code" viewBox="0 0 14 16">
+        <!-- Icon from GitHub Octicons - https://github.com/primer/octicons/ -->
+        <path d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3 9.5 3ZM4.5 3L0 8 4.5 13 6 11.5 2.5 8 6 4.5 4.5 3 4.5 3Z"/>
+      </symbol>
+
+      <symbol id="heart" viewBox="0 0 12 16">
+        <!-- Icon from GitHub Octicons - https://github.com/primer/octicons/ -->
+        <path d="M11.2 3C10.68 2.37 9.95 2.05 9 2 8.03 2 7.31 2.42 6.8 3 6.29 3.58 6.02 3.92 6 4 5.98 3.92 5.72 3.58 5.2 3 4.68 2.42 4.03 2 3 2 2.05 2.05 1.31 2.38 0.8 3 0.28 3.61 0.02 4.28 0 5 0 5.52 0.09 6.52 0.67 7.67 1.25 8.82 3.01 10.61 6 13 8.98 10.61 10.77 8.83 11.34 7.67 11.91 6.51 12 5.5 12 5 11.98 4.28 11.72 3.61 11.2 2.98L11.2 3Z"/>
+      </symbol>
+    </defs>
+  </svg>
+
   <div class="container">
     <div class="group" data-name="cannon">
       <div class="flex-rows">
         <div class="left">
-          <h2>Cannon</h2>
+          <h2>Basic Cannon</h2>
           <button class="run">Run ▶</button>
         </div>
         <div class="description">
@@ -147,7 +203,7 @@
     <div class="group" data-name="party">
       <div class="flex-rows">
         <div class="left">
-          <h2>Party</h2>
+          <h2>Party Mode</h2>
           <button class="run">Run ▶</button>
         </div>
         <div class="description">
@@ -208,6 +264,19 @@
       <div class="editor"></div>
     </div>
   </div>
+
+  <footer>
+    <a href="https://github.com/catdad">
+      <span class="icon">
+        <svg class="icon"><use xlink:href="#code"></use></svg>
+      </span>
+      <span> with </span>
+      <span class="icon">
+        <svg class="icon"><use xlink:href="#heart"></use></svg>
+      </span>
+      <span> by <b>catdad</b></span>
+    </a>
+  </footer>
 
   <script>
     var modes = {
