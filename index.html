@@ -17,6 +17,10 @@
       font-size: 1em;
     }
 
+    * {
+      box-sizing: border-box;
+    }
+
     .container {
       position: relative;
       max-width: 1000px;
@@ -30,7 +34,7 @@
       margin: 50px 0;
     }
 
-    .group .run {
+    .group .not-run {
       position: absolute;
       top: 0;
       right: 0;
@@ -57,6 +61,30 @@
     .editor {
       position: relative;
       min-height: 100px;
+      width: 100%;
+    }
+
+    .flex-rows {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+    }
+
+    .description {
+      display: flex;
+      color: white;
+      outline: 1px solid red;
+      width: 66%;
+      padding: 0 0 0 1em;
+      align-items: center;
+    }
+
+    .left {
+      flex-grow: 1;
+      outline: 1px solid blue;
+      display: flex;
+      flex-direction: column;
     }
 
     @media (max-width: 44em) {
@@ -75,14 +103,31 @@
 
   <div class="container">
     <div class="group" data-name="cannon">
-      <button class="run">Run ▶</button>
+      <div class="flex-rows">
+        <div class="left">
+          <h2>Cannon</h2>
+          <button class="run">Run ▶</button>
+        </div>
+        <div class="description">
+          The default mode... just your regular blast of confetti.
+        </div>
+      </div>
       <div class="editor"></div>
     </div>
   </div>
 
   <div class="container">
     <div class="group" data-name="party">
-      <button class="run">Run ▶</button>
+      <div class="flex-rows">
+        <div class="left">
+          <h2>Party</h2>
+          <button class="run">Run ▶</button>
+        </div>
+        <div class="description">
+          Go crazy with some randomness. Shot a random amount of confetti in random directions.
+          (Go ahead... you know you want to click that button more than once.)
+        </div>
+      </div>
       <div class="editor"></div>
     </div>
   </div>
