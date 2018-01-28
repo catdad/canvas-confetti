@@ -21,6 +21,7 @@
     ticks: 200,
     x: 0.5,
     y: 0.5,
+    zIndex: 100,
     colors: [
       '#26ccff',
       '#a25afd',
@@ -85,10 +86,7 @@
     canvas.style.top = '0px';
     canvas.style.left = '0px';
     canvas.style.pointerEvents = 'none';
-
-    if (Number(zIndex)) {
-      canvas.style.zIndex = zIndex;
-    }
+    canvas.style.zIndex = zIndex;
 
     return canvas;
   }
@@ -186,11 +184,12 @@
     var decay = prop(options, 'decay', Number);
     var colors = prop(options, 'colors');
     var ticks = prop(options, 'ticks', Number);
+    var zIndex = prop(options, 'zIndex', Number);
     var origin = getOrigin(options);
 
     var temp = particleCount;
     var fettis = [];
-    var canvas = animationObj ? animationObj.canvas : getCanvas(options ? options.zIndex : null);
+    var canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
 
     var startX = canvas.width * origin.x;
     var startY = canvas.height * origin.y;
