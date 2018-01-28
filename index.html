@@ -164,7 +164,8 @@
           <button class="run">Run ▶</button>
         </div>
         <div class="description">
-          Placeholder.
+          The effect is not limited to crazy rapid fire of confetti though. You can create a
+          wintery mood with gently falling particles across the entire page.
         </div>
       </div>
       <div class="editor"></div>
@@ -175,11 +176,13 @@
     <div class="group" data-name="continuous">
       <div class="flex-rows">
         <div class="left">
-          <h2>Continuous Fire</h2>
+          <h2>School Pride</h2>
           <button class="run">Run ▶</button>
         </div>
         <div class="description">
-          Placeholder.
+          But if you are into crazy rapid fire of confetti, what could be a better use than
+          to show everyone what you are all about? Tell people where you are from with two
+          confetti cannons from either side of the page. 🌰 Go Buckeyes! 🌰
         </div>
       </div>
       <div class="editor"></div>
@@ -253,9 +256,8 @@
       continuous: function continuous() {
         var end = Date.now() + (15 * 1000);
 
-        // red white and blue, #america
-        var colors = ['#ff0000', '#ffffff', '#0000ff'];
-        var n = 0;
+        // go Buckeyes!
+        var colors = ['#ff0000', '#ffffff'];
 
         (function frame() {
           confetti({
@@ -263,14 +265,14 @@
             angle: 60,
             spread: 55,
             origin: { x: 0 },
-            colors: [colors[n++ % colors.length]]
+            colors: colors
           });
           confetti({
             particleCount: 3,
             angle: 120,
             spread: 55,
             origin: { x: 1 },
-            colors: [colors[n++ % colors.length]]
+            colors: colors
           });
 
           if (Date.now() < end) {
