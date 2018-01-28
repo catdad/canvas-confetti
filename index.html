@@ -237,10 +237,10 @@
   </div>
 
   <div class="container">
-    <div class="group" data-name="party">
+    <div class="group" data-name="random">
       <div class="flex-rows">
         <div class="left">
-          <h2>Party Mode</h2>
+          <h2>Random Cannon</h2>
           <button class="run">
             Run
             <span class="icon">
@@ -352,7 +352,7 @@
           origin: { y: 0.6 }
         });
       },
-      party: function party() {
+      random: function random() {
         function r(min, max) {
           return Math.random() * (max - min) + min;
         }
@@ -364,7 +364,7 @@
           origin: { y: 0.6 }
         });
       },
-      fireworks: function random() {
+      fireworks: function fireworks() {
         var end = Date.now() + (15 * 1000);
 
         var interval = setInterval(function () {
