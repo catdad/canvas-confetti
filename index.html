@@ -6,8 +6,6 @@
   <meta name="theme-color" content="#393939">
   <title>🎊</title>
 
-  <script src="index.js"></script>
-
   <style>
     html, body {
       margin: 0;
@@ -34,15 +32,18 @@
       position: absolute;
       top: 0;
       right: 0;
-      color: white;
-      font-weight: bold;
       z-index: 3;
+
       background: none;
       border: none;
       outline: none;
-      cursor: pointer;
-      opacity: 0.6;
 
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+
+      opacity: 0.6;
       transition: opacity 100ms ease;
     }
 
@@ -55,6 +56,8 @@
       min-height: 100px;
     }
   </style>
+
+  <script src="index.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify.min.js"></script>
