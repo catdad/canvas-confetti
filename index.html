@@ -122,11 +122,12 @@
     span.icon {
       position: relative;
       display: inline-block;
-      height: 1.1em;
-      width: 1.1em;
+      height: 1em;
+      width: 1em;
     }
     svg.icon {
       position: absolute;
+      pointer-events: none;
       left: 0;
       width: 100%;
       height: 100%;
@@ -180,6 +181,10 @@
         <!-- Icon from GitHub Octicons - https://github.com/primer/octicons/ -->
         <path d="M11.2 3C10.68 2.37 9.95 2.05 9 2 8.03 2 7.31 2.42 6.8 3 6.29 3.58 6.02 3.92 6 4 5.98 3.92 5.72 3.58 5.2 3 4.68 2.42 4.03 2 3 2 2.05 2.05 1.31 2.38 0.8 3 0.28 3.61 0.02 4.28 0 5 0 5.52 0.09 6.52 0.67 7.67 1.25 8.82 3.01 10.61 6 13 8.98 10.61 10.77 8.83 11.34 7.67 11.91 6.51 12 5.5 12 5 11.98 4.28 11.72 3.61 11.2 2.98L11.2 3Z"/>
       </symbol>
+
+      <symbol id="run" viewBox="0 0 10 10">
+        <path d="M2 2L8 6L2 10" />
+      </symbol>
     </defs>
   </svg>
 
@@ -188,7 +193,12 @@
       <div class="flex-rows">
         <div class="left">
           <h2>Basic Cannon</h2>
-          <button class="run">Run ▶</button>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
         </div>
         <div class="description">
           The default mode... just your regular basic average blast of confetti. But it's still
@@ -204,7 +214,12 @@
       <div class="flex-rows">
         <div class="left">
           <h2>Party Mode</h2>
-          <button class="run">Run ▶</button>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
         </div>
         <div class="description">
           Go crazy with some randomness. Shoot a random amount of confetti in random directions.
@@ -220,7 +235,12 @@
       <div class="flex-rows">
         <div class="left">
           <h2>Fireworks</h2>
-          <button class="run">Run ▶</button>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
         </div>
         <div class="description">
           Why click a button repeatedly when you can have code do it for you? Shoot a firework
@@ -236,7 +256,12 @@
       <div class="flex-rows">
         <div class="left">
           <h2>Snow</h2>
-          <button class="run">Run ▶</button>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
         </div>
         <div class="description">
           The effect is not limited to crazy rapid fire of confetti though. You can create a
@@ -252,7 +277,12 @@
       <div class="flex-rows">
         <div class="left">
           <h2>School Pride</h2>
-          <button class="run">Run ▶</button>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
         </div>
         <div class="description">
           But if you are into crazy rapid fire of confetti, what could be a better use than
