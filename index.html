@@ -29,6 +29,14 @@
       display: none;
     }
 
+    a.github-corner {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 80px;
+      height: 80px;
+    }
+
     h1, h2 {
       text-align: center;
     }
@@ -191,8 +199,17 @@
       <symbol id="run" viewBox="0 0 10 10">
         <path d="M2 2L8 6L2 10" />
       </symbol>
+
+      <symbol id="octo" viewBox="0 0 80 80">
+       <!-- Adapted from Tim Holman's GitHub Corners - https://github.com/tholman/github-corners -->
+        <path d="M0 0L36.8 36.8 45.3 45.3 80 80 80 0 0 0ZM40.6 34.6C36.3 31.7 38.1 28.8 38.1 28.8 39 26.6 38.7 25.3 38.7 25.3 38.4 23 39.7 24.6 39.7 24.6 41 26.2 40.3 28.2 40.3 28.2 39.6 30.7 41 32.2 42.3 32.9L42.9 32.3C43.8 31.7 44.8 31.4 45.4 31.4 42.9 27.8 40.6 23.7 46.1 18.2 47.7 16.6 49.3 16 51.2 16 51.5 15.4 52.2 13.8 55 12.5 55 12.5 56.6 13.4 57.3 17.6 58.6 18.2 59.8 19.2 61.1 20.5 62.4 21.8 63.4 23 64 24.3 68.5 25.3 69.4 26.6 69.4 26.6 68.2 29.1 66.6 30.1 65.9 30.1 65.9 32 65.3 33.6 63.7 35.2 58.6 40.3 54.1 38.6 50.6 36 50.6 37 50.2 38 49 39.4Q45.9 42.8 45.2 43.6C44.7 44.2 45.3 45.3 45.3 45.3L36.8 36.8C36.8 36.8 37.8 37.4 38.4 36.8L40.6 34.6Z"/>
+      </symbol>
     </defs>
   </svg>
+
+  <a class="github-corner" href="https://github.com/catdad/canvas-confetti" aria-label="View source on Github">
+    <svg class="icon"><use xlink:href="#octo"></use></svg>
+  </a>
 
   <h1>Canvas Confetti</h1>
 
@@ -394,7 +411,7 @@
         var end = Date.now() + (15 * 1000);
 
         // go Buckeyes!
-        var colors = ['#ff0000', '#ffffff'];
+        var colors = ['#bb0000', '#ffffff'];
 
         (function frame() {
           confetti({
