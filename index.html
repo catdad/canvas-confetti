@@ -342,7 +342,8 @@
       var count = editor.session.getLength();
 
       // set height so that all code is visible
-      codeElem.style.height = (14 * count) + 1 + 'px';
+      codeElem.style.minHeight = (14 * count) + 1 + 'px';
+      codeElem.style.height = (count) + 'rem';
 
       button.onclick = function () {
         try {
