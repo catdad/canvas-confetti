@@ -1,1 +1,4 @@
-es6: true
+env:
+  es6: false
+  browser: true
+
