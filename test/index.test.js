@@ -5,6 +5,7 @@ import test from 'ava';
 import puppeteer from 'puppeteer';
 import send from 'send';
 import root from 'rootrequire';
+import jimp from 'jimp';
 
 const PORT = 9999;
 
@@ -67,6 +68,32 @@ function confetti(opts) {
   return `confetti(${opts ? JSON.stringify(opts) : ''});`;
 }
 
+function hex(n) {
+  const pad = (n) => {
+    while (n.length < 2) {
+      n = '0'+n;
+    }
+    return n;
+  };
+
+  return pad(n.toString(16));
+}
+
+const uniqueColors = async (buffer) => {
+  const image = await jimp.read(buffer);
+  const pixels = new Set();
+
+  image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
+    const r = image.bitmap.data[idx + 0];
+    const g = image.bitmap.data[idx + 1];
+    const b = image.bitmap.data[idx + 2];
+
+    pixels.add(`#${hex(r)}${hex(g)}${hex(b)}`);
+  });
+
+  return Array.from(pixels);
+};
+
 test.before(async () => {
   await testServer();
   await testBrowser();
@@ -87,6 +114,22 @@ test.after(async () => {
   });
 });
 
+test('shoots default confetti', async t => {
+  const page = await fixturePage();
+
+  await page.evaluate(confetti());
+
+  const buffer = await page.screenshot({
+    path: path.resolve(root, 'shots/0.png'),
+    type: 'png'
+  });
+
+  const pixels = await uniqueColors(buffer);
+  console.log('default', pixels.length);
+
+  t.pass();
+});
+
 test('shoots red confetti', async t => {
   const page = await fixturePage();
 
@@ -94,10 +137,13 @@ test('shoots red confetti', async t => {
     colors: ['#ff0000']
   }));
 
-  await page.screenshot({
+  const buffer = await page.screenshot({
     path: path.resolve(root, 'shots/1.png'),
     type: 'png'
   });
+
+  const pixels = await uniqueColors(buffer);
+  console.log('red', pixels.length);
 
   t.pass();
 });
@@ -109,10 +155,13 @@ test('shoots blue confetti', async t => {
     colors: ['#0000ff']
   }));
 
-  await page.screenshot({
+  const buffer = await page.screenshot({
     path: path.resolve(root, 'shots/2.png'),
     type: 'png'
   });
+
+  const pixels = await uniqueColors(buffer);
+  console.log('blue', pixels.length);
 
   t.pass();
 });

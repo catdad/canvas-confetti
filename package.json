@@ -22,7 +22,9 @@
     "ava": "^0.25.0",
     "babel-eslint": "^8.2.1",
     "eslint": "^4.16.0",
+    "jimp": "^0.2.28",
     "puppeteer": "^1.0.0",
+    "rootrequire": "^1.0.0",
     "send": "^0.16.1",
     "static-server": "^3.0.0"
   }
