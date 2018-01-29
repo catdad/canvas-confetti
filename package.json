@@ -4,7 +4,7 @@
   "description": "canvas-confetti",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ava test/**/*.test.js",
     "dev": "static-server --port 9001"
   },
   "repository": {
@@ -18,6 +18,9 @@
   },
   "homepage": "https://github.com/catdad/canvas-confetti#readme",
   "devDependencies": {
+    "ava": "^0.25.0",
+    "eslint": "^4.16.0",
+    "puppeteer": "^1.0.0",
     "static-server": "^3.0.0"
   }
 }
