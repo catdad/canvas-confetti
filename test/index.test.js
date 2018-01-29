@@ -14,14 +14,14 @@ const testServer = (function startServer() {
   return function () {
     return new Promise((resolve) => {
       if (server) {
-        return resolve();
+        return resolve(server);
       }
 
       server = http.createServer(function (req, res) {
         var file = path.resolve(root, req.url.slice(1));
         send(req, file).pipe(res);
       }).listen(PORT, () => {
-        resolve();
+        resolve(server);
       });
     });
   };
@@ -63,6 +63,11 @@ test.after(async () => {
 
   const browser = await testBrowser();
   await browser.close();
+
+  const server = await testServer();
+  await new Promise(resolve => {
+    server.close(() => resolve());
+  });
 });
 
 test('browses to the thing', async t => {
