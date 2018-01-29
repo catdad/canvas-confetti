@@ -50,6 +50,23 @@ const testPage = async () => {
   return page;
 };
 
+const fixturePage = async () => {
+  const page = await testPage();
+  await page.goto(`http://localhost:${PORT}/fixtures/page.html`);
+
+  return page;
+};
+
+const sleep = (time) => {
+  return new Promise(resolve => {
+    setTimeout(() => resolve(), time);
+  });
+};
+
+function confetti(opts) {
+  return `confetti(${opts ? JSON.stringify(opts) : ''});`;
+}
+
 test.before(async () => {
   await testServer();
   await testBrowser();
@@ -70,9 +87,32 @@ test.after(async () => {
   });
 });
 
-test('browses to the thing', async t => {
-  const page = await testPage();
-  await page.goto(`http://localhost:${PORT}/fixtures/page.html`);
+test('shoots red confetti', async t => {
+  const page = await fixturePage();
+
+  await page.evaluate(confetti({
+    colors: ['#ff0000']
+  }));
+
+  await page.screenshot({
+    path: path.resolve(root, 'shots/1.png'),
+    type: 'png'
+  });
+
+  t.pass();
+});
+
+test('shoots blue confetti', async t => {
+  const page = await fixturePage();
+
+  await page.evaluate(confetti({
+    colors: ['#0000ff']
+  }));
+
+  await page.screenshot({
+    path: path.resolve(root, 'shots/2.png'),
+    type: 'png'
+  });
 
   t.pass();
 });
