@@ -1,7 +1,10 @@
 import http from 'http';
+import path from 'path';
 
 import test from 'ava';
 import puppeteer from 'puppeteer';
+import send from 'send';
+import root from 'rootrequire';
 
 const PORT = 9999;
 
@@ -9,13 +12,14 @@ const testServer = (function startServer() {
   let server;
 
   return function () {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (server) {
         return resolve();
       }
 
       server = http.createServer(function (req, res) {
-        res.end('sdgdasgdasg adsgsda gdfa gdfsg fds gsdf');
+        var file = path.resolve(root, req.url.slice(1));
+        send(req, file).pipe(res);
       }).listen(PORT, () => {
         resolve();
       });
@@ -52,13 +56,18 @@ test.before(async () => {
 });
 
 test.after(async () => {
+  // wait a while, so I can see the browser
+  await new Promise(resolve => {
+    setTimeout(resolve, 10 * 1000);
+  });
+
   const browser = await testBrowser();
   await browser.close();
 });
 
 test('browses to the thing', async t => {
   const page = await testPage();
-  await page.goto(`http://localhost:${PORT}`);
+  await page.goto(`http://localhost:${PORT}/fixtures/page.html`);
 
   t.pass();
 });
