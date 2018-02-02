@@ -135,6 +135,9 @@ test.afterEach.always(async (t) => {
     return;
   }
 
+  // this is allowed, but still needs the eslint plugin to be updated
+  // https://github.com/avajs/eslint-plugin-ava/issues/176
+  // eslint-disable-next-line ava/use-t-well
   const name = t.title.replace(/^afterEach for /, '');
 
   await promisify(fs.writeFile)(`shots/${name}.original.png`, t.context.buffer);
