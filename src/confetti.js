@@ -1,5 +1,3 @@
-/* jshint browser: true */
-
 !(function (context, module) {
   var frame = (function(){
     return window.requestAnimationFrame ||
