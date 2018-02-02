@@ -2,7 +2,7 @@
   "name": "canvas-confetti",
   "version": "0.0.1",
   "description": "canvas-confetti",
-  "main": "index.js",
+  "main": "src/confetti.js",
   "scripts": {
     "test": "ava test/**/*.test.js",
     "lint": "eslint index.js test/**/*.js",
