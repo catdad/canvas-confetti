@@ -1,5 +1,7 @@
+import fs from 'fs';
 import http from 'http';
 import path from 'path';
+import { promisify } from 'util';
 
 import test from 'ava';
 import puppeteer from 'puppeteer';
@@ -36,7 +38,7 @@ const testBrowser = (() => {
       return Promise.resolve(browser);
     }
 
-    return puppeteer.launch({ headless: false }).then(thisBrowser => {
+    return puppeteer.launch({ headless: true }).then(thisBrowser => {
       browser = thisBrowser;
       return Promise.resolve(browser);
     });
@@ -80,7 +82,7 @@ function hex(n) {
 }
 
 const uniqueColors = async (buffer) => {
-  const image = await jimp.read(buffer);
+  const image = Buffer.isBuffer(buffer) ? await jimp.read(buffer) : buffer;
   const pixels = new Set();
 
   image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
@@ -94,17 +96,22 @@ const uniqueColors = async (buffer) => {
   return Array.from(pixels);
 };
 
+const reduceImg = async (buffer) => {
+  const image = await jimp.read(buffer);
+
+  // basically dialate the crap out of everything
+  image.blur(10);
+  image.posterize(0.1);
+
+  return image;
+};
+
 test.before(async () => {
   await testServer();
   await testBrowser();
 });
 
 test.after(async () => {
-  // wait a while, so I can see the browser
-  await new Promise(resolve => {
-    setTimeout(resolve, 10 * 1000);
-  });
-
   const browser = await testBrowser();
   await browser.close();
 
@@ -114,20 +121,41 @@ test.after(async () => {
   });
 });
 
+// hack to get the status of a test, until AVA implements this
+// https://github.com/avajs/ava/issues/840
+test.beforeEach((t) => {
+  t.context.passing = false;
+});
+test.afterEach((t) => {
+  t.context.passing = true;
+});
+
+test.afterEach.always(async (t) => {
+  if (t.context.passing) {
+    return;
+  }
+
+  // this is allowed, but still needs the eslint plugin to be updated
+  // https://github.com/avajs/eslint-plugin-ava/issues/176
+  // eslint-disable-next-line ava/use-t-well
+  const name = t.title.replace(/^afterEach for /, '');
+
+  await promisify(fs.writeFile)(`shots/${name}.original.png`, t.context.buffer);
+  await promisify(t.context.image.write.bind(t.context.image))(`shots/${name}.reduced.png`);
+});
+
 test('shoots default confetti', async t => {
   const page = await fixturePage();
 
   await page.evaluate(confetti());
 
-  const buffer = await page.screenshot({
-    path: path.resolve(root, 'shots/0.png'),
-    type: 'png'
-  });
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
 
-  const pixels = await uniqueColors(buffer);
-  console.log('default', pixels.length);
+  const pixels = await uniqueColors(t.context.image);
+  pixels.sort();
 
-  t.pass();
+  t.is(pixels.length, 8);
 });
 
 test('shoots red confetti', async t => {
@@ -137,15 +165,13 @@ test('shoots red confetti', async t => {
     colors: ['#ff0000']
   }));
 
-  const buffer = await page.screenshot({
-    path: path.resolve(root, 'shots/1.png'),
-    type: 'png'
-  });
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
 
-  const pixels = await uniqueColors(buffer);
-  console.log('red', pixels.length);
+  const pixels = await uniqueColors(t.context.image);
+  pixels.sort();
 
-  t.pass();
+  t.deepEqual(pixels, ['#ff0000', '#ffffff']);
 });
 
 test('shoots blue confetti', async t => {
@@ -155,13 +181,11 @@ test('shoots blue confetti', async t => {
     colors: ['#0000ff']
   }));
 
-  const buffer = await page.screenshot({
-    path: path.resolve(root, 'shots/2.png'),
-    type: 'png'
-  });
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
 
-  const pixels = await uniqueColors(buffer);
-  console.log('blue', pixels.length);
+  const pixels = await uniqueColors(t.context.image);
+  pixels.sort();
 
-  t.pass();
+  t.deepEqual(pixels, ['#0000ff', '#ffffff']);
 });
