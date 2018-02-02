@@ -1,5 +1,6 @@
 import http from 'http';
 import path from 'path';
+import { promisify } from 'util';
 
 import test from 'ava';
 import puppeteer from 'puppeteer';
@@ -80,7 +81,7 @@ function hex(n) {
 }
 
 const uniqueColors = async (buffer) => {
-  const image = await jimp.read(buffer);
+  const image = Buffer.isBuffer(buffer) ? await jimp.read(buffer) : buffer;
   const pixels = new Set();
 
   image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
@@ -92,6 +93,18 @@ const uniqueColors = async (buffer) => {
   });
 
   return Array.from(pixels);
+};
+
+const reduceImg = async (buffer, name) => {
+  const image = await jimp.read(buffer);
+
+  // basically dialate the crap out of everything
+  image.blur(10);
+  image.posterize(0.1);
+
+  await promisify(image.write.bind(image))(name);
+
+  return image;
 };
 
 test.before(async () => {
@@ -124,10 +137,12 @@ test('shoots default confetti', async t => {
     type: 'png'
   });
 
-  const pixels = await uniqueColors(buffer);
-  console.log('default', pixels.length);
+  const image = await reduceImg(buffer, 'shots/0-reduced.png');
 
-  t.pass();
+  const pixels = await uniqueColors(image);
+  pixels.sort();
+
+  t.is(pixels.length, 8);
 });
 
 test('shoots red confetti', async t => {
@@ -142,10 +157,12 @@ test('shoots red confetti', async t => {
     type: 'png'
   });
 
-  const pixels = await uniqueColors(buffer);
-  console.log('red', pixels.length);
+  const image = await reduceImg(buffer, 'shots/1-reduced.png');
 
-  t.pass();
+  const pixels = await uniqueColors(image);
+  pixels.sort();
+
+  t.deepEqual(pixels, ['#ff0000', '#ffffff']);
 });
 
 test('shoots blue confetti', async t => {
@@ -160,8 +177,10 @@ test('shoots blue confetti', async t => {
     type: 'png'
   });
 
-  const pixels = await uniqueColors(buffer);
-  console.log('blue', pixels.length);
+  const image = await reduceImg(buffer, 'shots/2-reduced.png');
 
-  t.pass();
+  const pixels = await uniqueColors(image);
+  pixels.sort();
+
+  t.deepEqual(pixels, ['#0000ff', '#ffffff']);
 });
