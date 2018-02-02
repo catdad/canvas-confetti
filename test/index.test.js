@@ -100,8 +100,8 @@ const reduceImg = async (buffer) => {
   const image = await jimp.read(buffer);
 
   // basically dialate the crap out of everything
-  image.blur(10);
-  image.posterize(0.1);
+  image.blur(2);
+  image.posterize(1);
 
   return image;
 };
