@@ -80,8 +80,8 @@
     var canvas = document.createElement('canvas');
     var rect = document.body.getBoundingClientRect();
 
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    canvas.width = rect.width || window.innerWidth;
+    canvas.height = rect.height || window.innerHeight;
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
     canvas.style.left = '0px';

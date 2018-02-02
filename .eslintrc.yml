@@ -1,0 +1,4 @@
+env:
+  es6: false
+  browser: true
+
