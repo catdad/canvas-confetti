@@ -4,6 +4,8 @@
   "description": "canvas-confetti",
   "main": "src/confetti.js",
   "scripts": {
+    "build": "node build/build.js",
+    "pretest": "npm run build -s",
     "test": "ava test/**/*.test.js",
     "lint": "eslint index.js test/**/*.js",
     "dev": "static-server --port 9001"
