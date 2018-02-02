@@ -37,7 +37,7 @@ const testBrowser = (() => {
       return Promise.resolve(browser);
     }
 
-    return puppeteer.launch({ headless: false }).then(thisBrowser => {
+    return puppeteer.launch({ headless: true }).then(thisBrowser => {
       browser = thisBrowser;
       return Promise.resolve(browser);
     });
@@ -113,11 +113,6 @@ test.before(async () => {
 });
 
 test.after(async () => {
-  // wait a while, so I can see the browser
-  await new Promise(resolve => {
-    setTimeout(resolve, 10 * 1000);
-  });
-
   const browser = await testBrowser();
   await browser.close();
 
