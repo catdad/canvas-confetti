@@ -59,9 +59,9 @@ const testPage = async () => {
   return page;
 };
 
-const fixturePage = async () => {
+const fixturePage = async (urlPath = 'fixtures/page.html') => {
   const page = await testPage();
-  await page.goto(`http://localhost:${PORT}/fixtures/page.html`);
+  await page.goto(`http://localhost:${PORT}/${urlPath}`);
 
   return page;
 };
@@ -195,4 +195,20 @@ test('shoots blue confetti', async t => {
   pixels.sort();
 
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
+});
+
+test('works using the browserify bundle', async t => {
+  const page = await fixturePage('fixtures/page.browserify.html');
+
+  await page.evaluate(confetti({
+    colors: ['#00ff00']
+  }));
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+  pixels.sort();
+
+  t.deepEqual(pixels, ['#00ff00', '#ffffff']);
 });

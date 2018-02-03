@@ -2,8 +2,11 @@
   "name": "canvas-confetti",
   "version": "0.0.1",
   "description": "canvas-confetti",
-  "main": "index.js",
+  "main": "src/confetti.js",
   "scripts": {
+    "build": "node build/build.js",
+    "browserify": "browserify --entry src/confetti.js --outfile temp/confetti.bundle.js --standalone confetti",
+    "pretest": "npm run build -s && npm run browserify -s",
     "test": "ava test/**/*.test.js",
     "lint": "eslint index.js test/**/*.js",
     "dev": "static-server --port 9001"
@@ -21,6 +24,7 @@
   "devDependencies": {
     "ava": "^0.25.0",
     "babel-eslint": "^8.2.1",
+    "browserify": "^15.2.0",
     "eslint": "^4.16.0",
     "eslint-plugin-ava": "^4.5.0",
     "jimp": "^0.2.28",

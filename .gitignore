@@ -37,3 +37,5 @@ node_modules/
 coverage/
 .nyc_output/
 shots/
+dist/
+temp/
