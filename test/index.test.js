@@ -196,3 +196,19 @@ test('shoots blue confetti', async t => {
 
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
 });
+
+test('works using the browserify bundle', async t => {
+  const page = await fixturePage('fixtures/page.browserify.html');
+
+  await page.evaluate(confetti({
+    colors: ['#00ff00']
+  }));
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+  pixels.sort();
+
+  t.deepEqual(pixels, ['#00ff00', '#ffffff']);
+});
