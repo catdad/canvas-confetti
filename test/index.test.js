@@ -66,6 +66,7 @@ const fixturePage = async () => {
   return page;
 };
 
+// eslint-disable-next-line no-unused-vars
 const sleep = (time) => {
   return new Promise(resolve => {
     setTimeout(() => resolve(), time);
