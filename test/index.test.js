@@ -11,6 +11,12 @@ import jimp from 'jimp';
 
 const PORT = 9999;
 
+// Docker-based CIs need this disabled
+// https://github.com/Quramy/puppeteer-example/blob/c28a5aa52fe3968c2d6cfca362ec28c36963be26/README.md#with-docker-based-ci-services
+const args = process.env.CI ? [
+  '--no-sandbox', '--disable-setuid-sandbox'
+] : [];
+
 const testServer = (function startServer() {
   let server;
 
@@ -38,7 +44,7 @@ const testBrowser = (() => {
       return Promise.resolve(browser);
     }
 
-    return puppeteer.launch({ headless: true }).then(thisBrowser => {
+    return puppeteer.launch({ headless: true, args }).then(thisBrowser => {
       browser = thisBrowser;
       return Promise.resolve(browser);
     });
