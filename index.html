@@ -183,12 +183,15 @@
     }
   </style>
 
-  <!-- this page is a demo that is not built, so fudge the module.exports support -->
   <script>
+    // this page is a demo that is not built, so fudge the module.exports support
+    // define a global `module` so that the actual source file can use it
     window.module = {};
   </script>
   <script src="src/confetti.js"></script>
   <script>
+    // define the `module.exports` as the `confetti` global, the way that the
+    // cdn distributed file would
     window.confetti = module.exports;
   </script>
 
