@@ -59,9 +59,9 @@ const testPage = async () => {
   return page;
 };
 
-const fixturePage = async (path = 'fixtures/page.html') => {
+const fixturePage = async (urlPath = 'fixtures/page.html') => {
   const page = await testPage();
-  await page.goto(`http://localhost:${PORT}/${path}`);
+  await page.goto(`http://localhost:${PORT}/${urlPath}`);
 
   return page;
 };
