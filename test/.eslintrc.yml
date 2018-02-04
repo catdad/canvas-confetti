@@ -9,4 +9,5 @@ parserOptions:
   sourceType: module
 plugins:
   - ava
-
+rules:
+  semi: [ error, always ]
