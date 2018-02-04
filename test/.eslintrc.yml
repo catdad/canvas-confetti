@@ -1,5 +1,4 @@
 extends:
-  - eslint:recommended
   - plugin:ava/recommended
 env:
   es6: true
@@ -9,5 +8,3 @@ parserOptions:
   sourceType: module
 plugins:
   - ava
-rules:
-  semi: [ error, always ]
