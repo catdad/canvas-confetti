@@ -220,8 +220,6 @@
     animationObj = animate(canvas, fettis, function () {
       animationObj = null;
       document.body.removeChild(canvas);
-
-      console.log('done!');
     });
   }
 
