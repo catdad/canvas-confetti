@@ -36,6 +36,8 @@ Temporary Items
 node_modules/
 coverage/
 .nyc_output/
+
+# project-specific stuff
 shots/
 dist/
 temp/
