@@ -8,7 +8,7 @@
     "browserify": "browserify --entry src/confetti.js --outfile temp/confetti.bundle.js --standalone confetti",
     "pretest": "npm run build -s && npm run browserify -s",
     "test": "ava test/**/*.test.js",
-    "lint": "eslint index.js test/**/*.js",
+    "lint": "eslint src/**/*.js test/**/*.js build/**/*.js",
     "dev": "static-server --port 9001"
   },
   "repository": {

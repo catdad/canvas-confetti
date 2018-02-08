@@ -7,4 +7,18 @@ node_js:
   - '8'
 
 script:
+  - npm run lint
   - npm test
+
+after_script:
+  - ls
+
+deploy:
+  provider: npm
+  email: vatev.1+npm@gmail.com
+  skip_cleanup: true
+  api_key:
+    secure: YbQELGFgyM0h3FfZBR7ZyX7foUszZOsZOwqlDDgNC7b3t1DaknpUJK7iriO4YlyeRUDbULB+JJrcod3J9KaI7ZyNpwm5vXCU431svxlZru0c/HWt8Y+q3A5OTyPHav5rZK9MeMQkltK/IAf4FIaE9Yr4VfsWXNbFeuy3CkiWEF0vKruhZiG5ELWB/rd9kDV+E6zVRYvgMJcYVg+JZgYVy8MChsk12pL+7oAtPcGBZaV8RTTfDJIEdDYZ6A00IfrQGcMkNoxRGLPwOE6u/Dc5K8vt23KU6mzPh81HG8CGoDB/1NHMRzBlVRoNnqrybguWWDkCgSndPGCIec2g/Ht6AUbYe8AKzTNxVDYbaoXJqThTGpt5sftYn/P1PdxCkUoukGxlMWYsmKhUJRc7IXbbNW/WhnMiHo8hoQGtAoZYVwycCd07OGZHsCxt3mCcSsPqxnRDqLgtj55oGhV6SxYN0YR5ZawnLr5O8tilzIajsPVlTPtHoAx/IByr13JdYoVAm8ClmOiTGS6CogXe8jJkzKxuxQ7mmFtn3LP0aMzeUTRVbjjKaoH91MES72mKtbC93AFt+KiMkGKxngFvp6MOybTiKC8YWAV513EnRfNzcAcxtNzNGTeANYrU2mZ0y3yLW4SOeq39OQu6QL/Qeb2S21tPX79CKr2YZD5N+2VgS30=
+  on:
+    tags: true
+    repo: catdad/canvas-confetti
