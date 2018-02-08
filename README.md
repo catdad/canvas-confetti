@@ -1,11 +1,14 @@
 # canvas-confetti
 
 [![travis][travis.svg]][travis.link]
+[![jsdelivr][jsdelivr.svg]][jsdelivr.link]
 [![npm-downloads][npm-downloads.svg]][npm.link]
 [![npm-version][npm-version.svg]][npm.link]
 
 [travis.svg]: https://travis-ci.org/catdad/canvas-confetti.svg?branch=master
 [travis.link]: https://travis-ci.org/catdad/canvas-confetti
+[jsdelivr.svg]: https://data.jsdelivr.com/v1/package/npm/canvas-confetti/badge?style=rounded
+[jsdelivr.link]: https://www.jsdelivr.com/package/npm/canvas-confetti
 [npm-downloads.svg]: https://img.shields.io/npm/dm/canvas-confetti.svg
 [npm.link]: https://www.npmjs.com/package/canvas-confetti
 [npm-version.svg]: https://img.shields.io/npm/v/canvas-confetti.svg
