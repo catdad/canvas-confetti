@@ -14,6 +14,22 @@
 
 [catdad.github.io/canvas-confetti](https://catdad.github.io/canvas-confetti/)
 
+## Install
+
+You can install this module as a component from NPM:
+
+```bash
+npm install --save canvas-confetti
+```
+
+You can then `require('canvas-confetti');` to use it in your project build. _Note that this is a client component, and will not run in Node. You will need to build your project with something like [webpack](https://github.com/webpack/webpack) in order to use this._
+
+You can also include this library in your HTML page directly from a CDN:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@0.0.1/dist/confetti.browser.min.js"></script>
+```
+
 ## API
 
 This library is exposed as a `confetti` function on `window`. It takes a single optional `options` object, which has the following properties:
