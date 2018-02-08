@@ -1,5 +1,7 @@
 # canvas-confetti
 
+[![Build Status](https://travis-ci.org/catdad/canvas-confetti.svg?branch=master)](https://travis-ci.org/catdad/canvas-confetti)
+
 ## Demo
 
 [catdad.github.io/canvas-confetti](https://catdad.github.io/canvas-confetti/)
