@@ -73,9 +73,9 @@ const sleep = (time) => {
   });
 };
 
-function confetti(opts) {
+function confetti(opts, wait = false) {
   return `
-confetti.Promise = null;
+${wait ? '' : 'confetti.Promise = null;'}
 confetti(${opts ? JSON.stringify(opts) : ''});
 `;
 }
@@ -198,6 +198,21 @@ test('shoots blue confetti', async t => {
   pixels.sort();
 
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
+});
+
+test('uses promises when available', async t => {
+  const page = await fixturePage();
+
+  await page.evaluate(confetti({}, true));
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+  pixels.sort();
+
+  // make sure that all confetti have disappeared
+  t.deepEqual(pixels, ['#ffffff']);
 });
 
 test('works using the browserify bundle', async t => {
