@@ -1,6 +1,6 @@
 {
   "name": "canvas-confetti",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "canvas-confetti",
   "main": "src/confetti.js",
   "scripts": {
