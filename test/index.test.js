@@ -150,8 +150,15 @@ test.afterEach.always(async (t) => {
   // eslint-disable-next-line ava/use-t-well
   const name = t.title.replace(/^afterEach for /, '');
 
-  await promisify(fs.writeFile)(`shots/${name}.original.png`, t.context.buffer);
-  await promisify(t.context.image.write.bind(t.context.image))(`shots/${name}.reduced.png`);
+  // save the raw buffer image, if one is present
+  if (t.context.buffer) {
+    await promisify(fs.writeFile)(`shots/${name}.original.png`, t.context.buffer);
+  }
+
+  // save the simplified/tested image, if one is present
+  if (t.context.image) {
+    await promisify(t.context.image.write.bind(t.context.image))(`shots/${name}.reduced.png`);
+  }
 });
 
 test('shoots default confetti', async t => {
