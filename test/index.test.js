@@ -17,6 +17,18 @@ const args = process.env.CI ? [
   '--no-sandbox', '--disable-setuid-sandbox'
 ] : [];
 
+const mkdir = async (dir) => {
+  return promisify(fs.mkdir)(dir)
+    .then(() => Promise.resolve())
+    .catch(err => {
+      if (err.code === 'EEXIST') {
+        return Promise.resolve();
+      }
+
+      return Promise.reject(err);
+    });
+};
+
 const testServer = (function startServer() {
   let server;
 
@@ -134,6 +146,7 @@ const reduceImg = async (buffer) => {
 };
 
 test.before(async () => {
+  await mkdir('./shots');
   await testServer();
   await testBrowser();
 });
