@@ -44,7 +44,8 @@ When installed from `npm`, this library can be required as a client component in
 `confetti` takes a single optional object. When `window.Promise` is available, it will return a Promise to let you know when it is done. When promises are not available (like in IE), it will return `null`. You can polyfill promises using any of the popular polyfills. You can also provide a promise implementation to `confetti` through:
 
 ```javascript
-var MyPromise = require('some-promise-lib');
+const MyPromise = require('some-promise-lib');
+const confetti = require('canvas-confetti');
 confetti.Promise = MyPromise;
 ```
 
