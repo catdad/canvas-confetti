@@ -1,6 +1,4 @@
-/* jshint browser: true */
-
-!(function (context, module) {
+(function () {
   var frame = (function(){
     return window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
@@ -34,6 +32,20 @@
   };
 
   var animationObj;
+
+  function noop() {}
+
+  // create a promise if it exists, otherwise, just
+  // call the function directly
+  function promise(func) {
+    if (module.exports.Promise) {
+      return new module.exports.Promise(func);
+    }
+
+    func(noop, noop);
+
+    return null;
+  }
 
   function convert(val, transform) {
     return transform ? transform(val) : val;
@@ -80,8 +92,8 @@
     var canvas = document.createElement('canvas');
     var rect = document.body.getBoundingClientRect();
 
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    canvas.width = document.documentElement.clientWidth || rect.width || window.innerWidth;
+    canvas.height = document.documentElement.clientHeight || rect.height || window.innerHeight;
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
     canvas.style.left = '0px';
@@ -152,27 +164,33 @@
     var width = canvas.width;
     var height = canvas.height;
 
-    function update() {
-      context.clearRect(0, 0, width, height);
+    var prom = promise(function (resolve) {
+      function update() {
+        context.clearRect(0, 0, width, height);
 
-      animatingFettis = animatingFettis.filter(function (fetti) {
-        return updateFetti(context, fetti);
-      });
+        animatingFettis = animatingFettis.filter(function (fetti) {
+          return updateFetti(context, fetti);
+        });
 
-      if (animatingFettis.length) {
-        frame(update);
-      } else {
-        done();
+        if (animatingFettis.length) {
+          frame(update);
+        } else {
+          done();
+          resolve();
+        }
       }
-    }
 
-    frame(update);
+      frame(update);
+    });
 
     return {
       addFettis: function (fettis) {
         animatingFettis = animatingFettis.concat(fettis);
+
+        return prom;
       },
-      canvas: canvas
+      canvas: canvas,
+      promise: prom
     };
   }
 
@@ -212,9 +230,7 @@
     // if we have a previous canvas already animating,
     // add to it
     if (animationObj) {
-      animationObj.addFettis(fettis);
-
-      return;
+      return animationObj.addFettis(fettis);
     }
 
     document.body.appendChild(canvas);
@@ -222,14 +238,11 @@
     animationObj = animate(canvas, fettis, function () {
       animationObj = null;
       document.body.removeChild(canvas);
-
-      console.log('done!');
     });
+
+    return animationObj.promise;
   }
 
-  if (module !== undefined) {
-    module.exports = confetti;
-  } else {
-    context.confetti = confetti;
-  }
-}(this, this.module)); // jshint ignore:line
+  module.exports = confetti;
+  module.exports.Promise = window.Promise || null;
+}());

@@ -38,6 +38,16 @@ coverage/
 .nyc_output/
 
 # project-specific stuff
+test/
 shots/
-dist/
 temp/
+build/
+fixtures/
+index.html
+
+# dotfiles don't need to be in npm
+.brackets.json
+.editorconfig
+.eslintrc*
+.travis.yml
+.gitattributes

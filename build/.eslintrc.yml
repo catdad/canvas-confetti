@@ -1,0 +1,7 @@
+env:
+  es6: true
+  node: true
+  browser: false
+parser: babel-eslint
+rules:
+  no-console: off

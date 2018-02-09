@@ -1,12 +1,59 @@
 # canvas-confetti
 
+[![travis][travis.svg]][travis.link]
+[![jsdelivr][jsdelivr.svg]][jsdelivr.link]
+[![npm-downloads][npm-downloads.svg]][npm.link]
+[![npm-version][npm-version.svg]][npm.link]
+
+[travis.svg]: https://travis-ci.org/catdad/canvas-confetti.svg?branch=master
+[travis.link]: https://travis-ci.org/catdad/canvas-confetti
+[jsdelivr.svg]: https://data.jsdelivr.com/v1/package/npm/canvas-confetti/badge?style=rounded
+[jsdelivr.link]: https://www.jsdelivr.com/package/npm/canvas-confetti
+[npm-downloads.svg]: https://img.shields.io/npm/dm/canvas-confetti.svg
+[npm.link]: https://www.npmjs.com/package/canvas-confetti
+[npm-version.svg]: https://img.shields.io/npm/v/canvas-confetti.svg
+
 ## Demo
 
 [catdad.github.io/canvas-confetti](https://catdad.github.io/canvas-confetti/)
 
+## Install
+
+You can install this module as a component from NPM:
+
+```bash
+npm install --save canvas-confetti
+```
+
+You can then `require('canvas-confetti');` to use it in your project build. _Note: this is a client component, and will not run in Node. You will need to build your project with something like [webpack](https://github.com/webpack/webpack) in order to use this._
+
+You can also include this library in your HTML page directly from a CDN:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@0.0.2/dist/confetti.browser.min.js"></script>
+```
+
+_Note: you should use the latest version at the time that you include your project. You can see all versions [on the releases page](https://github.com/catdad/canvas-confetti/releases)._
+
 ## API
 
-This library is exposed as a `confetti` function on `window`. It takes a single optional `options` object, which has the following properties:
+When installed from `npm`, this library can be required as a client component in your project build. When using the CDN version, it is exposed as a `confetti` function on `window`.
+
+### `confetti([options {Object}])` → `Promise|null`
+
+`confetti` takes a single optional object. When `window.Promise` is available, it will return a Promise to let you know when it is done. When promises are not available (like in IE), it will return `null`. You can polyfill promises using any of the popular polyfills. You can also provide a promise implementation to `confetti` through:
+
+```javascript
+const MyPromise = require('some-promise-lib');
+const confetti = require('canvas-confetti');
+confetti.Promise = MyPromise;
+```
+
+If you call `confetti` multiple times before it is done, it will return the same promise every time. Internally, the same canvas element will be reused, continuing the existing animation with the new confetti added. The promise returned by each call to `confetti` will resolve once all animations are done.
+
+#### `options`
+
+The `confetti` parameter is a single optional `options` object, which has the following properties:
 
 - `particleCount` _Integer (default: 50)_: The number of confetti to launch. More is always fun... but be cool, there's a lot of math involved.
 - `angle` _Number (default: 90)_: The angle in which to launch the confetti, in degrees. 90 is straight up.

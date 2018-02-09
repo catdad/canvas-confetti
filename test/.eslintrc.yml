@@ -1,0 +1,11 @@
+extends:
+  - plugin:ava/recommended
+env:
+  es6: true
+  node: true
+  browser: false
+parser: babel-eslint
+parserOptions:
+  sourceType: module
+plugins:
+  - ava

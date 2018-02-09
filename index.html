@@ -183,7 +183,17 @@
     }
   </style>
 
-  <script src="index.js"></script>
+  <script>
+    // this page is a demo that is not built, so fudge the module.exports support
+    // define a global `module` so that the actual source file can use it
+    window.module = {};
+  </script>
+  <script src="src/confetti.js"></script>
+  <script>
+    // define the `module.exports` as the `confetti` global, the way that the
+    // cdn distributed file would
+    window.confetti = module.exports;
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify.min.js"></script>
@@ -379,8 +389,6 @@
           }
 
           confetti({
-            angle: 90,
-            particleCount: 50,
             startVelocity: 30,
             spread: 360,
             ticks: 60,
