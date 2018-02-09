@@ -141,7 +141,7 @@ test.afterEach((t) => {
 });
 
 test.afterEach.always(async t => {
-  if (t.context.passing) {
+  if (t.context.passing && !process.env['CONFETTI_SHOW']) {
     return;
   }
 
