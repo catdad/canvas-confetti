@@ -74,7 +74,10 @@ const sleep = (time) => {
 };
 
 function confetti(opts) {
-  return `confetti(${opts ? JSON.stringify(opts) : ''});`;
+  return `
+confetti.Promise = null;
+confetti(${opts ? JSON.stringify(opts) : ''});
+`;
 }
 
 function hex(n) {
