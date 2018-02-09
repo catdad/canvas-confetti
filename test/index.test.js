@@ -73,8 +73,11 @@ const sleep = (time) => {
   });
 };
 
-function confetti(opts) {
-  return `confetti(${opts ? JSON.stringify(opts) : ''});`;
+function confetti(opts, wait = false) {
+  return `
+${wait ? '' : 'confetti.Promise = null;'}
+confetti(${opts ? JSON.stringify(opts) : ''});
+`;
 }
 
 function hex(n) {
@@ -137,7 +140,7 @@ test.afterEach((t) => {
   t.context.passing = true;
 });
 
-test.afterEach.always(async (t) => {
+test.afterEach.always(async t => {
   if (t.context.passing) {
     return;
   }
@@ -147,8 +150,15 @@ test.afterEach.always(async (t) => {
   // eslint-disable-next-line ava/use-t-well
   const name = t.title.replace(/^afterEach for /, '');
 
-  await promisify(fs.writeFile)(`shots/${name}.original.png`, t.context.buffer);
-  await promisify(t.context.image.write.bind(t.context.image))(`shots/${name}.reduced.png`);
+  // save the raw buffer image, if one is present
+  if (t.context.buffer) {
+    await promisify(fs.writeFile)(`shots/${name}.original.png`, t.context.buffer);
+  }
+
+  // save the simplified/tested image, if one is present
+  if (t.context.image) {
+    await promisify(t.context.image.write.bind(t.context.image))(`shots/${name}.reduced.png`);
+  }
 });
 
 test('shoots default confetti', async t => {
@@ -195,6 +205,42 @@ test('shoots blue confetti', async t => {
   pixels.sort();
 
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
+});
+
+test('uses promises when available', async t => {
+  const page = await fixturePage();
+
+  await page.evaluate(confetti({}, true));
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+  pixels.sort();
+
+  // make sure that all confetti have disappeared
+  t.deepEqual(pixels, ['#ffffff']);
+});
+
+test('removes the canvas when done', async t => {
+  const page = await fixturePage();
+
+  function hasCanvas() {
+    return page.evaluate(`!!document.querySelector('canvas')`);
+  }
+
+  // make sure there is no canvas before executing confetti
+  t.is(await hasCanvas(), false);
+
+  const promise = page.evaluate(confetti({}, true));
+
+  // confetti is running, make sure a canvas exists
+  t.is(await hasCanvas(), true);
+
+  await promise;
+
+  // confetti is done, canvas should be gone now
+  t.is(await hasCanvas(), false);
 });
 
 test('works using the browserify bundle', async t => {
