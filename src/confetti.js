@@ -33,6 +33,20 @@
 
   var animationObj;
 
+  function noop() {}
+
+  // create a promise if it exists, otherwise, just
+  // call the function directly
+  function promise(func) {
+    if (module.exports.Promise) {
+      return new module.exports.Promise(func);
+    }
+
+    func(noop, noop);
+
+    return null;
+  }
+
   function convert(val, transform) {
     return transform ? transform(val) : val;
   }
@@ -150,27 +164,33 @@
     var width = canvas.width;
     var height = canvas.height;
 
-    function update() {
-      context.clearRect(0, 0, width, height);
+    var prom = promise(function (resolve) {
+      function update() {
+        context.clearRect(0, 0, width, height);
 
-      animatingFettis = animatingFettis.filter(function (fetti) {
-        return updateFetti(context, fetti);
-      });
+        animatingFettis = animatingFettis.filter(function (fetti) {
+          return updateFetti(context, fetti);
+        });
 
-      if (animatingFettis.length) {
-        frame(update);
-      } else {
-        done();
+        if (animatingFettis.length) {
+          frame(update);
+        } else {
+          done();
+          resolve();
+        }
       }
-    }
 
-    frame(update);
+      frame(update);
+    });
 
     return {
       addFettis: function (fettis) {
         animatingFettis = animatingFettis.concat(fettis);
+
+        return prom;
       },
-      canvas: canvas
+      canvas: canvas,
+      promise: prom
     };
   }
 
@@ -210,9 +230,7 @@
     // if we have a previous canvas already animating,
     // add to it
     if (animationObj) {
-      animationObj.addFettis(fettis);
-
-      return;
+      return animationObj.addFettis(fettis);
     }
 
     document.body.appendChild(canvas);
@@ -221,7 +239,10 @@
       animationObj = null;
       document.body.removeChild(canvas);
     });
+
+    return animationObj.promise;
   }
 
   module.exports = confetti;
+  module.exports.Promise = window.Promise || null;
 }());
