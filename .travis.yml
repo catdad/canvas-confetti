@@ -8,7 +8,7 @@ node_js:
 
 script:
   - npm run lint
-  - npm test
+  - npm run citest
 
 after_script:
   - ls
