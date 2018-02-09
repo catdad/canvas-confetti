@@ -107,7 +107,7 @@ const uniqueColors = async (buffer) => {
     pixels.add(`#${hex(r)}${hex(g)}${hex(b)}`);
   });
 
-  return Array.from(pixels).sort();;
+  return Array.from(pixels).sort();
 };
 
 const reduceImg = async (buffer) => {
