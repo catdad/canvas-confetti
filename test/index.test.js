@@ -110,6 +110,19 @@ const uniqueColors = async (buffer) => {
   return Array.from(pixels).sort();
 };
 
+const uniqueColorsBySide = async (buffer) => {
+  const image = await readImage(buffer);
+
+  const { width, height } = image.bitmap;
+  const leftImage = image.clone().crop(0, 0, width / 2, height);
+  const rightImage = image.clone().crop(width / 2, 0, width/2, height);
+
+  return {
+    left: await uniqueColors(leftImage),
+    right: await uniqueColors(rightImage)
+  };
+};
+
 const reduceImg = async (buffer) => {
   const image = await jimp.read(buffer);
 
@@ -206,6 +219,27 @@ test('shoots blue confetti', async t => {
   const pixels = await uniqueColors(t.context.image);
 
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
+});
+
+test('shoots confetti to the left', async t => {
+  const page = await fixturePage();
+
+  await page.evaluate(confetti({
+    colors: ['#0000ff'],
+    particleCount: 1000,
+    angle: 180,
+    startVelocity: 20
+  }));
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColorsBySide(t.context.image);
+
+  // left side has stuff on it
+  t.deepEqual(pixels.left, ['#0000ff', '#ffffff']);
+  // right side is all white
+  t.deepEqual(pixels.right, ['#ffffff']);
 });
 
 test('uses promises when available', async t => {
