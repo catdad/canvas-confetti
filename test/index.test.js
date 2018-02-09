@@ -242,6 +242,27 @@ test('shoots confetti to the left', async t => {
   t.deepEqual(pixels.right, ['#ffffff']);
 });
 
+test('shoots confetti to the right', async t => {
+  const page = await fixturePage();
+
+  await page.evaluate(confetti({
+    colors: ['#0000ff'],
+    particleCount: 1000,
+    angle: 0,
+    startVelocity: 20
+  }));
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColorsBySide(t.context.image);
+
+  // right side has stuff on it
+  t.deepEqual(pixels.right, ['#0000ff', '#ffffff']);
+  // left side is all white
+  t.deepEqual(pixels.left, ['#ffffff']);
+});
+
 test('uses promises when available', async t => {
   const page = await fixturePage();
 
