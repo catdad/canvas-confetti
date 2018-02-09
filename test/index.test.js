@@ -215,6 +215,27 @@ test('uses promises when available', async t => {
   t.deepEqual(pixels, ['#ffffff']);
 });
 
+test('removes the canvas when done', async t => {
+  const page = await fixturePage();
+
+  function hasCanvas() {
+    return page.evaluate(`!!document.querySelector('canvas')`);
+  }
+
+  // make sure there is no canvas before executing confetti
+  t.is(await hasCanvas(), false);
+
+  const promise = page.evaluate(confetti({}, true));
+
+  // confetti is running, make sure a canvas exists
+  t.is(await hasCanvas(), true);
+
+  await promise;
+
+  // confetti is done, canvas should be gone now
+  t.is(await hasCanvas(), false);
+});
+
 test('works using the browserify bundle', async t => {
   const page = await fixturePage('fixtures/page.browserify.html');
 
