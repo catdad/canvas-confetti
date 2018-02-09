@@ -37,7 +37,22 @@ _Note: you should use the latest version at the time that you include your proje
 
 ## API
 
-This library is exposed as a `confetti` function on `window`. It takes a single optional `options` object, which has the following properties:
+When installed from `npm`, this library can be required as a client component in your project build. When using the CDN version, it is exposed as a `confetti` function on `window`.
+
+### `confetti([options {Object}])` → `Promise|null`
+
+`confetti` takes a single optional object. When `window.Promise` is available, it will return a Promise to let you know when it is done. When promises are not available (like in IE), it will return `null`. You can polyfill promises using any of the popular polyfills. You can also provide a promise implementation to `confetti` through:
+
+```javascript
+var MyPromise = require('some-promise-lib');
+confetti.Promise = MyPromise;
+```
+
+If you call `confetti` multiple times before it is done, it will return the same promise every time. Internally, the same canvas element will be reused, continuing the existing animation with the new confetti added. The promise returned by each call to `confetti` will resolve once all animations are done.
+
+#### `options`
+
+The `confetti` parameter is a single optional `options` object, which has the following properties:
 
 - `particleCount` _Integer (default: 50)_: The number of confetti to launch. More is always fun... but be cool, there's a lot of math involved.
 - `angle` _Number (default: 90)_: The angle in which to launch the confetti, in degrees. 90 is straight up.
