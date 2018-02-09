@@ -91,8 +91,12 @@ function hex(n) {
   return pad(n.toString(16));
 }
 
+const readImage = async (buffer) => {
+  return await (Buffer.isBuffer(buffer) ? jimp.read(buffer) : Promise.resolve(buffer));
+};
+
 const uniqueColors = async (buffer) => {
-  const image = Buffer.isBuffer(buffer) ? await jimp.read(buffer) : buffer;
+  const image = await readImage(buffer);
   const pixels = new Set();
 
   image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
@@ -103,7 +107,7 @@ const uniqueColors = async (buffer) => {
     pixels.add(`#${hex(r)}${hex(g)}${hex(b)}`);
   });
 
-  return Array.from(pixels);
+  return Array.from(pixels).sort();;
 };
 
 const reduceImg = async (buffer) => {
@@ -170,7 +174,6 @@ test('shoots default confetti', async t => {
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
-  pixels.sort();
 
   t.is(pixels.length, 8);
 });
@@ -186,7 +189,6 @@ test('shoots red confetti', async t => {
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
-  pixels.sort();
 
   t.deepEqual(pixels, ['#ff0000', '#ffffff']);
 });
@@ -202,7 +204,6 @@ test('shoots blue confetti', async t => {
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
-  pixels.sort();
 
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
 });
@@ -216,7 +217,6 @@ test('uses promises when available', async t => {
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
-  pixels.sort();
 
   // make sure that all confetti have disappeared
   t.deepEqual(pixels, ['#ffffff']);
@@ -254,7 +254,6 @@ test('works using the browserify bundle', async t => {
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
-  pixels.sort();
 
   t.deepEqual(pixels, ['#00ff00', '#ffffff']);
 });
