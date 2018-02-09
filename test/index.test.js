@@ -140,7 +140,7 @@ test.afterEach((t) => {
   t.context.passing = true;
 });
 
-test.afterEach.always(async (t) => {
+test.afterEach.always(async t => {
   if (t.context.passing) {
     return;
   }
