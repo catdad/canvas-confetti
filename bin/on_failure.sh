@@ -2,7 +2,7 @@ upload_file () {
   filename=$1
   urlname=${filename// /_}
 
-  downloadurl=`curl --upload-file "./$filename" https://transfer.sh/$urlname`
+  downloadurl=`curl -sS --upload-file "./$filename" https://transfer.sh/$urlname`
 
   echo image \"$filename\"
   echo "  uploaded to: $downloadurl"
