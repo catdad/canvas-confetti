@@ -1,5 +1,12 @@
+green=`tput setaf 2`
+reset=`tput sgr0`
+
 line_break () {
   echo --------------------------------------
+}
+
+print_green () {
+  echo "${green}$@${reset}"
 }
 
 upload_file () {
@@ -9,7 +16,7 @@ upload_file () {
   downloadurl=`curl -sS --upload-file "./$filename" https://transfer.sh/$urlname`
 
   echo image \"$filename\"
-  echo "  uploaded to: $downloadurl"
+  print_green "  uploaded to: $downloadurl"
 }
 
 find_files () {
