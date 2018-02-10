@@ -1,3 +1,7 @@
+line_break () {
+  echo --------------------------------------
+}
+
 upload_file () {
   filename=$1
   urlname=${filename// /_}
@@ -6,11 +10,14 @@ upload_file () {
 
   echo image \"$filename\"
   echo "  uploaded to: $downloadurl"
-  echo --------------------------------------
 }
 
 find_files () {
   cd shots
+
+  echo list of files present:
+  ls -l
+  line_break
 
   for i in *.png;do upload_file "$i";done
 }
