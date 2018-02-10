@@ -311,4 +311,6 @@ test('works using the browserify bundle', async t => {
   const pixels = await uniqueColors(t.context.image);
 
   t.deepEqual(pixels, ['#00ff00', '#ffffff']);
+
+  t.is(false, true);
 });
