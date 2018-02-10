@@ -13,6 +13,9 @@ script:
 after_script:
   - ls
 
+after_failure:
+  - ./bin/on_failure.sh
+
 deploy:
   provider: npm
   email: vatev.1+npm@gmail.com
