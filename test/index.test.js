@@ -219,9 +219,7 @@ test.afterEach.always(async t => {
 test('shoots default confetti', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti());
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.buffer = await confettiImage(page);
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
