@@ -92,6 +92,18 @@ confetti(${opts ? JSON.stringify(opts) : ''});
 `;
 }
 
+function confettiImage(opts) {
+  return `
+  confetti(${opts ? JSON.stringify(opts) : ''});
+  new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      var canvas = document.querySelector('canvas');
+      return resolve(canvas.toDataURL('image/png'));
+    }, 300);
+  });
+`;
+}
+
 function hex(n) {
   const pad = (n) => {
     while (n.length < 2) {
@@ -135,8 +147,18 @@ const uniqueColorsBySide = async (buffer) => {
   };
 };
 
-const reduceImg = async (buffer) => {
+const removeOpacity = async (buffer) => {
   const image = await jimp.read(buffer);
+  image.rgba(false).background(0xFFFFFFFF);
+  var opaqueBuffer = await promisify(image.getBuffer.bind(image))(jimp.MIME_PNG);
+
+  return await jimp.read(opaqueBuffer);
+};
+
+const reduceImg = async (buffer, opaque = false) => {
+  const image = opaque ?
+    await await removeOpacity(buffer) :
+    await jimp.read(buffer);
 
   // basically dialate the crap out of everything
   image.blur(2);
