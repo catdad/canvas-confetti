@@ -216,6 +216,10 @@ test.afterEach.always(async t => {
   }
 });
 
+/*
+ * Image-based tests
+ */
+
 test('shoots default confetti', async t => {
   const page = await fixturePage();
 
@@ -295,6 +299,10 @@ test('shoots confetti to the right', async t => {
   t.deepEqual(pixels.left, ['#ffffff']);
 });
 
+/*
+ * Operational tests
+ */
+
 test('uses promises when available', async t => {
   const page = await fixturePage();
 
@@ -329,6 +337,10 @@ test('removes the canvas when done', async t => {
   // confetti is done, canvas should be gone now
   t.is(await hasCanvas(), false);
 });
+
+/*
+ * Browserify tests
+ */
 
 test('works using the browserify bundle', async t => {
   const page = await fixturePage('fixtures/page.browserify.html');
