@@ -234,11 +234,9 @@ test('shoots default confetti', async t => {
 test('shoots red confetti', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti({
+  t.context.buffer = await confettiImage(page, {
     colors: ['#ff0000']
-  }));
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  });
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
@@ -249,11 +247,9 @@ test('shoots red confetti', async t => {
 test('shoots blue confetti', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti({
+  t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff']
-  }));
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  });
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
