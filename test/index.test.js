@@ -158,7 +158,7 @@ const removeOpacity = async (buffer) => {
   return await jimp.read(opaqueBuffer);
 };
 
-const reduceImg = async (buffer, opaque = false) => {
+const reduceImg = async (buffer, opaque = true) => {
   const image = opaque ?
     await await removeOpacity(buffer) :
     await jimp.read(buffer);
