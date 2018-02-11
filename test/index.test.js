@@ -260,14 +260,12 @@ test('shoots blue confetti', async t => {
 test('shoots confetti to the left', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti({
+  t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff'],
-    particleCount: 1000,
+    particleCount: 100,
     angle: 180,
     startVelocity: 20
-  }));
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  });
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColorsBySide(t.context.image);
@@ -281,14 +279,12 @@ test('shoots confetti to the left', async t => {
 test('shoots confetti to the right', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti({
+  t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff'],
-    particleCount: 1000,
+    particleCount: 100,
     angle: 0,
     startVelocity: 20
-  }));
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  });
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColorsBySide(t.context.image);
