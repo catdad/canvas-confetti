@@ -92,16 +92,19 @@ confetti(${opts ? JSON.stringify(opts) : ''});
 `;
 }
 
-function confettiImage(opts) {
-  return `
-  confetti(${opts ? JSON.stringify(opts) : ''});
+async function confettiImage(page, opts = {}) {
+  const base64png = await page.evaluate(`
+  confetti(${JSON.stringify(opts)});
   new Promise(function (resolve, reject) {
     setTimeout(function () {
       var canvas = document.querySelector('canvas');
       return resolve(canvas.toDataURL('image/png'));
-    }, 300);
+    }, 200);
   });
-`;
+`);
+
+  const imageData = base64png.replace(/data:image\/png;base64,/, '');
+  return new Buffer(imageData, 'base64');
 }
 
 function hex(n) {
