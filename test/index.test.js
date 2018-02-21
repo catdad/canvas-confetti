@@ -17,6 +17,18 @@ const args = process.env.CI ? [
   '--no-sandbox', '--disable-setuid-sandbox'
 ] : [];
 
+const mkdir = async (dir) => {
+  return promisify(fs.mkdir)(dir)
+    .then(() => Promise.resolve())
+    .catch(err => {
+      if (err.code === 'EEXIST') {
+        return Promise.resolve();
+      }
+
+      return Promise.reject(err);
+    });
+};
+
 const testServer = (function startServer() {
   let server;
 
@@ -80,6 +92,21 @@ confetti(${opts ? JSON.stringify(opts) : ''});
 `;
 }
 
+async function confettiImage(page, opts = {}) {
+  const base64png = await page.evaluate(`
+  confetti(${JSON.stringify(opts)});
+  new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      var canvas = document.querySelector('canvas');
+      return resolve(canvas.toDataURL('image/png'));
+    }, 200);
+  });
+`);
+
+  const imageData = base64png.replace(/data:image\/png;base64,/, '');
+  return new Buffer(imageData, 'base64');
+}
+
 function hex(n) {
   const pad = (n) => {
     while (n.length < 2) {
@@ -123,8 +150,18 @@ const uniqueColorsBySide = async (buffer) => {
   };
 };
 
-const reduceImg = async (buffer) => {
+const removeOpacity = async (buffer) => {
   const image = await jimp.read(buffer);
+  image.rgba(false).background(0xFFFFFFFF);
+  var opaqueBuffer = await promisify(image.getBuffer.bind(image))(jimp.MIME_PNG);
+
+  return await jimp.read(opaqueBuffer);
+};
+
+const reduceImg = async (buffer, opaque = true) => {
+  const image = opaque ?
+    await await removeOpacity(buffer) :
+    await jimp.read(buffer);
 
   // basically dialate the crap out of everything
   image.blur(2);
@@ -134,6 +171,7 @@ const reduceImg = async (buffer) => {
 };
 
 test.before(async () => {
+  await mkdir('./shots');
   await testServer();
   await testBrowser();
 });
@@ -178,12 +216,14 @@ test.afterEach.always(async t => {
   }
 });
 
+/*
+ * Image-based tests
+ */
+
 test('shoots default confetti', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti());
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.buffer = await confettiImage(page);
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
@@ -194,11 +234,9 @@ test('shoots default confetti', async t => {
 test('shoots red confetti', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti({
+  t.context.buffer = await confettiImage(page, {
     colors: ['#ff0000']
-  }));
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  });
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
@@ -209,11 +247,9 @@ test('shoots red confetti', async t => {
 test('shoots blue confetti', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti({
+  t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff']
-  }));
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  });
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
@@ -224,14 +260,12 @@ test('shoots blue confetti', async t => {
 test('shoots confetti to the left', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti({
+  t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff'],
-    particleCount: 1000,
+    particleCount: 100,
     angle: 180,
     startVelocity: 20
-  }));
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  });
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColorsBySide(t.context.image);
@@ -245,14 +279,12 @@ test('shoots confetti to the left', async t => {
 test('shoots confetti to the right', async t => {
   const page = await fixturePage();
 
-  await page.evaluate(confetti({
+  t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff'],
-    particleCount: 1000,
+    particleCount: 100,
     angle: 0,
     startVelocity: 20
-  }));
-
-  t.context.buffer = await page.screenshot({ type: 'png' });
+  });
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColorsBySide(t.context.image);
@@ -262,6 +294,10 @@ test('shoots confetti to the right', async t => {
   // left side is all white
   t.deepEqual(pixels.left, ['#ffffff']);
 });
+
+/*
+ * Operational tests
+ */
 
 test('uses promises when available', async t => {
   const page = await fixturePage();
@@ -297,6 +333,10 @@ test('removes the canvas when done', async t => {
   // confetti is done, canvas should be gone now
   t.is(await hasCanvas(), false);
 });
+
+/*
+ * Browserify tests
+ */
 
 test('works using the browserify bundle', async t => {
   const page = await fixturePage('fixtures/page.browserify.html');
