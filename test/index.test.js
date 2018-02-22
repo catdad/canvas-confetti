@@ -354,16 +354,17 @@ test('handles window resizes', async t => {
   // for 10 seconds... that should be longer than
   // this test... we won't wait for it anyway
   page.evaluate(`
-    var promise = confetti(${JSON.stringify(opts)});
-
+    var opts = ${JSON.stringify(opts)};
     var end = Date.now() + (10 * 1000);
+
+    var promise = confetti(opts);
 
     var interval = setInterval(function() {
         if (Date.now() > end) {
             return clearInterval(interval);
         }
 
-        confetti(${JSON.stringify(opts)});
+        confetti(opts);
     }, ${time});
   `);
 
