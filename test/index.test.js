@@ -295,6 +295,60 @@ test('shoots confetti to the right', async t => {
   t.deepEqual(pixels.left, ['#ffffff']);
 });
 
+test.only('handles window resizes', async t => {
+  const width = 500;
+  const time = 50;
+
+  const page = await fixturePage();
+  await page.setViewport({ width: width / 2, height: 500 });
+
+  let resolved = false;
+
+  let opts = {
+    colors: ['#0000ff'],
+    origin: { x: 1, y: 0 },
+    angle: 0,
+    startVelocity: 0,
+    particleCount: 2
+  };
+
+  // continuously animate more and more confetti
+  // for 10 seconds... that should be longer than
+  // this test... we won't wait for it anyway
+  page.evaluate(`
+    var promise = confetti(${JSON.stringify(opts)});
+
+    var end = Date.now() + (10 * 1000);
+
+    var interval = setInterval(function() {
+        if (Date.now() > end) {
+            return clearInterval(interval);
+        }
+
+        confetti(${JSON.stringify(opts)});
+    }, ${time});
+
+    promise;
+  `).then(function () {
+    resolved = true;
+  });
+
+  await sleep(time * 4);
+  await page.setViewport({ width: width, height: 500 });
+  await sleep(time * 4);
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+
+  // make sure that we did not already finish animating confetti
+  // if we have, the screenshot we took might be invalid
+  t.is(resolved, false);
+
+  t.context.image = await reduceImg(t.context.buffer);
+
+
+  t.is(false, true);
+});
+
 /*
  * Operational tests
  */
