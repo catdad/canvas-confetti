@@ -295,12 +295,13 @@ test('shoots confetti to the right', async t => {
   t.deepEqual(pixels.left, ['#ffffff']);
 });
 
-test.only('handles window resizes', async t => {
+test('handles window resizes', async t => {
   const width = 500;
+  const height = 500;
   const time = 50;
 
   const page = await fixturePage();
-  await page.setViewport({ width: width / 2, height: 500 });
+  await page.setViewport({ width: width / 2, height });
 
   let resolved = false;
 
@@ -334,7 +335,7 @@ test.only('handles window resizes', async t => {
   });
 
   await sleep(time * 4);
-  await page.setViewport({ width: width, height: 500 });
+  await page.setViewport({ width, height });
   await sleep(time * 4);
 
   t.context.buffer = await page.screenshot({ type: 'png' });
@@ -345,8 +346,16 @@ test.only('handles window resizes', async t => {
 
   t.context.image = await reduceImg(t.context.buffer);
 
+  // chop this image into thirds
+  let widthThird = Math.floor(width / 3);
+  let first = t.context.image.clone().crop(widthThird * 0, 0, widthThird, height);
+  let second = t.context.image.clone().crop(widthThird * 1, 0, widthThird, height);
+  let third = t.context.image.clone().crop(widthThird * 2, 0, widthThird, height);
 
-  t.is(false, true);
+  // the first will be white, the second and third will have confetti in them
+  t.deepEqual(await uniqueColors(first), ['#ffffff']);
+  t.deepEqual(await uniqueColors(second), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(third), ['#0000ff', '#ffffff']);
 });
 
 /*
