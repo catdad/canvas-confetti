@@ -303,8 +303,6 @@ test('handles window resizes', async t => {
   const page = await fixturePage();
   await page.setViewport({ width: width / 2, height });
 
-  let resolved = false;
-
   let opts = {
     colors: ['#0000ff'],
     origin: { x: 1, y: 0 },
@@ -328,27 +326,13 @@ test('handles window resizes', async t => {
 
         confetti(${JSON.stringify(opts)});
     }, ${time});
-
-    promise;
-  `).then(function () {
-    resolved = true;
-  }).catch(() => {
-    // ignore errors... the entire suite might finish
-    // before the 10 seconds, causing the browser to close,
-    // which will error and we don't care... if there is
-    // a confetti problem, it will show up in the screenshot
-  });
+  `);
 
   await sleep(time * 4);
   await page.setViewport({ width, height });
   await sleep(time * 4);
 
   t.context.buffer = await page.screenshot({ type: 'png' });
-
-  // make sure that we did not already finish animating confetti
-  // if we have, the screenshot we took might be invalid
-  t.is(resolved, false);
-
   t.context.image = await reduceImg(t.context.buffer);
 
   // chop this image into thirds
