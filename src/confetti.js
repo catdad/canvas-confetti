@@ -88,12 +88,18 @@
     return origin;
   }
 
-  function getCanvas(zIndex) {
-    var canvas = document.createElement('canvas');
+  function setCanvasSize(canvas) {
     var rect = document.body.getBoundingClientRect();
 
     canvas.width = document.documentElement.clientWidth || rect.width || window.innerWidth;
     canvas.height = document.documentElement.clientHeight || rect.height || window.innerHeight;
+  }
+
+  function getCanvas(zIndex) {
+    var canvas = document.createElement('canvas');
+
+    setCanvasSize(canvas);
+
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
     canvas.style.left = '0px';
@@ -164,8 +170,20 @@
     var width = canvas.width;
     var height = canvas.height;
 
+    function onResize() {
+      // don't actually query the size here, since this
+      // can execute frequently and rapidly
+      width = height = null;
+    }
+
     var prom = promise(function (resolve) {
       function update() {
+        if (!width && !height) {
+          setCanvasSize(canvas);
+          width = canvas.width;
+          height = canvas.height;
+        }
+
         context.clearRect(0, 0, width, height);
 
         animatingFettis = animatingFettis.filter(function (fetti) {
@@ -175,6 +193,8 @@
         if (animatingFettis.length) {
           frame(update);
         } else {
+          window.removeEventListener('resize', onResize);
+
           done();
           resolve();
         }
@@ -182,6 +202,8 @@
 
       frame(update);
     });
+
+    window.addEventListener('resize', onResize, false);
 
     return {
       addFettis: function (fettis) {
