@@ -332,6 +332,11 @@ test('handles window resizes', async t => {
     promise;
   `).then(function () {
     resolved = true;
+  }).catch(() => {
+    // ignore errors... the entire suite might finish
+    // before the 10 seconds, causing the browser to close,
+    // which will error and we don't care... if there is
+    // a confetti problem, it will show up in the screenshot
   });
 
   await sleep(time * 4);
