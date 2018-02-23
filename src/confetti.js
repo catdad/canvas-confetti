@@ -140,18 +140,18 @@
 
     var progress = (fetti.tick++) / fetti.totalTicks;
 
-    var x =       fetti.x + (fetti.random * fetti.tiltCos);
-    var y =       fetti.y + (fetti.random * fetti.tiltSin);
-    var x2 =      fetti.wobbleX + (fetti.random * fetti.tiltCos);
-    var y2 =      fetti.wobbleY + (fetti.random * fetti.tiltSin);
+    var x1 = fetti.x + (fetti.random * fetti.tiltCos);
+    var y1 = fetti.y + (fetti.random * fetti.tiltSin);
+    var x2 = fetti.wobbleX + (fetti.random * fetti.tiltCos);
+    var y2 = fetti.wobbleY + (fetti.random * fetti.tiltSin);
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
     context.beginPath();
 
     context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
-    context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y));
+    context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
     context.lineTo(Math.floor(x2), Math.floor(y2));
-    context.lineTo(Math.floor(x), Math.floor(fetti.wobbleY));
+    context.lineTo(Math.floor(x1), Math.floor(fetti.wobbleY));
 
     context.closePath();
     context.fill();
