@@ -228,7 +228,8 @@ test('shoots default confetti', async t => {
 
   const pixels = await uniqueColors(t.context.image);
 
-  t.is(pixels.length, 8);
+  t.true(pixels.length >= 7);
+  t.true(pixels.length <= 8);
 });
 
 test('shoots red confetti', async t => {
