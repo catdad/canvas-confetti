@@ -89,10 +89,8 @@
   }
 
   function setCanvasSize(canvas) {
-    var rect = document.body.getBoundingClientRect();
-
-    canvas.width = document.documentElement.clientWidth || rect.width || window.innerWidth;
-    canvas.height = document.documentElement.clientHeight || rect.height || window.innerHeight;
+    canvas.width = document.documentElement.clientWidth;
+    canvas.height = document.documentElement.clientHeight;
   }
 
   function getCanvas(zIndex) {
