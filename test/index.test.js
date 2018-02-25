@@ -335,6 +335,59 @@ test('removes the canvas when done', async t => {
   t.is(await hasCanvas(), false);
 });
 
+test('handles window resizes', async t => {
+  const width = 500;
+  const height = 500;
+  const time = 50;
+
+  const page = await fixturePage();
+  await page.setViewport({ width: width / 2, height });
+
+  let opts = {
+    colors: ['#0000ff'],
+    origin: { x: 1, y: 0 },
+    angle: 0,
+    startVelocity: 0,
+    particleCount: 2
+  };
+
+  // continuously animate more and more confetti
+  // for 10 seconds... that should be longer than
+  // this test... we won't wait for it anyway
+  page.evaluate(`
+    var opts = ${JSON.stringify(opts)};
+    var end = Date.now() + (10 * 1000);
+
+    var promise = confetti(opts);
+
+    var interval = setInterval(function() {
+        if (Date.now() > end) {
+            return clearInterval(interval);
+        }
+
+        confetti(opts);
+    }, ${time});
+  `);
+
+  await sleep(time * 4);
+  await page.setViewport({ width, height });
+  await sleep(time * 4);
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  // chop this image into thirds
+  let widthThird = Math.floor(width / 3);
+  let first = t.context.image.clone().crop(widthThird * 0, 0, widthThird, height);
+  let second = t.context.image.clone().crop(widthThird * 1, 0, widthThird, height);
+  let third = t.context.image.clone().crop(widthThird * 2, 0, widthThird, height);
+
+  // the first will be white, the second and third will have confetti in them
+  t.deepEqual(await uniqueColors(first), ['#ffffff']);
+  t.deepEqual(await uniqueColors(second), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(third), ['#0000ff', '#ffffff']);
+});
+
 /*
  * Browserify tests
  */
