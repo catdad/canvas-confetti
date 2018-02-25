@@ -10,9 +10,6 @@ script:
   - npm run lint
   - npm run citest
 
-after_script:
-  - ls
-
 after_failure:
   - ./bin/on_failure.sh
 
