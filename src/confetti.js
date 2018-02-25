@@ -88,12 +88,16 @@
     return origin;
   }
 
+  function setCanvasSize(canvas) {
+    canvas.width = document.documentElement.clientWidth;
+    canvas.height = document.documentElement.clientHeight;
+  }
+
   function getCanvas(zIndex) {
     var canvas = document.createElement('canvas');
-    var rect = document.body.getBoundingClientRect();
 
-    canvas.width = document.documentElement.clientWidth || rect.width || window.innerWidth;
-    canvas.height = document.documentElement.clientHeight || rect.height || window.innerHeight;
+    setCanvasSize(canvas);
+
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
     canvas.style.left = '0px';
@@ -120,7 +124,9 @@
       decay: opts.decay,
       random: Math.random() + 5,
       tiltSin: 0,
-      tiltCos: 0
+      tiltCos: 0,
+      wobbleX: 0,
+      wobbleY: 0
     };
   }
 
@@ -133,24 +139,23 @@
     fetti.tiltSin = Math.sin(fetti.tiltAngle);
     fetti.tiltCos = Math.cos(fetti.tiltAngle);
     fetti.random = Math.random() + 5;
+    fetti.wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
+    fetti.wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
 
     var progress = (fetti.tick++) / fetti.totalTicks;
 
-    var wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
-    var wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
-
-    var x =       fetti.x + (fetti.random * fetti.tiltCos);
-    var y =       fetti.y + (fetti.random * fetti.tiltSin);
-    var x2 =      wobbleX + (fetti.random * fetti.tiltCos);
-    var y2 =      wobbleY + (fetti.random * fetti.tiltSin);
+    var x1 = fetti.x + (fetti.random * fetti.tiltCos);
+    var y1 = fetti.y + (fetti.random * fetti.tiltSin);
+    var x2 = fetti.wobbleX + (fetti.random * fetti.tiltCos);
+    var y2 = fetti.wobbleY + (fetti.random * fetti.tiltSin);
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
     context.beginPath();
 
     context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
-    context.lineTo(Math.floor(wobbleX), Math.floor(y));
+    context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
     context.lineTo(Math.floor(x2), Math.floor(y2));
-    context.lineTo(Math.floor(x), Math.floor(wobbleY));
+    context.lineTo(Math.floor(x1), Math.floor(fetti.wobbleY));
 
     context.closePath();
     context.fill();
@@ -164,8 +169,20 @@
     var width = canvas.width;
     var height = canvas.height;
 
+    function onResize() {
+      // don't actually query the size here, since this
+      // can execute frequently and rapidly
+      width = height = null;
+    }
+
     var prom = promise(function (resolve) {
       function update() {
+        if (!width && !height) {
+          setCanvasSize(canvas);
+          width = canvas.width;
+          height = canvas.height;
+        }
+
         context.clearRect(0, 0, width, height);
 
         animatingFettis = animatingFettis.filter(function (fetti) {
@@ -175,6 +192,8 @@
         if (animatingFettis.length) {
           frame(update);
         } else {
+          window.removeEventListener('resize', onResize);
+
           done();
           resolve();
         }
@@ -182,6 +201,8 @@
 
       frame(update);
     });
+
+    window.addEventListener('resize', onResize, false);
 
     return {
       addFettis: function (fettis) {
