@@ -106,6 +106,12 @@ confetti({
 });
 ```
 
+In some cases you may need to destoy confetti, you can do this by calling method `destroy`
+
+```
+confetti.destroy();
+```
+
 I said creative... we can do better. Since it doesn't matter how many times we call `confetti` (just the total number of confetti in the air), we can do some fun things, like continuously launch more and more confetti for 30 seconds, from multiple directions:
 
 ```javascript
