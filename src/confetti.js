@@ -1,5 +1,5 @@
 (function () {
-  var frame = (function(){
+  var frame = (function () {
     return window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
       window.mozRequestAnimationFrame ||
@@ -33,7 +33,8 @@
 
   var animationObj;
 
-  function noop() {}
+  function noop() {
+  }
 
   // create a promise if it exists, otherwise, just
   // call the function directly
@@ -70,13 +71,13 @@
     var val = String(str).replace(/[^0-9a-f]/gi, '');
 
     if (val.length < 6) {
-        val = val[0]+val[0]+val[1]+val[1]+val[2]+val[2];
+      val = val[0] + val[0] + val[1] + val[1] + val[2] + val[2];
     }
 
     return {
-      r: toDecimal(val.substring(0,2)),
-      g: toDecimal(val.substring(2,4)),
-      b: toDecimal(val.substring(4,6))
+      r: toDecimal(val.substring(0, 2)),
+      g: toDecimal(val.substring(2, 4)),
+      b: toDecimal(val.substring(4, 6))
     };
   }
 
@@ -228,7 +229,7 @@
 
     var temp = particleCount;
     var fettis = [];
-    var canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
+    canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
 
     var startX = canvas.width * origin.x;
     var startY = canvas.height * origin.y;
@@ -257,13 +258,21 @@
     document.body.appendChild(canvas);
 
     animationObj = animate(canvas, fettis, function () {
-      animationObj = null;
-      document.body.removeChild(canvas);
+      destroy();
     });
 
     return animationObj.promise;
   }
 
+  function destroy() {
+    animationObj = null;
+    try {
+      document.body.removeChild(canvas);
+    } catch (e) {}
+    canvas = null;
+  }
+
   module.exports = confetti;
+  module.exports.destroy = destroy;
   module.exports.Promise = window.Promise || null;
 }());
