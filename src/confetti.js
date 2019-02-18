@@ -31,7 +31,7 @@
     ]
   };
 
-  var animationObj;
+  var animations = {};
 
   function noop() {}
 
@@ -93,16 +93,19 @@
     canvas.height = document.documentElement.clientHeight;
   }
 
-  function getCanvas(zIndex) {
+  function createDefaultCanvas(zIndex) {
     var canvas = document.createElement('canvas');
 
     setCanvasSize(canvas);
 
+    canvas.id = '__default';
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
     canvas.style.left = '0px';
     canvas.style.pointerEvents = 'none';
     canvas.style.zIndex = zIndex;
+
+    document.body.appendChild(canvas);
 
     return canvas;
   }
@@ -223,12 +226,20 @@
     var decay = prop(options, 'decay', Number);
     var colors = prop(options, 'colors');
     var ticks = prop(options, 'ticks', Number);
-    var zIndex = prop(options, 'zIndex', Number);
     var origin = getOrigin(options);
+    var canvas = prop(options, 'canvas');
+    
+    var isDefault = canvas == null;
+    if (isDefault) {
+      canvas = createDefaultCanvas(prop(options, 'zIndex', Number));
+    }
+
+    if (!canvas.id) {
+      throw new Error('User-specified canvas must have a unique id attribute.');
+    }
 
     var temp = particleCount;
-    var fettis = [];
-    var canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
+    var fettis = [];    
 
     var startX = canvas.width * origin.x;
     var startY = canvas.height * origin.y;
@@ -248,20 +259,25 @@
       );
     }
 
-    // if we have a previous canvas already animating,
+    // if we have an existing animation for this canvas,
     // add to it
-    if (animationObj) {
-      return animationObj.addFettis(fettis);
+
+    var anim = animations[canvas.id];
+    if (anim) {
+      anim.addFettis(fettis);
+    }
+    else {
+      anim = animations[canvas.id] = animate(canvas, fettis, function () {
+        // when the animation is over delete the object from the global tracker
+        // and remove canvas if we created it
+        delete animations[canvas.id];
+        if (isDefault) {
+          document.body.removeChild(canvas);
+        }
+      })
     }
 
-    document.body.appendChild(canvas);
-
-    animationObj = animate(canvas, fettis, function () {
-      animationObj = null;
-      document.body.removeChild(canvas);
-    });
-
-    return animationObj.promise;
+    return anim.promise;
   }
 
   module.exports = confetti;
