@@ -93,11 +93,14 @@
     canvas.height = document.documentElement.clientHeight;
   }
 
-  function createDefaultCanvas(zIndex) {
+  function getDefaultCanvas(zIndex) {
+    
+    if (animations['__default']) {
+      return animations['__default'].canvas;
+    }
+    
     var canvas = document.createElement('canvas');
-
     setCanvasSize(canvas);
-
     canvas.id = '__default';
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
@@ -106,7 +109,6 @@
     canvas.style.zIndex = zIndex;
 
     document.body.appendChild(canvas);
-
     return canvas;
   }
 
@@ -231,7 +233,7 @@
     
     var isDefault = canvas == null;
     if (isDefault) {
-      canvas = createDefaultCanvas(prop(options, 'zIndex', Number));
+      canvas = getDefaultCanvas(prop(options, 'zIndex', Number));
     }
 
     if (!canvas.id) {
