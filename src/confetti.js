@@ -276,7 +276,7 @@
         if (isDefault) {
           document.body.removeChild(canvas);
         }
-      })
+      });
     }
 
     return anim.promise;
