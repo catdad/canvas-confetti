@@ -85,6 +85,14 @@ const sleep = (time) => {
   });
 };
 
+const createBuffer = (data, format) => {
+  try {
+    return Buffer.from(data, format);
+  } catch(e) {
+    return new Buffer(data, format);
+  }
+};
+
 function confetti(opts, wait = false) {
   return `
 ${wait ? '' : 'confetti.Promise = null;'}
@@ -104,7 +112,7 @@ async function confettiImage(page, opts = {}) {
 `);
 
   const imageData = base64png.replace(/data:image\/png;base64,/, '');
-  return new Buffer(imageData, 'base64');
+  return createBuffer(imageData, 'base64');
 }
 
 function hex(n) {
