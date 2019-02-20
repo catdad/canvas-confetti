@@ -31,8 +31,6 @@
     ]
   };
 
-  var animationObj;
-
   function noop() {}
 
   // create a promise if it exists, otherwise, just
@@ -215,55 +213,69 @@
     };
   }
 
-  function confetti(options) {
-    var particleCount = prop(options, 'particleCount', Math.floor);
-    var angle = prop(options, 'angle', Number);
-    var spread = prop(options, 'spread', Number);
-    var startVelocity = prop(options, 'startVelocity', Number);
-    var decay = prop(options, 'decay', Number);
-    var colors = prop(options, 'colors');
-    var ticks = prop(options, 'ticks', Number);
-    var zIndex = prop(options, 'zIndex', Number);
-    var origin = getOrigin(options);
+  function confettiCannon(canvas) {
+    var isLibCanvas = !canvas;
+    var animationObj;
 
-    var temp = particleCount;
-    var fettis = [];
-    var canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
+    return function fire(options) {
+      var particleCount = prop(options, 'particleCount', Math.floor);
+      var angle = prop(options, 'angle', Number);
+      var spread = prop(options, 'spread', Number);
+      var startVelocity = prop(options, 'startVelocity', Number);
+      var decay = prop(options, 'decay', Number);
+      var colors = prop(options, 'colors');
+      var ticks = prop(options, 'ticks', Number);
+      var zIndex = prop(options, 'zIndex', Number);
+      var origin = getOrigin(options);
 
-    var startX = canvas.width * origin.x;
-    var startY = canvas.height * origin.y;
+      var temp = particleCount;
+      var fettis = [];
 
-    while (temp--) {
-      fettis.push(
-        randomPhysics({
-          x: startX,
-          y: startY,
-          angle: angle,
-          spread: spread,
-          startVelocity: startVelocity,
-          color: colors[temp % colors.length],
-          ticks: ticks,
-          decay: decay
-        })
-      );
-    }
+      if (isLibCanvas) {
+        canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
+      }
 
-    // if we have a previous canvas already animating,
-    // add to it
-    if (animationObj) {
-      return animationObj.addFettis(fettis);
-    }
+      var startX = canvas.width * origin.x;
+      var startY = canvas.height * origin.y;
 
-    document.body.appendChild(canvas);
+      while (temp--) {
+        fettis.push(
+          randomPhysics({
+            x: startX,
+            y: startY,
+            angle: angle,
+            spread: spread,
+            startVelocity: startVelocity,
+            color: colors[temp % colors.length],
+            ticks: ticks,
+            decay: decay
+          })
+        );
+      }
 
-    animationObj = animate(canvas, fettis, function () {
-      animationObj = null;
-      document.body.removeChild(canvas);
-    });
+      // if we have a previous canvas already animating,
+      // add to it
+      if (animationObj) {
+        return animationObj.addFettis(fettis);
+      }
 
-    return animationObj.promise;
+      if (isLibCanvas) {
+        document.body.appendChild(canvas);
+      }
+
+      animationObj = animate(canvas, fettis, function () {
+        animationObj = null;
+
+        if (isLibCanvas) {
+          document.body.removeChild(canvas);
+        }
+      });
+
+      return animationObj.promise;
+    };
   }
 
-  module.exports = confetti;
+  module.exports = confettiCannon();
+  module.exports.create = confettiCannon;
   module.exports.Promise = window.Promise || null;
 }());
