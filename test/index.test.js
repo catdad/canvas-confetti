@@ -130,7 +130,7 @@ function hex(n) {
 }
 
 const readImage = async (buffer) => {
-  return await (Buffer.isBuffer(buffer) ? jimp.read(buffer) : Promise.resolve(buffer));
+  return Buffer.isBuffer(buffer) ? await jimp.read(buffer) : buffer;
 };
 
 const uniqueColors = async (buffer) => {
@@ -162,7 +162,7 @@ const uniqueColorsBySide = async (buffer) => {
 };
 
 const removeOpacity = async (buffer) => {
-  const image = await jimp.read(buffer);
+  const image = await readImage(buffer);
   image.rgba(false).background(0xFFFFFFFF);
   var opaqueBuffer = await promisify(image.getBuffer.bind(image))(jimp.MIME_PNG);
 
@@ -171,8 +171,8 @@ const removeOpacity = async (buffer) => {
 
 const reduceImg = async (buffer, opaque = true) => {
   const image = opaque ?
-    await await removeOpacity(buffer) :
-    await jimp.read(buffer);
+    await removeOpacity(buffer) :
+    await readImage(buffer);
 
   // basically dialate the crap out of everything
   image.blur(2);
@@ -360,10 +360,10 @@ test('shoots confetti repeatedly using requestAnimationFrame', async t => {
   await sleep(time / 4);
   const buff4 = await page.screenshot({ type: 'png' });
 
-  const img1 = await jimp.read(buff1);
-  const img2 = await jimp.read(buff2);
-  const img3 = await jimp.read(buff3);
-  const img4 = await jimp.read(buff4);
+  const img1 = await readImage(buff1);
+  const img2 = await readImage(buff2);
+  const img3 = await readImage(buff3);
+  const img4 = await readImage(buff4);
   const { width, height } = img1.bitmap;
 
   const image = await newimg(width * 4, height);
@@ -375,10 +375,10 @@ test('shoots confetti repeatedly using requestAnimationFrame', async t => {
   t.context.buffer = await promisify(image.getBuffer.bind(image))(jimp.MIME_PNG);
   t.context.image = await reduceImg(t.context.buffer);
 
-  t.deepEqual(await uniqueColors(await reduceImg(buff1)), ['#0000ff', '#ffffff']);
-  t.deepEqual(await uniqueColors(await reduceImg(buff2)), ['#0000ff', '#ffffff']);
-  t.deepEqual(await uniqueColors(await reduceImg(buff3)), ['#0000ff', '#ffffff']);
-  t.deepEqual(await uniqueColors(await reduceImg(buff4)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img1)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img2)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img3)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img4)), ['#0000ff', '#ffffff']);
 });
 
 test('uses promises when available', async t => {
