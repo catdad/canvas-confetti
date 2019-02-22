@@ -171,8 +171,11 @@
       opacity: 1;
     }
 
-    #custom-canvas {
+    .custom-canvas {
       margin-top: 30px;
+      width: 100%;
+      max-width: 1000px;
+      height: 380px;
       background: #363636;
     }
 
@@ -378,7 +381,7 @@
       </div>
       <div class="editor"></div>
       <div class="flex-rows">
-        <canvas id="custom-canvas" width="1000" height="480"></canvas>
+        <canvas id="custom-canvas" class="custom-canvas"></canvas>
       </div>
     </div>
   </div>
@@ -490,11 +493,12 @@
 
         // save this function... we'll save it to the canvas itself for
         // the purpose of this demo
-        canvas.confetti = confetti.create(canvas);
+        canvas.confetti = canvas.confetti || confetti.create(canvas, { resize: true });
 
         canvas.confetti({
+          spread: 70,
           origin: {
-              y: 0.9
+              y: 1.2
           }
         });
       }
