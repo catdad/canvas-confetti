@@ -86,15 +86,19 @@
     return origin;
   }
 
-  function setCanvasSize(canvas) {
+  function setCanvasWindowSize(canvas) {
     canvas.width = document.documentElement.clientWidth;
     canvas.height = document.documentElement.clientHeight;
   }
 
+  function setCanvasRectSize(canvas) {
+    var rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+  }
+
   function getCanvas(zIndex) {
     var canvas = document.createElement('canvas');
-
-    setCanvasSize(canvas);
 
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
@@ -161,7 +165,7 @@
     return fetti.tick < fetti.totalTicks;
   }
 
-  function animate(canvas, fettis, done) {
+  function animate(canvas, fettis, resizer, done) {
     var animatingFettis = fettis.slice();
     var context = canvas.getContext('2d');
     var width = canvas.width;
@@ -176,7 +180,7 @@
     var prom = promise(function (resolve) {
       function update() {
         if (!width && !height) {
-          setCanvasSize(canvas);
+          resizer(canvas);
           width = canvas.width;
           height = canvas.height;
         }
@@ -213,8 +217,13 @@
     };
   }
 
-  function confettiCannon(canvas) {
+  function confettiCannon(canvas, globalOpts) {
     var isLibCanvas = !canvas;
+    var resizer = isLibCanvas ?
+      setCanvasWindowSize :
+      prop(globalOpts || {}, 'resize') ?
+        setCanvasRectSize :
+        noop;
     var animationObj;
 
     return function fire(options) {
@@ -234,6 +243,13 @@
       if (isLibCanvas) {
         canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
       }
+
+      if (isLibCanvas) {
+        document.body.appendChild(canvas);
+      }
+
+      // initialize canvas size
+      resizer(canvas);
 
       var startX = canvas.width * origin.x;
       var startY = canvas.height * origin.y;
@@ -259,11 +275,7 @@
         return animationObj.addFettis(fettis);
       }
 
-      if (isLibCanvas) {
-        document.body.appendChild(canvas);
-      }
-
-      animationObj = animate(canvas, fettis, function () {
+      animationObj = animate(canvas, fettis, resizer, function () {
         animationObj = null;
 
         if (isLibCanvas) {
