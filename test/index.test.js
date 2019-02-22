@@ -16,6 +16,7 @@ const PORT = 9999;
 const args = process.env.CI ? [
   '--no-sandbox', '--disable-setuid-sandbox'
 ] : [];
+const headless = process.env.CI ? true : process.env.VISIBLE ? false : true;
 
 const mkdir = async (dir) => {
   return promisify(fs.mkdir)(dir)
@@ -57,7 +58,7 @@ const testBrowser = (() => {
     }
 
     return puppeteer.launch({
-      headless: true,
+      headless,
       args: [ '--disable-background-timer-throttling' ].concat(args)
     }).then(thisBrowser => {
       browser = thisBrowser;
