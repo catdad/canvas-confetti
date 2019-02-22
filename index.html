@@ -370,7 +370,7 @@
         </div>
         <div class="description">
           <p>
-            Finally, to specify your own canvas just pass the canvas through in the options.  The 
+            Finally, to specify your own canvas just pass the canvas through in the options.  The
             canvas <i>must</i> have a unique id attribute set.  The confetti function will throw an
             exception if this is not set.
           </p>
@@ -486,12 +486,15 @@
         }());
       },
       custom: function() {
-        confetti({
-          canvas: document.getElementById('custom-canvas'),
-          particleCount: 100,
-          spread: 70,
+        var canvas = document.getElementById('custom-canvas');
+
+        // save this function... we'll save it to the canvas itself for
+        // the purpose of this demo
+        canvas.confetti = confetti.create(canvas);
+
+        canvas.confetti({
           origin: {
-              y: 0.6
+              y: 0.9
           }
         });
       }
