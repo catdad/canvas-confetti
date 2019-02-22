@@ -100,6 +100,8 @@
   function getCanvas(zIndex) {
     var canvas = document.createElement('canvas');
 
+    setCanvasWindowSize(canvas);
+
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
     canvas.style.left = '0px';
@@ -165,11 +167,12 @@
     return fetti.tick < fetti.totalTicks;
   }
 
-  function animate(canvas, fettis, resizer, done) {
+  function animate(canvas, fettis, isLibCanvas, allowResize, done) {
     var animatingFettis = fettis.slice();
     var context = canvas.getContext('2d');
     var width = canvas.width;
     var height = canvas.height;
+    var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
 
     function onResize() {
       // don't actually query the size here, since this
@@ -194,7 +197,9 @@
         if (animatingFettis.length) {
           frame(update);
         } else {
-          window.removeEventListener('resize', onResize);
+          if (allowResize) {
+            window.removeEventListener('resize', onResize);
+          }
 
           done();
           resolve();
@@ -204,7 +209,9 @@
       frame(update);
     });
 
-    window.addEventListener('resize', onResize, false);
+    if (allowResize) {
+      window.addEventListener('resize', onResize, false);
+    }
 
     return {
       addFettis: function (fettis) {
@@ -219,11 +226,8 @@
 
   function confettiCannon(canvas, globalOpts) {
     var isLibCanvas = !canvas;
-    var resizer = isLibCanvas ?
-      setCanvasWindowSize :
-      prop(globalOpts || {}, 'resize') ?
-        setCanvasRectSize :
-        noop;
+    var allowResize = !!prop(globalOpts || {}, 'resize');
+    var resized = false;
     var animationObj;
 
     return function fire(options) {
@@ -242,14 +246,11 @@
 
       if (isLibCanvas) {
         canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
+      } else if (allowResize && !resized) {
+        // initialize the size of a user-supplied canvas
+        setCanvasRectSize(canvas);
+        resized = true;
       }
-
-      if (isLibCanvas) {
-        document.body.appendChild(canvas);
-      }
-
-      // initialize canvas size
-      resizer(canvas);
 
       var startX = canvas.width * origin.x;
       var startY = canvas.height * origin.y;
@@ -275,7 +276,11 @@
         return animationObj.addFettis(fettis);
       }
 
-      animationObj = animate(canvas, fettis, resizer, function () {
+      if (isLibCanvas) {
+        document.body.appendChild(canvas);
+      }
+
+      animationObj = animate(canvas, fettis, isLibCanvas, (isLibCanvas || allowResize), function () {
         animationObj = null;
 
         if (isLibCanvas) {
