@@ -56,7 +56,10 @@ const testBrowser = (() => {
       return Promise.resolve(browser);
     }
 
-    return puppeteer.launch({ headless: true, args }).then(thisBrowser => {
+    return puppeteer.launch({
+      headless: true,
+      args: [ '--disable-background-timer-throttling' ].concat(args)
+    }).then(thisBrowser => {
       browser = thisBrowser;
       return Promise.resolve(browser);
     });
@@ -307,6 +310,76 @@ test('shoots confetti to the right', async t => {
 /*
  * Operational tests
  */
+
+test('shoots confetti repeatedly using requestAnimationFrame', async t => {
+  const page = await fixturePage();
+  const time = 10 * 1000;
+
+  let opts = {
+    colors: ['#0000ff'],
+    origin: { y: 1 },
+    count: 1
+  };
+
+  // continuously animate more and more confetti
+  // for 10 seconds... that should be longer than
+  // this test... we won't wait for it anyway
+  page.evaluate(`
+    var opts = ${JSON.stringify(opts)};
+    var end = Date.now() + (${time});
+
+    var promise = confetti(opts);
+
+    (function frame() {
+      confetti(opts);
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+  `);
+
+  const newimg = function (width, height) {
+    return new Promise((resolve, reject) => {
+      new jimp(width, height, (err, img) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(img);
+      });
+    });
+  };
+
+  await sleep(time / 4);
+  const buff1 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff2 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff3 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff4 = await page.screenshot({ type: 'png' });
+
+  const img1 = await jimp.read(buff1);
+  const img2 = await jimp.read(buff2);
+  const img3 = await jimp.read(buff3);
+  const img4 = await jimp.read(buff4);
+  const { width, height } = img1.bitmap;
+
+  const image = await newimg(width * 4, height);
+  await image.composite(img1, 0, 0);
+  await image.composite(img2, width, 0);
+  await image.composite(img3, width * 2, 0);
+  await image.composite(img4, width * 3, 0);
+
+  t.context.buffer = await promisify(image.getBuffer.bind(image))(jimp.MIME_PNG);
+  t.context.image = await reduceImg(t.context.buffer);
+
+  t.deepEqual(await uniqueColors(await reduceImg(buff1)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(buff2)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(buff3)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(buff4)), ['#0000ff', '#ffffff']);
+});
 
 test('uses promises when available', async t => {
   const page = await fixturePage();
