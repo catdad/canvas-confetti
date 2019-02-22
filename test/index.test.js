@@ -96,16 +96,16 @@ const createBuffer = (data, format) => {
   }
 };
 
-function confetti(opts, wait = false) {
+function confetti(opts, wait = false, funcName = 'confetti') {
   return `
 ${wait ? '' : 'confetti.Promise = null;'}
-confetti(${opts ? JSON.stringify(opts) : ''});
+${funcName}(${opts ? JSON.stringify(opts) : ''});
 `;
 }
 
-async function confettiImage(page, opts = {}) {
+async function confettiImage(page, opts = {}, funcName = 'confetti') {
   const base64png = await page.evaluate(`
-  confetti(${JSON.stringify(opts)});
+  ${funcName}(${JSON.stringify(opts)});
   new Promise(function (resolve, reject) {
     setTimeout(function () {
       var canvas = document.querySelector('canvas');
@@ -470,6 +470,38 @@ test('handles window resizes', async t => {
   t.deepEqual(await uniqueColors(second), ['#0000ff', '#ffffff']);
   t.deepEqual(await uniqueColors(third), ['#0000ff', '#ffffff']);
 });
+
+/*
+ * Custom canvas
+ */
+
+const injectCanvas = async (page, allowResize) => {
+  await page.evaluate(`
+    var canvas = document.createElement('canvas');
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+
+    document.body.appendChild(canvas);
+
+    window.myConfetti = confetti.create(canvas, { resize: ${!!allowResize} });
+  `);
+};
+
+test('can create instances of confetti in separate canvas', async t => {
+  const page = await fixturePage();
+  await injectCanvas(page, true);
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff0000']
+  }, 'myConfetti');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
+});
+
+test.todo('can use both a custom canvas and default canvas at the same time');
+
+test.todo('shoots confetti repeatedly in custom canvas using requestAnimationFrame');
 
 /*
  * Browserify tests
