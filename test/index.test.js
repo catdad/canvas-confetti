@@ -185,6 +185,18 @@ const reduceImg = async (buffer, opaque = true) => {
   return image;
 };
 
+const emptyImg = function (width, height) {
+  return new Promise((resolve, reject) => {
+    new jimp(width, height, (err, img) => {
+      if (err) {
+        return reject(err);
+      }
+
+      resolve(img);
+    });
+  });
+};
+
 test.before(async () => {
   await mkdir('./shots');
   await testServer();
@@ -341,18 +353,6 @@ test('shoots confetti repeatedly using requestAnimationFrame', async t => {
     }());
   `);
 
-  const newimg = function (width, height) {
-    return new Promise((resolve, reject) => {
-      new jimp(width, height, (err, img) => {
-        if (err) {
-          return reject(err);
-        }
-
-        resolve(img);
-      });
-    });
-  };
-
   await sleep(time / 4);
   const buff1 = await page.screenshot({ type: 'png' });
   await sleep(time / 4);
@@ -368,7 +368,7 @@ test('shoots confetti repeatedly using requestAnimationFrame', async t => {
   const img4 = await readImage(buff4);
   const { width, height } = img1.bitmap;
 
-  const comp = await newimg(width * 4, height);
+  const comp = await emptyImg(width * 4, height);
   await comp.composite(img1, 0, 0);
   await comp.composite(img2, width, 0);
   await comp.composite(img3, width * 2, 0);
