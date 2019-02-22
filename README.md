@@ -67,6 +67,10 @@ The `confetti` parameter is a single optional `options` object, which has the fo
 - `colors` _Array&lt;String&gt;_: An array of color strings, in the HEX format... you know, like `#bada55`.
 - `zIndex` _Integer (default: 100)_: The confetti should be on top, after all. But if you have a crazy high page, you can set it even higher.
 
+### `confetti.create(canvas, [globalOptions])` → `function`
+
+TODO
+
 ## Examples
 
 Launch some confetti the default way:
