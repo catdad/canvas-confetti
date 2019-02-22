@@ -500,6 +500,21 @@ test('can create instances of confetti in separate canvas', async t => {
   t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
 });
 
+test('can use a custom canvas without resizing', async t => {
+  const page = await fixturePage();
+  await injectCanvas(page, false);
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff0000'],
+    startVelocity: 2,
+    spread: 360,
+    origin: { y: 0 }
+  }, 'myConfetti');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
+});
+
 test('shoots confetti repeatedly in defaut and custom canvas using requestAnimationFrame', async t => {
   const page = await fixturePage();
   await injectCanvas(page);
