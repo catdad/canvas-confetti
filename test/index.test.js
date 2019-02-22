@@ -317,7 +317,7 @@ test('shoots confetti to the right', async t => {
 
 test('shoots confetti repeatedly using requestAnimationFrame', async t => {
   const page = await fixturePage();
-  const time = 10 * 1000;
+  const time = 6 * 1000;
 
   let opts = {
     colors: ['#0000ff'],
