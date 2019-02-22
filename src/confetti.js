@@ -181,6 +181,15 @@
     }
 
     var prom = promise(function (resolve) {
+      function onDone() {
+        if (allowResize) {
+          window.removeEventListener('resize', onResize);
+        }
+
+        done();
+        resolve();
+      }
+
       function update() {
         if (!width && !height) {
           resizer(canvas);
@@ -197,12 +206,7 @@
         if (animatingFettis.length) {
           frame(update);
         } else {
-          if (allowResize) {
-            window.removeEventListener('resize', onResize);
-          }
-
-          done();
-          resolve();
+          onDone();
         }
       }
 
