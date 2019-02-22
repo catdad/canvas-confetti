@@ -488,21 +488,36 @@ const injectCanvas = async (page, allowResize = true) => {
   `);
 };
 
+const getCanvasSize = async (page) => {
+  return await page.evaluate(`
+    var canvas = document.querySelector('canvas');
+    var size = { width: canvas.width, height: canvas.height };
+    Promise.resolve(size);
+  `);
+};
+
 test('can create instances of confetti in separate canvas', async t => {
   const page = await fixturePage();
   await injectCanvas(page);
+
+  const beforeSize = await getCanvasSize(page);
 
   t.context.buffer = await confettiImage(page, {
     colors: ['#ff0000']
   }, 'myConfetti');
   t.context.image = await reduceImg(t.context.buffer);
 
+  const afterSize = await getCanvasSize(page);
+
   t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
+  t.notDeepEqual(beforeSize, afterSize);
 });
 
 test('can use a custom canvas without resizing', async t => {
   const page = await fixturePage();
   await injectCanvas(page, false);
+
+  const beforeSize = await getCanvasSize(page);
 
   t.context.buffer = await confettiImage(page, {
     colors: ['#ff0000'],
@@ -512,7 +527,10 @@ test('can use a custom canvas without resizing', async t => {
   }, 'myConfetti');
   t.context.image = await reduceImg(t.context.buffer);
 
+  const afterSize = await getCanvasSize(page);
+
   t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
+  t.deepEqual(beforeSize, afterSize);
 });
 
 test('shoots confetti repeatedly in defaut and custom canvas using requestAnimationFrame', async t => {
