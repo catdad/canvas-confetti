@@ -129,6 +129,10 @@ function hex(n) {
   return pad(n.toString(16));
 }
 
+const getImageBuffer = async (image) => {
+  return await promisify(image.getBuffer.bind(image))(jimp.MIME_PNG);
+};
+
 const readImage = async (buffer) => {
   return Buffer.isBuffer(buffer) ? await jimp.read(buffer) : buffer;
 };
@@ -328,8 +332,6 @@ test('shoots confetti repeatedly using requestAnimationFrame', async t => {
     var opts = ${JSON.stringify(opts)};
     var end = Date.now() + (${time});
 
-    var promise = confetti(opts);
-
     (function frame() {
       confetti(opts);
 
@@ -366,13 +368,13 @@ test('shoots confetti repeatedly using requestAnimationFrame', async t => {
   const img4 = await readImage(buff4);
   const { width, height } = img1.bitmap;
 
-  const image = await newimg(width * 4, height);
-  await image.composite(img1, 0, 0);
-  await image.composite(img2, width, 0);
-  await image.composite(img3, width * 2, 0);
-  await image.composite(img4, width * 3, 0);
+  const comp = await newimg(width * 4, height);
+  await comp.composite(img1, 0, 0);
+  await comp.composite(img2, width, 0);
+  await comp.composite(img3, width * 2, 0);
+  await comp.composite(img4, width * 3, 0);
 
-  t.context.buffer = await promisify(image.getBuffer.bind(image))(jimp.MIME_PNG);
+  t.context.buffer = await getImageBuffer(comp);
   t.context.image = await reduceImg(t.context.buffer);
 
   t.deepEqual(await uniqueColors(await reduceImg(img1)), ['#0000ff', '#ffffff']);
