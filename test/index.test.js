@@ -499,9 +499,7 @@ test('can create instances of confetti in separate canvas', async t => {
   t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
 });
 
-test.todo('can use both a custom canvas and default canvas at the same time');
-
-test('shoots confetti repeatedly in custom canvas using requestAnimationFrame', async t => {
+test('shoots confetti repeatedly in defaut and custom canvas using requestAnimationFrame', async t => {
   const page = await fixturePage();
   await injectCanvas(page);
   const time = 6 * 1000;
