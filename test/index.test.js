@@ -475,7 +475,7 @@ test('handles window resizes', async t => {
  * Custom canvas
  */
 
-const injectCanvas = async (page, allowResize) => {
+const injectCanvas = async (page, allowResize = true) => {
   await page.evaluate(`
     var canvas = document.createElement('canvas');
     canvas.style.width = '100%';
@@ -489,7 +489,7 @@ const injectCanvas = async (page, allowResize) => {
 
 test('can create instances of confetti in separate canvas', async t => {
   const page = await fixturePage();
-  await injectCanvas(page, true);
+  await injectCanvas(page);
 
   t.context.buffer = await confettiImage(page, {
     colors: ['#ff0000']
@@ -501,7 +501,71 @@ test('can create instances of confetti in separate canvas', async t => {
 
 test.todo('can use both a custom canvas and default canvas at the same time');
 
-test.todo('shoots confetti repeatedly in custom canvas using requestAnimationFrame');
+test('shoots confetti repeatedly in custom canvas using requestAnimationFrame', async t => {
+  const page = await fixturePage();
+  await injectCanvas(page);
+  const time = 6 * 1000;
+
+  let regular = {
+    colors: ['#0000ff'],
+    origin: { x: 0.2, y: 1 },
+    count: 1,
+    spread: 10
+  };
+  let custom = {
+    colors: ['#ff0000'],
+    origin: { x: 0.8, y: 1 },
+    count: 1,
+    spread: 10
+  };
+
+  // continuously animate more and more confetti
+  // for 10 seconds... that should be longer than
+  // this test... we won't wait for it anyway
+  page.evaluate(`
+    var regular = ${JSON.stringify(regular)};
+    var custom = ${JSON.stringify(custom)};
+    var end = Date.now() + (${time});
+
+    (function frame() {
+      confetti(regular);
+      myConfetti(custom);
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+  `);
+
+  await sleep(time / 4);
+  const buff1 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff2 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff3 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff4 = await page.screenshot({ type: 'png' });
+
+  const img1 = await readImage(buff1);
+  const img2 = await readImage(buff2);
+  const img3 = await readImage(buff3);
+  const img4 = await readImage(buff4);
+  const { width, height } = img1.bitmap;
+
+  const comp = await emptyImg(width * 4, height);
+  await comp.composite(img1, 0, 0);
+  await comp.composite(img2, width, 0);
+  await comp.composite(img3, width * 2, 0);
+  await comp.composite(img4, width * 3, 0);
+
+  t.context.buffer = await getImageBuffer(comp);
+  t.context.image = await reduceImg(t.context.buffer);
+
+  t.deepEqual(await uniqueColors(await reduceImg(img1)), ['#0000ff', '#ff0000', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img2)), ['#0000ff', '#ff0000', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img3)), ['#0000ff', '#ff0000', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img4)), ['#0000ff', '#ff0000', '#ffffff']);
+});
 
 /*
  * Browserify tests
