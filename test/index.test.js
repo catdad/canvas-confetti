@@ -16,6 +16,7 @@ const PORT = 9999;
 const args = process.env.CI ? [
   '--no-sandbox', '--disable-setuid-sandbox'
 ] : [];
+const headless = process.env.CI ? true : process.env.VISIBLE ? false : true;
 
 const mkdir = async (dir) => {
   return promisify(fs.mkdir)(dir)
@@ -56,7 +57,10 @@ const testBrowser = (() => {
       return Promise.resolve(browser);
     }
 
-    return puppeteer.launch({ headless: true, args }).then(thisBrowser => {
+    return puppeteer.launch({
+      headless,
+      args: [ '--disable-background-timer-throttling' ].concat(args)
+    }).then(thisBrowser => {
       browser = thisBrowser;
       return Promise.resolve(browser);
     });
@@ -93,16 +97,16 @@ const createBuffer = (data, format) => {
   }
 };
 
-function confetti(opts, wait = false) {
+function confetti(opts, wait = false, funcName = 'confetti') {
   return `
 ${wait ? '' : 'confetti.Promise = null;'}
-confetti(${opts ? JSON.stringify(opts) : ''});
+${funcName}(${opts ? JSON.stringify(opts) : ''});
 `;
 }
 
-async function confettiImage(page, opts = {}) {
+async function confettiImage(page, opts = {}, funcName = 'confetti') {
   const base64png = await page.evaluate(`
-  confetti(${JSON.stringify(opts)});
+  ${funcName}(${JSON.stringify(opts)});
   new Promise(function (resolve, reject) {
     setTimeout(function () {
       var canvas = document.querySelector('canvas');
@@ -126,8 +130,12 @@ function hex(n) {
   return pad(n.toString(16));
 }
 
+const getImageBuffer = async (image) => {
+  return await promisify(image.getBuffer.bind(image))(jimp.MIME_PNG);
+};
+
 const readImage = async (buffer) => {
-  return await (Buffer.isBuffer(buffer) ? jimp.read(buffer) : Promise.resolve(buffer));
+  return Buffer.isBuffer(buffer) ? await jimp.read(buffer) : buffer;
 };
 
 const uniqueColors = async (buffer) => {
@@ -159,7 +167,7 @@ const uniqueColorsBySide = async (buffer) => {
 };
 
 const removeOpacity = async (buffer) => {
-  const image = await jimp.read(buffer);
+  const image = await readImage(buffer);
   image.rgba(false).background(0xFFFFFFFF);
   var opaqueBuffer = await promisify(image.getBuffer.bind(image))(jimp.MIME_PNG);
 
@@ -168,14 +176,26 @@ const removeOpacity = async (buffer) => {
 
 const reduceImg = async (buffer, opaque = true) => {
   const image = opaque ?
-    await await removeOpacity(buffer) :
-    await jimp.read(buffer);
+    await removeOpacity(buffer) :
+    await readImage(buffer);
 
   // basically dialate the crap out of everything
   image.blur(2);
   image.posterize(1);
 
   return image;
+};
+
+const emptyImg = function (width, height) {
+  return new Promise((resolve, reject) => {
+    new jimp(width, height, (err, img) => {
+      if (err) {
+        return reject(err);
+      }
+
+      resolve(img);
+    });
+  });
 };
 
 test.before(async () => {
@@ -308,6 +328,62 @@ test('shoots confetti to the right', async t => {
  * Operational tests
  */
 
+test('shoots confetti repeatedly using requestAnimationFrame', async t => {
+  const page = await fixturePage();
+  const time = 6 * 1000;
+
+  let opts = {
+    colors: ['#0000ff'],
+    origin: { y: 1 },
+    count: 1
+  };
+
+  // continuously animate more and more confetti
+  // for 10 seconds... that should be longer than
+  // this test... we won't wait for it anyway
+  page.evaluate(`
+    var opts = ${JSON.stringify(opts)};
+    var end = Date.now() + (${time});
+
+    (function frame() {
+      confetti(opts);
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+  `);
+
+  await sleep(time / 4);
+  const buff1 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff2 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff3 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff4 = await page.screenshot({ type: 'png' });
+
+  const img1 = await readImage(buff1);
+  const img2 = await readImage(buff2);
+  const img3 = await readImage(buff3);
+  const img4 = await readImage(buff4);
+  const { width, height } = img1.bitmap;
+
+  const comp = await emptyImg(width * 4, height);
+  await comp.composite(img1, 0, 0);
+  await comp.composite(img2, width, 0);
+  await comp.composite(img3, width * 2, 0);
+  await comp.composite(img4, width * 3, 0);
+
+  t.context.buffer = await getImageBuffer(comp);
+  t.context.image = await reduceImg(t.context.buffer);
+
+  t.deepEqual(await uniqueColors(await reduceImg(img1)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img2)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img3)), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img4)), ['#0000ff', '#ffffff']);
+});
+
 test('uses promises when available', async t => {
   const page = await fixturePage();
 
@@ -394,6 +470,133 @@ test('handles window resizes', async t => {
   t.deepEqual(await uniqueColors(first), ['#ffffff']);
   t.deepEqual(await uniqueColors(second), ['#0000ff', '#ffffff']);
   t.deepEqual(await uniqueColors(third), ['#0000ff', '#ffffff']);
+});
+
+/*
+ * Custom canvas
+ */
+
+const injectCanvas = async (page, allowResize = true) => {
+  await page.evaluate(`
+    var canvas = document.createElement('canvas');
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+
+    document.body.appendChild(canvas);
+
+    window.myConfetti = confetti.create(canvas, { resize: ${!!allowResize} });
+  `);
+};
+
+const getCanvasSize = async (page) => {
+  return await page.evaluate(`
+    var canvas = document.querySelector('canvas');
+    var size = { width: canvas.width, height: canvas.height };
+    Promise.resolve(size);
+  `);
+};
+
+test('can create instances of confetti in separate canvas', async t => {
+  const page = await fixturePage();
+  await injectCanvas(page);
+
+  const beforeSize = await getCanvasSize(page);
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff0000']
+  }, 'myConfetti');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const afterSize = await getCanvasSize(page);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
+  t.notDeepEqual(beforeSize, afterSize);
+});
+
+test('can use a custom canvas without resizing', async t => {
+  const page = await fixturePage();
+  await injectCanvas(page, false);
+
+  const beforeSize = await getCanvasSize(page);
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff0000'],
+    startVelocity: 2,
+    spread: 360,
+    origin: { y: 0 }
+  }, 'myConfetti');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const afterSize = await getCanvasSize(page);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
+  t.deepEqual(beforeSize, afterSize);
+});
+
+test('shoots confetti repeatedly in defaut and custom canvas using requestAnimationFrame', async t => {
+  const page = await fixturePage();
+  await injectCanvas(page);
+  const time = 6 * 1000;
+
+  let regular = {
+    colors: ['#0000ff'],
+    origin: { x: 0.2, y: 1 },
+    count: 1,
+    spread: 10
+  };
+  let custom = {
+    colors: ['#ff0000'],
+    origin: { x: 0.8, y: 1 },
+    count: 1,
+    spread: 10
+  };
+
+  // continuously animate more and more confetti
+  // for 10 seconds... that should be longer than
+  // this test... we won't wait for it anyway
+  page.evaluate(`
+    var regular = ${JSON.stringify(regular)};
+    var custom = ${JSON.stringify(custom)};
+    var end = Date.now() + (${time});
+
+    (function frame() {
+      confetti(regular);
+      myConfetti(custom);
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+  `);
+
+  await sleep(time / 4);
+  const buff1 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff2 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff3 = await page.screenshot({ type: 'png' });
+  await sleep(time / 4);
+  const buff4 = await page.screenshot({ type: 'png' });
+
+  const img1 = await readImage(buff1);
+  const img2 = await readImage(buff2);
+  const img3 = await readImage(buff3);
+  const img4 = await readImage(buff4);
+  const { width, height } = img1.bitmap;
+
+  const comp = await emptyImg(width * 4, height);
+  await comp.composite(img1, 0, 0);
+  await comp.composite(img2, width, 0);
+  await comp.composite(img3, width * 2, 0);
+  await comp.composite(img4, width * 3, 0);
+
+  t.context.buffer = await getImageBuffer(comp);
+  t.context.image = await reduceImg(t.context.buffer);
+
+  t.deepEqual(await uniqueColors(await reduceImg(img1)), ['#0000ff', '#ff0000', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img2)), ['#0000ff', '#ff0000', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img3)), ['#0000ff', '#ff0000', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img4)), ['#0000ff', '#ff0000', '#ffffff']);
 });
 
 /*

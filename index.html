@@ -171,6 +171,14 @@
       opacity: 1;
     }
 
+    .custom-canvas {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 1000px;
+      height: 380px;
+      background: #363636;
+    }
+
     @media (min-width: 44em) {
       .container {
         width: 95%;
@@ -351,6 +359,32 @@
     </div>
   </div>
 
+  <div class="container">
+    <div class="group" data-name="custom">
+      <div class="flex-rows">
+        <div class="left">
+          <h2>Custom Canvas</h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            But if you just hate confetti all over the place, there's something here for you
+            as well. You can limit where the confetti appear by providing your own canvas element.
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+      <div class="flex-rows">
+        <canvas id="custom-canvas" class="custom-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <a href="https://github.com/catdad">
       <span class="icon">
@@ -452,6 +486,20 @@
             requestAnimationFrame(frame);
           }
         }());
+      },
+      custom: function() {
+        var canvas = document.getElementById('custom-canvas');
+
+        // save this function... we'll save it to the canvas itself for
+        // the purpose of this demo
+        canvas.confetti = canvas.confetti || confetti.create(canvas, { resize: true });
+
+        canvas.confetti({
+          spread: 70,
+          origin: {
+              y: 1.2
+          }
+        });
       }
     };
 

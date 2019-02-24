@@ -67,6 +67,28 @@ The `confetti` parameter is a single optional `options` object, which has the fo
 - `colors` _Array&lt;String&gt;_: An array of color strings, in the HEX format... you know, like `#bada55`.
 - `zIndex` _Integer (default: 100)_: The confetti should be on top, after all. But if you have a crazy high page, you can set it even higher.
 
+### `confetti.create(canvas, [globalOptions])` → `function`
+
+This method creates an instance of the `confetti` function that uses a custom canvas. This is useful if you want to limit the area on your page in which confetti appear. By default, this method will not modify the canvas in any way (other than drawing to it).
+
+_Canvas can be misunderstood a bit though, so let me explain why you might want to let the module modify the canvas just a bit. By default, a `canvas` is a relatively small image -- somewhere around 300x150, depending on the browser. When you resize it using CSS, this sets the display size of the canvas, but not the image being represented on that canvas. Think of it as loading a 300x150 jpeg image in am `img` tag and then setting the CSS for that tag to `1500x600` -- your image will end up stretched out and blurry. In the case of a canvas, you need to also set the width of height of the canvas image itself. If you don't want to do that, you can allow the confetti function to set it for you._
+
+The following global options are available:
+* `resize` _Boolean (default: false)_: Whether to allow setting the canvas image size, as well as keep it correctly sized if the window changes size (e.g. resiging the window, rotating a mobile device, etc.). By default, the canvas size will not be modified.
+
+```javascript
+var myCanvas = document.createElement('canvas');
+document.appendChild(myCanvas);
+
+var myConfetti = confetti.create(myCanvas, { resize: true });
+myConfetti({
+  particleCount: 100,
+  spread: 160
+  // any other options from the global
+  // confetti function
+});
+```
+
 ## Examples
 
 Launch some confetti the default way:

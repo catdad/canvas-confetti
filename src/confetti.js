@@ -31,8 +31,6 @@
     ]
   };
 
-  var animationObj;
-
   function noop() {}
 
   // create a promise if it exists, otherwise, just
@@ -88,15 +86,21 @@
     return origin;
   }
 
-  function setCanvasSize(canvas) {
+  function setCanvasWindowSize(canvas) {
     canvas.width = document.documentElement.clientWidth;
     canvas.height = document.documentElement.clientHeight;
+  }
+
+  function setCanvasRectSize(canvas) {
+    var rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
   }
 
   function getCanvas(zIndex) {
     var canvas = document.createElement('canvas');
 
-    setCanvasSize(canvas);
+    setCanvasWindowSize(canvas);
 
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
@@ -163,11 +167,12 @@
     return fetti.tick < fetti.totalTicks;
   }
 
-  function animate(canvas, fettis, done) {
+  function animate(canvas, fettis, isLibCanvas, allowResize, done) {
     var animatingFettis = fettis.slice();
     var context = canvas.getContext('2d');
     var width = canvas.width;
     var height = canvas.height;
+    var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
 
     function onResize() {
       // don't actually query the size here, since this
@@ -176,9 +181,18 @@
     }
 
     var prom = promise(function (resolve) {
+      function onDone() {
+        if (allowResize) {
+          window.removeEventListener('resize', onResize);
+        }
+
+        done();
+        resolve();
+      }
+
       function update() {
         if (!width && !height) {
-          setCanvasSize(canvas);
+          resizer(canvas);
           width = canvas.width;
           height = canvas.height;
         }
@@ -192,17 +206,16 @@
         if (animatingFettis.length) {
           frame(update);
         } else {
-          window.removeEventListener('resize', onResize);
-
-          done();
-          resolve();
+          onDone();
         }
       }
 
       frame(update);
     });
 
-    window.addEventListener('resize', onResize, false);
+    if (allowResize) {
+      window.addEventListener('resize', onResize, false);
+    }
 
     return {
       addFettis: function (fettis) {
@@ -215,55 +228,75 @@
     };
   }
 
-  function confetti(options) {
-    var particleCount = prop(options, 'particleCount', Math.floor);
-    var angle = prop(options, 'angle', Number);
-    var spread = prop(options, 'spread', Number);
-    var startVelocity = prop(options, 'startVelocity', Number);
-    var decay = prop(options, 'decay', Number);
-    var colors = prop(options, 'colors');
-    var ticks = prop(options, 'ticks', Number);
-    var zIndex = prop(options, 'zIndex', Number);
-    var origin = getOrigin(options);
+  function confettiCannon(canvas, globalOpts) {
+    var isLibCanvas = !canvas;
+    var allowResize = !!prop(globalOpts || {}, 'resize');
+    var resized = false;
+    var animationObj;
 
-    var temp = particleCount;
-    var fettis = [];
-    var canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
+    return function fire(options) {
+      var particleCount = prop(options, 'particleCount', Math.floor);
+      var angle = prop(options, 'angle', Number);
+      var spread = prop(options, 'spread', Number);
+      var startVelocity = prop(options, 'startVelocity', Number);
+      var decay = prop(options, 'decay', Number);
+      var colors = prop(options, 'colors');
+      var ticks = prop(options, 'ticks', Number);
+      var zIndex = prop(options, 'zIndex', Number);
+      var origin = getOrigin(options);
 
-    var startX = canvas.width * origin.x;
-    var startY = canvas.height * origin.y;
+      var temp = particleCount;
+      var fettis = [];
 
-    while (temp--) {
-      fettis.push(
-        randomPhysics({
-          x: startX,
-          y: startY,
-          angle: angle,
-          spread: spread,
-          startVelocity: startVelocity,
-          color: colors[temp % colors.length],
-          ticks: ticks,
-          decay: decay
-        })
-      );
-    }
+      if (isLibCanvas) {
+        canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
+      } else if (allowResize && !resized) {
+        // initialize the size of a user-supplied canvas
+        setCanvasRectSize(canvas);
+        resized = true;
+      }
 
-    // if we have a previous canvas already animating,
-    // add to it
-    if (animationObj) {
-      return animationObj.addFettis(fettis);
-    }
+      var startX = canvas.width * origin.x;
+      var startY = canvas.height * origin.y;
 
-    document.body.appendChild(canvas);
+      while (temp--) {
+        fettis.push(
+          randomPhysics({
+            x: startX,
+            y: startY,
+            angle: angle,
+            spread: spread,
+            startVelocity: startVelocity,
+            color: colors[temp % colors.length],
+            ticks: ticks,
+            decay: decay
+          })
+        );
+      }
 
-    animationObj = animate(canvas, fettis, function () {
-      animationObj = null;
-      document.body.removeChild(canvas);
-    });
+      // if we have a previous canvas already animating,
+      // add to it
+      if (animationObj) {
+        return animationObj.addFettis(fettis);
+      }
 
-    return animationObj.promise;
+      if (isLibCanvas) {
+        document.body.appendChild(canvas);
+      }
+
+      animationObj = animate(canvas, fettis, isLibCanvas, (isLibCanvas || allowResize), function () {
+        animationObj = null;
+
+        if (isLibCanvas) {
+          document.body.removeChild(canvas);
+        }
+      });
+
+      return animationObj.promise;
+    };
   }
 
-  module.exports = confetti;
+  module.exports = confettiCannon();
+  module.exports.create = confettiCannon;
   module.exports.Promise = window.Promise || null;
 }());
