@@ -48,6 +48,7 @@ ${content}
 // end source content
 
 export default module.exports;
+export let create = module.exports.create;
 `;
 }
 
