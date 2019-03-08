@@ -3,6 +3,8 @@ const { promisify } = require('util');
 
 const { name, version, main } = require('../package.json');
 
+const buildDate = (new Date()).toISOString();
+
 function mkdir(dir) {
   return promisify(fs.mkdir)(dir).then(() => {
     return Promise.resolve();
@@ -23,8 +25,8 @@ function writeFile(file, content) {
   return promisify(fs.writeFile)(file, content);
 }
 
-function buildFile(content) {
-  return `// ${name} v${version} built on ${(new Date()).toISOString()}
+function buildCommonJs(content) {
+  return `// ${name} v${version} built on ${buildDate}
 !(function (window) {
   var module = {};
 
@@ -37,9 +39,26 @@ ${content}
 `;
 }
 
+function buildModule(content) {
+  return `// ${name} v${version} built on ${buildDate}
+var module = {};
+
+// source content
+${content}
+// end source content
+
+export default module.exports;
+`;
+}
+
 mkdir('dist')
 .then(() => readFile(main))
-.then(file => writeFile('dist/confetti.browser.js', buildFile(file)))
+.then(file => {
+  return Promise.all([
+    writeFile('dist/confetti.browser.js', buildCommonJs(file)),
+    writeFile('dist/confetti.module.mjs', buildModule(file))
+  ]);
+})
 .catch(err => {
   console.error(err);
   process.exitCode = 1;
