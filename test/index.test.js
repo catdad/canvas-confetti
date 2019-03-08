@@ -99,7 +99,7 @@ const createBuffer = (data, format) => {
 
 function confetti(opts, wait = false, funcName = 'confetti') {
   return `
-${wait ? '' : 'confetti.Promise = null;'}
+${wait ? '' : `${funcName}.Promise = null;`}
 ${funcName}(${opts ? JSON.stringify(opts) : ''});
 `;
 }
@@ -476,7 +476,7 @@ test('handles window resizes', async t => {
  * Custom canvas
  */
 
-const injectCanvas = async (page, allowResize = true) => {
+const injectCanvas = async (page, allowResize = true, createName = 'confetti.create') => {
   await page.evaluate(`
     var canvas = document.createElement('canvas');
     canvas.style.width = '100%';
@@ -484,7 +484,7 @@ const injectCanvas = async (page, allowResize = true) => {
 
     document.body.appendChild(canvas);
 
-    window.myConfetti = confetti.create(canvas, { resize: ${!!allowResize} });
+    window.myConfetti = ${createName}(canvas, { resize: ${!!allowResize} });
   `);
 };
 
@@ -617,3 +617,38 @@ test('works using the browserify bundle', async t => {
 
   t.deepEqual(pixels, ['#00ff00', '#ffffff']);
 });
+
+/*
+ * ESM tests
+ */
+
+test('the esm module exposed confetti as the default', async t => {
+  const page = await fixturePage('fixtures/page.module.html');
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff00ff']
+  }, 'confettiAlias');
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+
+  t.deepEqual(pixels, ['#ff00ff', '#ffffff']);
+});
+
+test('the esm module exposed confetti.create as create', async t => {
+  const page = await fixturePage('fixtures/page.module.html');
+
+  await injectCanvas(page, true, 'createAlias');
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff00ff']
+  }, 'myConfetti');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+
+  t.deepEqual(pixels, ['#ff00ff', '#ffffff']);
+});
+
