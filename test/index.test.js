@@ -219,6 +219,7 @@ test.after(async () => {
 // hack to get the status of a test, until AVA implements this
 // https://github.com/avajs/ava/issues/840
 test.beforeEach((t) => {
+  t.context.page = null;
   t.context.passing = false;
 });
 test.afterEach((t) => {
@@ -226,6 +227,10 @@ test.afterEach((t) => {
 });
 
 test.afterEach.always(async t => {
+  if (t.context.page) {
+    await t.context.page.close();
+  }
+
   if (t.context.passing && !process.env['CONFETTI_SHOW']) {
     return;
   }
@@ -251,7 +256,7 @@ test.afterEach.always(async t => {
  */
 
 test('shoots default confetti', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
 
   t.context.buffer = await confettiImage(page);
   t.context.image = await reduceImg(t.context.buffer);
@@ -263,7 +268,7 @@ test('shoots default confetti', async t => {
 });
 
 test('shoots red confetti', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
 
   t.context.buffer = await confettiImage(page, {
     colors: ['#ff0000']
@@ -276,7 +281,7 @@ test('shoots red confetti', async t => {
 });
 
 test('shoots blue confetti', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
 
   t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff']
@@ -289,7 +294,7 @@ test('shoots blue confetti', async t => {
 });
 
 test('shoots confetti to the left', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
 
   t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff'],
@@ -308,7 +313,7 @@ test('shoots confetti to the left', async t => {
 });
 
 test('shoots confetti to the right', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
 
   t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff'],
@@ -331,7 +336,7 @@ test('shoots confetti to the right', async t => {
  */
 
 test('shoots confetti repeatedly using requestAnimationFrame', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
   const time = 6 * 1000;
 
   let opts = {
@@ -387,7 +392,7 @@ test('shoots confetti repeatedly using requestAnimationFrame', async t => {
 });
 
 test('uses promises when available', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
 
   await page.evaluate(confetti({}, true));
 
@@ -401,7 +406,7 @@ test('uses promises when available', async t => {
 });
 
 test('removes the canvas when done', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
 
   function hasCanvas() {
     return page.evaluate(`!!document.querySelector('canvas')`);
@@ -426,7 +431,7 @@ test('handles window resizes', async t => {
   const height = 500;
   const time = 50;
 
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
   await page.setViewport({ width: width / 2, height });
 
   let opts = {
@@ -499,7 +504,7 @@ const getCanvasSize = async (page) => {
 };
 
 test('can create instances of confetti in separate canvas', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
   await injectCanvas(page);
 
   const beforeSize = await getCanvasSize(page);
@@ -516,7 +521,7 @@ test('can create instances of confetti in separate canvas', async t => {
 });
 
 test('can use a custom canvas without resizing', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
   await injectCanvas(page, false);
 
   const beforeSize = await getCanvasSize(page);
@@ -536,7 +541,7 @@ test('can use a custom canvas without resizing', async t => {
 });
 
 test('shoots confetti repeatedly in defaut and custom canvas using requestAnimationFrame', async t => {
-  const page = await fixturePage();
+  const page = t.context.page = await fixturePage();
   await injectCanvas(page);
   const time = 6 * 1000;
 
@@ -606,7 +611,7 @@ test('shoots confetti repeatedly in defaut and custom canvas using requestAnimat
  */
 
 test('works using the browserify bundle', async t => {
-  const page = await fixturePage('fixtures/page.browserify.html');
+  const page = t.context.page = await fixturePage('fixtures/page.browserify.html');
 
   await page.evaluate(confetti({
     colors: ['#00ff00']
