@@ -630,7 +630,7 @@ test('works using the browserify bundle', async t => {
  */
 
 test('the esm module exposed confetti as the default', async t => {
-  const page = await fixturePage('fixtures/page.module.html');
+  const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   t.context.buffer = await confettiImage(page, {
     colors: ['#ff00ff']
@@ -645,7 +645,7 @@ test('the esm module exposed confetti as the default', async t => {
 });
 
 test('the esm module exposed confetti.create as create', async t => {
-  const page = await fixturePage('fixtures/page.module.html');
+  const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   await injectCanvas(page, true, 'createAlias');
 
