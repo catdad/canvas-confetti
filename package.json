@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "canvas-confetti",
   "main": "src/confetti.js",
+  "module": "dist/confetti.module.mjs",
   "scripts": {
     "build": "node build/build.js",
     "browserify": "browserify --entry src/confetti.js --outfile temp/confetti.bundle.js --standalone confetti",
