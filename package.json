@@ -4,6 +4,7 @@
   "description": "canvas-confetti",
   "main": "src/confetti.js",
   "module": "dist/confetti.module.mjs",
+  "jsdelivr": "dist/confetti.browser.js",
   "scripts": {
     "build": "node build/build.js",
     "browserify": "browserify --entry src/confetti.js --outfile temp/confetti.bundle.js --standalone confetti",
