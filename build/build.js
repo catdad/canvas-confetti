@@ -27,15 +27,13 @@ function writeFile(file, content) {
 
 function buildCommonJs(content) {
   return `// ${name} v${version} built on ${buildDate}
-!(function (window) {
-  var module = {};
-
+!(function (window, module) {
 // source content
 ${content}
 // end source content
 
   window.confetti = module.exports;
-}(window));
+}(window, {}));
 `;
 }
 
