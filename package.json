@@ -1,7 +1,7 @@
 {
   "name": "canvas-confetti",
   "version": "0.2.0",
-  "description": "canvas-confetti",
+  "description": "performant confetti animation in the browser",
   "main": "src/confetti.js",
   "module": "dist/confetti.module.mjs",
   "jsdelivr": "dist/confetti.browser.js",
@@ -42,6 +42,7 @@
   "dependencies": {},
   "keywords": [
     "canvas",
-    "confetti"
+    "confetti",
+    "animation"
   ]
 }
