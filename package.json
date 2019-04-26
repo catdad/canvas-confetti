@@ -38,5 +38,10 @@
     "rootrequire": "^1.0.0",
     "send": "^0.16.1",
     "static-server": "^3.0.0"
-  }
+  },
+  "dependencies": {},
+  "keywords": [
+    "canvas",
+    "confetti"
+  ]
 }
