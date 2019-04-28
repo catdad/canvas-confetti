@@ -1,8 +1,10 @@
 {
   "name": "canvas-confetti",
-  "version": "0.1.0",
-  "description": "canvas-confetti",
+  "version": "0.2.1",
+  "description": "performant confetti animation in the browser",
   "main": "src/confetti.js",
+  "module": "dist/confetti.module.mjs",
+  "jsdelivr": "dist/confetti.browser.js",
   "scripts": {
     "build": "node build/build.js",
     "browserify": "browserify --entry src/confetti.js --outfile temp/confetti.bundle.js --standalone confetti",
@@ -36,5 +38,11 @@
     "rootrequire": "^1.0.0",
     "send": "^0.16.1",
     "static-server": "^3.0.0"
-  }
+  },
+  "dependencies": {},
+  "keywords": [
+    "canvas",
+    "confetti",
+    "animation"
+  ]
 }

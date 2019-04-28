@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>test harness</title>
+
+  <style>
+    html, body {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <script type="module">
+    import confetti, { create } from '/dist/confetti.module.mjs';
+
+    if (window.confetti) {
+      throw 'nope';
+    }
+
+    window.confettiAlias = confetti;
+    window.createAlias = create;
+  </script>
+</body>
+</html>
