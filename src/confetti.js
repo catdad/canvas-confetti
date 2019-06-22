@@ -193,6 +193,8 @@
     var width = canvas.width;
     var height = canvas.height;
     var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
+    var animationFrame;
+    var destroy;
 
     function onResize() {
       // don't actually query the size here, since this
@@ -202,6 +204,8 @@
 
     var prom = promise(function (resolve) {
       function onDone() {
+        animationFrame = destroy = null;
+
         if (allowResize) {
           window.removeEventListener('resize', onResize);
         }
@@ -224,13 +228,14 @@
         });
 
         if (animatingFettis.length) {
-          frame(update);
+          animationFrame = frame(update);
         } else {
           onDone();
         }
       }
 
-      frame(update);
+      animationFrame = frame(update);
+      destroy = onDone;
     });
 
     if (allowResize) {
@@ -244,7 +249,16 @@
         return prom;
       },
       canvas: canvas,
-      promise: prom
+      promise: prom,
+      reset: function () {
+        if (animationFrame) {
+          cancel(animationFrame);
+        }
+
+        if (destroy) {
+          destroy();
+        }
+      }
     };
   }
 
@@ -254,7 +268,7 @@
     var resized = false;
     var animationObj;
 
-    return function fire(options) {
+    function fire(options) {
       var particleCount = prop(options, 'particleCount', Math.floor);
       var angle = prop(options, 'angle', Number);
       var spread = prop(options, 'spread', Number);
@@ -313,7 +327,15 @@
       });
 
       return animationObj.promise;
+    }
+
+    fire.reset = function () {
+      if (animationObj) {
+        animationObj.reset();
+      }
     };
+
+    return fire;
   }
 
   module.exports = confettiCannon();
