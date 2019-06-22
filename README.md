@@ -1,4 +1,4 @@
-# canvas-confetti
+# 🎊 canvas confetti 🎊
 
 [![travis][travis.svg]][travis.link]
 [![jsdelivr][jsdelivr.svg]][jsdelivr.link]
