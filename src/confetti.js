@@ -210,6 +210,8 @@
           window.removeEventListener('resize', onResize);
         }
 
+        context.clearRect(0, 0, width, height);
+
         done();
         resolve();
       }
