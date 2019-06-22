@@ -1,13 +1,33 @@
 (function () {
-  var frame = (function(){
-    return window.requestAnimationFrame ||
-      window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame ||
-      window.oRequestAnimationFrame ||
-      window.msRequestAnimationFrame ||
-      function (cb) {
-        window.setTimeout(cb, 1000 / 60);
+  var frame, cancel;
+  (function(){
+    if (window.requestAnimationFrame && window.cancelAnimationFrame) {
+      frame = window.requestAnimationFrame;
+      cancel = window.cancelAnimationFrame;
+    } else {
+      ['webkit', 'moz', 'o', 'ms'].forEach(function (name) {
+        if (frame && cancel) {
+          return;
+        }
+
+        var framename = name + 'RequestAnimationFrame';
+        var cancelname = name + 'CancelAnimationFrame';
+
+        if (window[framename] && window[cancelname]) {
+          frame = window[framename];
+          cancel = window[cancelname];
+        }
+      });
+    }
+
+    if (!(frame && cancel)) {
+      frame = function (cb) {
+        return window.setTimeout(cb, 1000 / 60);
       };
+      cancel = function (timer) {
+        return window.clearTimeout(timer);
+      };
+    }
   }());
 
   var defaults = {
