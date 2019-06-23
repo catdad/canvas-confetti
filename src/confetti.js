@@ -1,13 +1,33 @@
 (function () {
-  var frame = (function(){
-    return window.requestAnimationFrame ||
-      window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame ||
-      window.oRequestAnimationFrame ||
-      window.msRequestAnimationFrame ||
-      function (cb) {
-        window.setTimeout(cb, 1000 / 60);
+  var frame, cancel;
+  (function(){
+    if (window.requestAnimationFrame && window.cancelAnimationFrame) {
+      frame = window.requestAnimationFrame;
+      cancel = window.cancelAnimationFrame;
+    } else {
+      ['webkit', 'moz', 'o', 'ms'].forEach(function (name) {
+        if (frame && cancel) {
+          return;
+        }
+
+        var framename = name + 'RequestAnimationFrame';
+        var cancelname = name + 'CancelAnimationFrame';
+
+        if (window[framename] && window[cancelname]) {
+          frame = window[framename];
+          cancel = window[cancelname];
+        }
+      });
+    }
+
+    if (!(frame && cancel)) {
+      frame = function (cb) {
+        return window.setTimeout(cb, 1000 / 60);
       };
+      cancel = function (timer) {
+        return window.clearTimeout(timer);
+      };
+    }
   }());
 
   var defaults = {
@@ -173,6 +193,8 @@
     var width = canvas.width;
     var height = canvas.height;
     var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
+    var animationFrame;
+    var destroy;
 
     function onResize() {
       // don't actually query the size here, since this
@@ -182,9 +204,13 @@
 
     var prom = promise(function (resolve) {
       function onDone() {
+        animationFrame = destroy = null;
+
         if (allowResize) {
           window.removeEventListener('resize', onResize);
         }
+
+        context.clearRect(0, 0, width, height);
 
         done();
         resolve();
@@ -204,13 +230,14 @@
         });
 
         if (animatingFettis.length) {
-          frame(update);
+          animationFrame = frame(update);
         } else {
           onDone();
         }
       }
 
-      frame(update);
+      animationFrame = frame(update);
+      destroy = onDone;
     });
 
     if (allowResize) {
@@ -224,7 +251,16 @@
         return prom;
       },
       canvas: canvas,
-      promise: prom
+      promise: prom,
+      reset: function () {
+        if (animationFrame) {
+          cancel(animationFrame);
+        }
+
+        if (destroy) {
+          destroy();
+        }
+      }
     };
   }
 
@@ -234,7 +270,7 @@
     var resized = false;
     var animationObj;
 
-    return function fire(options) {
+    function fire(options) {
       var particleCount = prop(options, 'particleCount', Math.floor);
       var angle = prop(options, 'angle', Number);
       var spread = prop(options, 'spread', Number);
@@ -293,7 +329,15 @@
       });
 
       return animationObj.promise;
+    }
+
+    fire.reset = function () {
+      if (animationObj) {
+        animationObj.reset();
+      }
     };
+
+    return fire;
   }
 
   module.exports = confettiCannon();

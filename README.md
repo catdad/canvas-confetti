@@ -1,4 +1,4 @@
-# canvas-confetti
+# 🎊 canvas confetti 🎊
 
 [![travis][travis.svg]][travis.link]
 [![jsdelivr][jsdelivr.svg]][jsdelivr.link]
@@ -30,7 +30,7 @@ You can then `require('canvas-confetti');` to use it in your project build. _Not
 You can also include this library in your HTML page directly from a CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@0.2.1/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@0.3.0/dist/confetti.browser.min.js"></script>
 ```
 
 _Note: you should use the latest version at the time that you include your project. You can see all versions [on the releases page](https://github.com/catdad/canvas-confetti/releases)._
@@ -87,6 +87,31 @@ myConfetti({
   // any other options from the global
   // confetti function
 });
+```
+
+### `confetti.reset()`
+
+Stops the animation and clears all confetti, as well as immediately resolves any outstanding promises. In the case of a separate confetti instance created with [`confetti.create`](#confetticreatecanvas-globaloptions--function), that instacne will have its own `reset` method.
+
+```javascript
+confetti();
+
+setTimeout(() => {
+  confetti.reset();
+}, 100);
+```
+
+```javascript
+var myCanvas = document.createElement('canvas');
+document.appendChild(myCanvas);
+
+var myConfetti = confetti.create(myCanvas, { resize: true });
+
+myConfetti();
+
+setTimeout(() => {
+  myConfetti.reset();
+}, 100);
 ```
 
 ## Examples
