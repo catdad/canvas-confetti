@@ -482,13 +482,6 @@ test('handles window resizes', async t => {
 test('stops and removes canvas immediately when `reset` is called', async t => {
   const page = t.context.page = await fixturePage();
 
-  function hasCanvas() {
-    return page.evaluate(`!!document.querySelector('canvas')`);
-  }
-
-  // make sure there is no canvas before executing confetti
-  t.is(await hasCanvas(), false);
-
   const promise = page.evaluate(`new Promise((resolve, reject) => {
     const results = [];
     results.push(!!document.querySelector('canvas'));
