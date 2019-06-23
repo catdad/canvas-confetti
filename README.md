@@ -89,6 +89,31 @@ myConfetti({
 });
 ```
 
+### `confetti.reset()`
+
+Stops the animation and clears all confetti, as well as immediately resolves any outstanding promises. In the case of a separate confetti instance created with [`confetti.create`](#confetticreatecanvas-globaloptions--function), that instacne will have its own `reset` method.
+
+```javascript
+confetti();
+
+setTimeout(() => {
+  confetti.reset();
+}, 100);
+```
+
+```javascript
+var myCanvas = document.createElement('canvas');
+document.appendChild(myCanvas);
+
+var myConfetti = confetti.create(myCanvas, { resize: true });
+
+myConfetti();
+
+setTimeout(() => {
+  myConfetti.reset();
+}, 100);
+```
+
 ## Examples
 
 Launch some confetti the default way:
