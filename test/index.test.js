@@ -711,3 +711,9 @@ test('the esm module exposed confetti.create as create', async t => {
   t.deepEqual(pixels, ['#ff00ff', '#ffffff']);
 });
 
+test('exposed confetti method has a `reset` property', async t => {
+  const page = t.context.page = await fixturePage('fixtures/page.module.html');
+
+  t.is(await page.evaluate(`typeof confettiAlias.reset`), 'function');
+});
+
