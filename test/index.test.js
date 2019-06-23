@@ -633,6 +633,31 @@ test('shoots confetti repeatedly in defaut and custom canvas using requestAnimat
   t.deepEqual(await uniqueColors(await reduceImg(img4)), ['#0000ff', '#ff0000', '#ffffff']);
 });
 
+test('calling `reset` method clears all existing confetti but more can be launched after', async t => {
+  const page = t.context.page = await fixturePage();
+  await injectCanvas(page);
+
+  const prom1 = page.evaluate(confetti({ colors: ['#ff0000'] }, true, 'myConfetti'));
+  await sleep(50);
+  const img1 = await page.screenshot({ type: 'png' });
+
+  await Promise.all([
+    prom1,
+    page.evaluate(`myConfetti.reset();`)
+  ]);
+  const img2 = await page.screenshot({ type: 'png' });
+
+  const prom2 = page.evaluate(confetti({ colors: ['#ff0000'] }, true, 'myConfetti'));
+  await sleep(50);
+  const img3 = await page.screenshot({ type: 'png' });
+
+  await prom2;
+
+  t.deepEqual(await uniqueColors(await reduceImg(img1)), ['#ff0000', '#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img2)), ['#ffffff']);
+  t.deepEqual(await uniqueColors(await reduceImg(img3)), ['#ff0000', '#ffffff']);
+});
+
 /*
  * Browserify tests
  */
