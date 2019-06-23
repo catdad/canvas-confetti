@@ -492,7 +492,9 @@ test('stops and removes canvas immediately when `reset` is called', async t => {
   const promise = page.evaluate(`new Promise((resolve, reject) => {
     const results = [];
     results.push(!!document.querySelector('canvas'));
-    const p = confetti();
+    confetti().then(() => {
+      results.push('done');
+    });
     results.push(!!document.querySelector('canvas'));
     confetti.reset();
     results.push(!!document.querySelector('canvas'));
@@ -501,7 +503,7 @@ test('stops and removes canvas immediately when `reset` is called', async t => {
 
   const results = await promise;
 
-  t.deepEqual(results, [false, true, false]);
+  t.deepEqual(results, [false, true, false, 'done']);
 });
 
 /*
