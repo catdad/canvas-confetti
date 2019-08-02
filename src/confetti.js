@@ -143,6 +143,7 @@
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: Math.random() * Math.PI,
       color: hexToRgb(opts.color),
+      shape: Math.random() < 0.5 ? 'default' : 'circle',
       tick: 0,
       totalTicks: opts.ticks,
       decay: opts.decay,
@@ -175,11 +176,17 @@
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
     context.beginPath();
-
     context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
-    context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
-    context.lineTo(Math.floor(x2), Math.floor(y2));
-    context.lineTo(Math.floor(x1), Math.floor(fetti.wobbleY));
+
+    switch (fetti.shape) {
+      case 'circle':
+        context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1), Math.abs(y2 - y1), Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
+        break;
+      default:
+        context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
+        context.lineTo(Math.floor(x2), Math.floor(y2));
+        context.lineTo(Math.floor(x1), Math.floor(fetti.wobbleY));
+    }
 
     context.closePath();
     context.fill();
