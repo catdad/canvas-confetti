@@ -184,7 +184,7 @@
     context.beginPath();
 
     if (fetti.shape === 'circle') {
-      context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1), Math.abs(y2 - y1), Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
+      context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * 0.6, Math.abs(y2 - y1) * 0.6, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
     } else {
       context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
       context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
