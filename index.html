@@ -431,6 +431,7 @@
             startVelocity: 30,
             spread: 360,
             ticks: 60,
+            shapes: ['square'],
             origin: {
               x: Math.random(),
               // since they fall down, start a bit higher than random
@@ -452,7 +453,8 @@
               // since they fall down, start a bit higher than random
               y: Math.random() - 0.2
             },
-            colors: ['#ffffff']
+            colors: ['#ffffff'],
+            shapes: ['circle']
           });
 
           if (Date.now() < end) {

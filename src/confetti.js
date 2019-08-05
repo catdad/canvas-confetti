@@ -39,6 +39,7 @@
     ticks: 200,
     x: 0.5,
     y: 0.5,
+    shapes: ['square', 'circle'],
     zIndex: 100,
     colors: [
       '#26ccff',
@@ -78,6 +79,11 @@
       options && isOk(options[name]) ? options[name] : defaults[name],
       transform
     );
+  }
+
+  function randomInt(min, max) {
+    // [min, max)
+    return Math.floor(Math.random() * (max - min)) + min;
   }
 
   function toDecimal(str) {
@@ -143,6 +149,7 @@
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: Math.random() * Math.PI,
       color: hexToRgb(opts.color),
+      shape: opts.shape,
       tick: 0,
       totalTicks: opts.ticks,
       decay: opts.decay,
@@ -176,10 +183,14 @@
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
     context.beginPath();
 
-    context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
-    context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
-    context.lineTo(Math.floor(x2), Math.floor(y2));
-    context.lineTo(Math.floor(x1), Math.floor(fetti.wobbleY));
+    if (fetti.shape === 'circle') {
+      context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * 0.6, Math.abs(y2 - y1) * 0.6, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
+    } else {
+      context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
+      context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
+      context.lineTo(Math.floor(x2), Math.floor(y2));
+      context.lineTo(Math.floor(x1), Math.floor(fetti.wobbleY));
+    }
 
     context.closePath();
     context.fill();
@@ -279,6 +290,7 @@
       var colors = prop(options, 'colors');
       var ticks = prop(options, 'ticks', Number);
       var zIndex = prop(options, 'zIndex', Number);
+      var shapes = prop(options, 'shapes');
       var origin = getOrigin(options);
 
       var temp = particleCount;
@@ -304,6 +316,7 @@
             spread: spread,
             startVelocity: startVelocity,
             color: colors[temp % colors.length],
+            shape: shapes[randomInt(0, shapes.length)],
             ticks: ticks,
             decay: decay
           })
