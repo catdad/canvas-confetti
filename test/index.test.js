@@ -293,6 +293,20 @@ test('shoots blue confetti', async t => {
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
 });
 
+test('shoots circle confetti', async t => {
+  const page = t.context.page = await fixturePage();
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#0000ff'],
+    shapes: ['circle']
+  });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+
+  t.deepEqual(pixels, ['#0000ff', '#ffffff']);
+});
+
 test('shoots confetti to the left', async t => {
   const page = t.context.page = await fixturePage();
 
