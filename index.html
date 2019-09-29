@@ -129,6 +129,21 @@
       flex-direction: column;
     }
 
+    a.anchor {
+      position: relative;
+      color: currentColor;
+      text-decoration: none;
+    }
+
+    a.anchor:hover::before {
+      content: "🔗";
+      color: currentColor;
+      position: absolute;
+      left: -2rem;
+      top: 0;
+      transform: scale(0.75, 0.75);
+    }
+
     footer {
       font-size: 0.9rem;
       text-align: center;
@@ -239,11 +254,11 @@
 
   <h1>Canvas Confetti</h1>
 
-  <div class="container"><a id="basic"></a>
+  <div class="container">
     <div class="group" data-name="cannon">
       <div class="flex-rows">
         <div class="left">
-          <a href="#basic"><h2>Basic Cannon</h2></a>
+          <h2><a href="#basic" id="basic" class="anchor">Basic Cannon</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -262,11 +277,11 @@
     </div>
   </div>
 
-  <div class="container"><a id="random"></a>
+  <div class="container">
     <div class="group" data-name="random">
       <div class="flex-rows">
         <div class="left">
-          <a href="#random"><h2>Random Cannon</h2></a>
+          <h2><a href="#random" id="random" class="anchor">Random Cannon</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -285,11 +300,11 @@
     </div>
   </div>
 
-  <div class="container"><a id="fireworks"></a>
+  <div class="container">
     <div class="group" data-name="fireworks">
       <div class="flex-rows">
         <div class="left">
-          <a href="#fireworks"><h2>Fireworks</h2></a>
+          <h2><a href="#fireworks" id="fireworks" class="anchor">Fireworks</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -308,11 +323,11 @@
     </div>
   </div>
 
-  <div class="container"><a id="snow"></a>
+  <div class="container">
     <div class="group" data-name="snow">
       <div class="flex-rows">
         <div class="left">
-          <a href="#snow"><h2>Snow</h2></a>
+          <h2><a href="#snow" id="snow" class="anchor">Snow</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -331,11 +346,11 @@
     </div>
   </div>
 
-  <div class="container"><a id="continuous"></a>
+  <div class="container">
     <div class="group" data-name="continuous">
       <div class="flex-rows">
         <div class="left">
-          <a href="#continuous"><h2>School Pride</h2></a>
+          <h2><a href="#continuous" id="continuous" class="anchor">School Pride</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -356,11 +371,11 @@
     </div>
   </div>
 
-  <div class="container"><a id="custom-canvas"></a>
+  <div class="container">
     <div class="group" data-name="custom">
       <div class="flex-rows">
         <div class="left">
-          <a href="#custom-canvas"><h2>Custom Canvas</h2></a>
+          <h2><a href="#custom-canvas" id="custom-canvas" class="anchor">Custom Canvas</a></h2>
           <button class="run">
             Run
             <span class="icon">
