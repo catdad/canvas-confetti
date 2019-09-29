@@ -129,6 +129,21 @@
       flex-direction: column;
     }
 
+    a.anchor {
+      position: relative;
+      color: currentColor;
+      text-decoration: none;
+    }
+
+    a.anchor:hover::before {
+      content: "🔗";
+      color: currentColor;
+      position: absolute;
+      left: -2rem;
+      top: 0;
+      transform: scale(0.75, 0.75);
+    }
+
     footer {
       font-size: 0.9rem;
       text-align: center;
@@ -243,7 +258,7 @@
     <div class="group" data-name="cannon">
       <div class="flex-rows">
         <div class="left">
-          <h2>Basic Cannon</h2>
+          <h2><a href="#basic" id="basic" class="anchor">Basic Cannon</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -266,7 +281,7 @@
     <div class="group" data-name="random">
       <div class="flex-rows">
         <div class="left">
-          <h2>Random Cannon</h2>
+          <h2><a href="#random" id="random" class="anchor">Random Cannon</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -289,7 +304,7 @@
     <div class="group" data-name="fireworks">
       <div class="flex-rows">
         <div class="left">
-          <h2>Fireworks</h2>
+          <h2><a href="#fireworks" id="fireworks" class="anchor">Fireworks</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -312,7 +327,7 @@
     <div class="group" data-name="snow">
       <div class="flex-rows">
         <div class="left">
-          <h2>Snow</h2>
+          <h2><a href="#snow" id="snow" class="anchor">Snow</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -335,7 +350,7 @@
     <div class="group" data-name="continuous">
       <div class="flex-rows">
         <div class="left">
-          <h2>School Pride</h2>
+          <h2><a href="#continuous" id="continuous" class="anchor">School Pride</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -360,7 +375,7 @@
     <div class="group" data-name="custom">
       <div class="flex-rows">
         <div class="left">
-          <h2>Custom Canvas</h2>
+          <h2><a href="#custom-canvas" id="custom-canvas" class="anchor">Custom Canvas</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -377,7 +392,7 @@
       </div>
       <div class="editor"></div>
       <div class="flex-rows">
-        <canvas id="custom-canvas" class="custom-canvas"></canvas>
+        <canvas id="my-canvas" class="custom-canvas"></canvas>
       </div>
     </div>
   </div>
@@ -487,7 +502,7 @@
         }());
       },
       custom: function() {
-        var canvas = document.getElementById('custom-canvas');
+        var canvas = document.getElementById('my-canvas');
 
         // save this function... we'll save it to the canvas itself for
         // the purpose of this demo
