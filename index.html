@@ -239,11 +239,11 @@
 
   <h1>Canvas Confetti</h1>
 
-  <div class="container">
+  <div class="container"><a id="basic"></a>
     <div class="group" data-name="cannon">
       <div class="flex-rows">
         <div class="left">
-          <h2>Basic Cannon</h2>
+          <a href="#basic"><h2>Basic Cannon</h2></a>
           <button class="run">
             Run
             <span class="icon">
@@ -262,11 +262,11 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container"><a id="random"></a>
     <div class="group" data-name="random">
       <div class="flex-rows">
         <div class="left">
-          <h2>Random Cannon</h2>
+          <a href="#random"><h2>Random Cannon</h2></a>
           <button class="run">
             Run
             <span class="icon">
@@ -285,11 +285,11 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container"><a id="fireworks"></a>
     <div class="group" data-name="fireworks">
       <div class="flex-rows">
         <div class="left">
-          <h2>Fireworks</h2>
+          <a href="#fireworks"><h2>Fireworks</h2></a>
           <button class="run">
             Run
             <span class="icon">
@@ -308,11 +308,11 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container"><a id="snow"></a>
     <div class="group" data-name="snow">
       <div class="flex-rows">
         <div class="left">
-          <h2>Snow</h2>
+          <a href="#snow"><h2>Snow</h2></a>
           <button class="run">
             Run
             <span class="icon">
@@ -331,11 +331,11 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container"><a id="continuous"></a>
     <div class="group" data-name="continuous">
       <div class="flex-rows">
         <div class="left">
-          <h2>School Pride</h2>
+          <a href="#continuous"><h2>School Pride</h2></a>
           <button class="run">
             Run
             <span class="icon">
@@ -356,11 +356,11 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container"><a id="custom-canvas"></a>
     <div class="group" data-name="custom">
       <div class="flex-rows">
         <div class="left">
-          <h2>Custom Canvas</h2>
+          <a href="#custom-canvas"><h2>Custom Canvas</h2></a>
           <button class="run">
             Run
             <span class="icon">
@@ -377,7 +377,7 @@
       </div>
       <div class="editor"></div>
       <div class="flex-rows">
-        <canvas id="custom-canvas" class="custom-canvas"></canvas>
+        <canvas id="my-canvas" class="custom-canvas"></canvas>
       </div>
     </div>
   </div>
@@ -487,7 +487,7 @@
         }());
       },
       custom: function() {
-        var canvas = document.getElementById('custom-canvas');
+        var canvas = document.getElementById('my-canvas');
 
         // save this function... we'll save it to the canvas itself for
         // the purpose of this demo
