@@ -92,7 +92,7 @@ myConfetti({
 
 ### `confetti.reset()`
 
-Stops the animation and clears all confetti, as well as immediately resolves any outstanding promises. In the case of a separate confetti instance created with [`confetti.create`](#confetticreatecanvas-globaloptions--function), that instacne will have its own `reset` method.
+Stops the animation and clears all confetti, as well as immediately resolves any outstanding promises. In the case of a separate confetti instance created with [`confetti.create`](#confetticreatecanvas-globaloptions--function), that instance will have its own `reset` method.
 
 ```javascript
 confetti();
