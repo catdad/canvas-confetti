@@ -13,7 +13,7 @@ test('can be evaluated in a node vm', async t => {
   t.is(typeof file, 'string');
 
   const context = vm.createContext({ module: {} });
-  const result = vm.runInContext(file, context);
+  vm.runInContext(file, context);
 
   t.is(typeof context.module.exports, 'function');
   t.is(typeof context.module.exports.create, 'function');
