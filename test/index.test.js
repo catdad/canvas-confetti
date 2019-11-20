@@ -237,7 +237,7 @@ test.afterEach.always(async t => {
   // this is allowed, but still needs the eslint plugin to be updated
   // https://github.com/avajs/eslint-plugin-ava/issues/176
   // eslint-disable-next-line ava/use-t-well
-  const name = t.title.replace(/^afterEach for /, '');
+  const name = t.title.replace(/^afterEach\.always hook for /, '');
 
   // save the raw buffer image, if one is present
   if (t.context.buffer) {
