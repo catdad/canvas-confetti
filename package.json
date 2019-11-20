@@ -9,12 +9,11 @@
     "build": "node build/build.js",
     "browserify": "browserify --entry src/confetti.js --outfile temp/confetti.bundle.js --standalone confetti",
     "pretest": "npm run build -s && npm run browserify -s",
-    "test": "cd test && ava",
+    "test": "cd test && ava --verbose --serial",
     "lint": "eslint src/**/*.js test/**/*.js build/**/*.js",
     "dev": "static-server --port 9001",
     "devtest": "cross-env CONFETTI_SHOW=1 npm test",
-    "supertest": "npm run devtest -- -- --verbose --serial",
-    "citest": "npm run test -- --verbose --serial"
+    "citest": "npm run test"
   },
   "repository": {
     "type": "git",
