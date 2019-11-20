@@ -1,33 +1,55 @@
 (function () {
-  var frame, cancel;
-  (function(){
-    if (window.requestAnimationFrame && window.cancelAnimationFrame) {
-      frame = window.requestAnimationFrame;
-      cancel = window.cancelAnimationFrame;
-    } else {
-      ['webkit', 'moz', 'o', 'ms'].forEach(function (name) {
-        if (frame && cancel) {
-          return;
-        }
+  var raf = (function () {
+    var frame, cancel;
 
-        var framename = name + 'RequestAnimationFrame';
-        var cancelname = name + 'CancelAnimationFrame';
+    function init() {
+      if (window.requestAnimationFrame && window.cancelAnimationFrame) {
+        frame = window.requestAnimationFrame;
+        cancel = window.cancelAnimationFrame;
+      } else {
+        ['webkit', 'moz', 'o', 'ms'].forEach(function (name) {
+          if (frame && cancel) {
+            return;
+          }
 
-        if (window[framename] && window[cancelname]) {
-          frame = window[framename];
-          cancel = window[cancelname];
-        }
-      });
+          var framename = name + 'RequestAnimationFrame';
+          var cancelname = name + 'CancelAnimationFrame';
+
+          if (window[framename] && window[cancelname]) {
+            frame = window[framename];
+            cancel = window[cancelname];
+          }
+        });
+      }
+
+      if (!(frame && cancel)) {
+        frame = function (cb) {
+          return window.setTimeout(cb, 1000 / 60);
+        };
+        cancel = function (timer) {
+          return window.clearTimeout(timer);
+        };
+      }
     }
 
-    if (!(frame && cancel)) {
-      frame = function (cb) {
-        return window.setTimeout(cb, 1000 / 60);
-      };
-      cancel = function (timer) {
-        return window.clearTimeout(timer);
-      };
-    }
+    return {
+      frame: function (arg) {
+        if (frame) {
+          return frame(arg);
+        }
+
+        init();
+        return frame(arg);
+      },
+      cancel: function (arg) {
+        if (cancel) {
+          return cancel(arg);
+        }
+
+        init();
+        return cancel(arg);
+      }
+    };
   }());
 
   var defaults = {
@@ -57,8 +79,11 @@
   // create a promise if it exists, otherwise, just
   // call the function directly
   function promise(func) {
-    if (module.exports.Promise) {
-      return new module.exports.Promise(func);
+    var ModulePromise = module.exports.Promise;
+    var Prom = ModulePromise !== void 0 ? ModulePromise : window.Promise;
+
+    if (typeof Prom === 'function') {
+      return new Prom(func);
     }
 
     func(noop, noop);
@@ -252,13 +277,13 @@
         });
 
         if (animatingFettis.length) {
-          animationFrame = frame(update);
+          animationFrame = raf.frame(update);
         } else {
           onDone();
         }
       }
 
-      animationFrame = frame(update);
+      animationFrame = raf.frame(update);
       destroy = onDone;
     });
 
@@ -276,7 +301,7 @@
       promise: prom,
       reset: function () {
         if (animationFrame) {
-          cancel(animationFrame);
+          raf.cancel(animationFrame);
         }
 
         if (destroy) {
@@ -366,5 +391,4 @@
 
   module.exports = confettiCannon();
   module.exports.create = confettiCannon;
-  module.exports.Promise = window.Promise || null;
 }());
