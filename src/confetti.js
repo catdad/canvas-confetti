@@ -1,4 +1,4 @@
-(function main() {
+(function main(global = {}) {
   var undef = 'undefined';
   var worker;
   var isWorker = typeof IS_WORKER !== undef;
@@ -12,9 +12,9 @@
     var frame, cancel;
 
     function init() {
-      if (window.requestAnimationFrame && window.cancelAnimationFrame) {
-        frame = window.requestAnimationFrame;
-        cancel = window.cancelAnimationFrame;
+      if (global.requestAnimationFrame && global.cancelAnimationFrame) {
+        frame = global.requestAnimationFrame;
+        cancel = global.cancelAnimationFrame;
       } else {
         ['webkit', 'moz', 'o', 'ms'].forEach(function (name) {
           if (frame && cancel) {
@@ -24,19 +24,19 @@
           var framename = name + 'RequestAnimationFrame';
           var cancelname = name + 'CancelAnimationFrame';
 
-          if (window[framename] && window[cancelname]) {
-            frame = window[framename];
-            cancel = window[cancelname];
+          if (global[framename] && global[cancelname]) {
+            frame = global[framename];
+            cancel = global[cancelname];
           }
         });
       }
 
       if (!(frame && cancel)) {
         frame = function (cb) {
-          return window.setTimeout(cb, 1000 / 60);
+          return setTimeout(cb, 1000 / 60);
         };
         cancel = function (timer) {
-          return window.clearTimeout(timer);
+          return clearTimeout(timer);
         };
       }
     }
@@ -89,7 +89,7 @@
   // call the function directly
   function promise(func) {
     var ModulePromise = module.exports.Promise;
-    var Prom = ModulePromise !== void 0 ? ModulePromise : window.Promise;
+    var Prom = Promise; // TODO: ModulePromise !== void 0 ? ModulePromise : window.Promise;
 
     if (typeof Prom === 'function') {
       return new Prom(func);
@@ -263,7 +263,7 @@
         animationFrame = destroy = null;
 
         if (allowResize) {
-          window.removeEventListener('resize', onResize);
+          global.removeEventListener('resize', onResize);
         }
 
         context.clearRect(0, 0, width, height);
@@ -297,7 +297,7 @@
     });
 
     if (allowResize) {
-      window.addEventListener('resize', onResize, false);
+      global.addEventListener('resize', onResize, false);
     }
 
     return {
@@ -431,4 +431,4 @@
       worker.postMessage({ options: options });
     };
   })();
-}());
+}(this));
