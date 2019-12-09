@@ -1,4 +1,13 @@
-(function () {
+(function main() {
+  var undef = 'undefined';
+  var worker;
+  var isWorker = typeof IS_WORKER !== undef;
+  var canUseWorker = typeof Worker !== undef &&
+      typeof Blob !== undef &&
+      typeof OffscreenCanvas !== undef &&
+      typeof URL !== undef &&
+      !!URL.createObjectURL;
+
   var raf = (function () {
     var frame, cancel;
 
@@ -318,6 +327,7 @@
     var animationObj;
 
     function fire(options) {
+      console.log(isWorker, options);
       var particleCount = prop(options, 'particleCount', Math.floor);
       var angle = prop(options, 'angle', Number);
       var spread = prop(options, 'spread', Number);
@@ -391,4 +401,34 @@
 
   module.exports = confettiCannon();
   module.exports.create = confettiCannon;
+  module.exports.async = (function () {
+    var canvas;
+
+    if (!isWorker && canUseWorker && !worker) {
+      console.log('creating worker');
+      var code = [
+        'var CANVAS, CONFETTI;',
+        'var IS_WORKER = 1;',
+        'var module = {};',
+        '(' + main.toString() + ')();',
+        'onmessage = function(msg) {',
+        'console.log(msg);',
+        '  if (msg.data.options) CONFETTI(msg.data.options);',
+        '  else {',
+        '    CONFETTI = module.exports.create(msg.data.canvas);',
+        '  }',
+        '}',
+      ].join('\n');
+      worker = new Worker(URL.createObjectURL(new Blob([code])));
+      canvas = getCanvas(1);
+      var offscreen = canvas.transferControlToOffscreen();
+      worker.postMessage({ canvas: offscreen }, [offscreen]);
+    }
+
+    return function (options) {
+      console.log('FIRE');
+      document.body.appendChild(canvas);
+      worker.postMessage({ options: options });
+    };
+  })();
 }());
