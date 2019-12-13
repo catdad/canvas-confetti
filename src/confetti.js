@@ -2,38 +2,23 @@
   var raf = (function () {
     var frame, cancel;
 
-    function init() {
-      if (typeof requestAnimationFrame === 'function' && typeof cancelAnimationFrame === 'function') {
-        frame = requestAnimationFrame;
-        cancel = cancelAnimationFrame;
-      } else {
-        frame = function (cb) {
-          return setTimeout(cb, 1000 / 60);
-        };
-        cancel = function (timer) {
-          return clearTimeout(timer);
-        };
-      }
+    if (typeof requestAnimationFrame === 'function' && typeof cancelAnimationFrame === 'function') {
+      frame = function (cb) {
+        return requestAnimationFrame(cb);
+      };
+      cancel = function (timer) {
+        return cancelAnimationFrame(timer);
+      };
+    } else {
+      frame = function (cb) {
+        return setTimeout(cb, 1000 / 60);
+      };
+      cancel = function (timer) {
+        return clearTimeout(timer);
+      };
     }
 
-    return {
-      frame: function (arg) {
-        if (frame) {
-          return frame(arg);
-        }
-
-        init();
-        return frame(arg);
-      },
-      cancel: function (arg) {
-        if (cancel) {
-          return cancel(arg);
-        }
-
-        init();
-        return cancel(arg);
-      }
-    };
+    return { frame: frame, cancel: cancel };
   }());
 
   var defaults = {
