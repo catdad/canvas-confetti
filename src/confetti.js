@@ -421,8 +421,9 @@
       function done() {
         animationObj = null;
 
-        if (isLibCanvas && canvas.parent) {
+        if (isLibCanvas && canvas) {
           document.body.removeChild(canvas);
+          canvas = null;
         }
       }
 
