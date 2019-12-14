@@ -1,4 +1,4 @@
-(function main(global = {}) {
+(function main(global) {
   var undef = 'undefined';
   var worker;
   var isWorker = typeof IS_WORKER !== undef;
