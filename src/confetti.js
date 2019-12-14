@@ -11,54 +11,23 @@
   var raf = (function () {
     var frame, cancel;
 
-    function init() {
-      if (global.requestAnimationFrame && global.cancelAnimationFrame) {
-        frame = global.requestAnimationFrame;
-        cancel = global.cancelAnimationFrame;
-      } else {
-        ['webkit', 'moz', 'o', 'ms'].forEach(function (name) {
-          if (frame && cancel) {
-            return;
-          }
-
-          var framename = name + 'RequestAnimationFrame';
-          var cancelname = name + 'CancelAnimationFrame';
-
-          if (global[framename] && global[cancelname]) {
-            frame = global[framename];
-            cancel = global[cancelname];
-          }
-        });
-      }
-
-      if (!(frame && cancel)) {
-        frame = function (cb) {
-          return setTimeout(cb, 1000 / 60);
-        };
-        cancel = function (timer) {
-          return clearTimeout(timer);
-        };
-      }
+    if (typeof requestAnimationFrame === 'function' && typeof cancelAnimationFrame === 'function') {
+      frame = function (cb) {
+        return requestAnimationFrame(cb);
+      };
+      cancel = function (timer) {
+        return cancelAnimationFrame(timer);
+      };
+    } else {
+      frame = function (cb) {
+        return setTimeout(cb, 1000 / 60);
+      };
+      cancel = function (timer) {
+        return clearTimeout(timer);
+      };
     }
 
-    return {
-      frame: function (arg) {
-        if (frame) {
-          return frame(arg);
-        }
-
-        init();
-        return frame(arg);
-      },
-      cancel: function (arg) {
-        if (cancel) {
-          return cancel(arg);
-        }
-
-        init();
-        return cancel(arg);
-      }
-    };
+    return { frame: frame, cancel: cancel };
   }());
 
   var defaults = {
