@@ -1,6 +1,5 @@
 (function main(global) {
   var undef = 'undefined';
-  var worker;
   var isWorker = typeof IS_WORKER !== undef;
   var canUseWorker = global.Worker &&
     global.Blob &&
@@ -8,6 +7,23 @@
     global.Promise &&
     global.URL &&
     global.URL.createObjectURL;
+
+  function noop() {}
+
+  // create a promise if it exists, otherwise, just
+  // call the function directly
+  function promise(func) {
+    var ModulePromise = module.exports.Promise;
+    var Prom = ModulePromise !== void 0 ? ModulePromise : global.Promise;
+
+    if (typeof Prom === 'function') {
+      return new Prom(func);
+    }
+
+    func(noop, noop);
+
+    return null;
+  }
 
   var raf = (function () {
     var frame, cancel;
@@ -31,6 +47,63 @@
     return { frame: frame, cancel: cancel };
   }());
 
+  var getWorker = (function () {
+    var worker;
+
+    function decorate(worker) {
+      worker.init = function initWorker(canvas) {
+        var offscreen = canvas.transferControlToOffscreen();
+        worker.postMessage({ canvas: offscreen }, [offscreen]);
+      };
+
+      worker.fire = function fireWorker(options, done) {
+        var id = Math.random().toString(36).slice(2);
+
+        return promise(function (resolve) {
+          function workerDone(msg) {
+            if (msg.data.callback !== id) {
+              return;
+            }
+
+            worker.removeEventListener('message', workerDone);
+            done();
+            resolve();
+          }
+
+          worker.addEventListener('message', workerDone);
+          worker.postMessage({ options: options, callback: id });
+        });
+      };
+    }
+
+    return function () {
+      if (worker) {
+        console.log('return existing worker');
+        return worker;
+      }
+
+      if (!isWorker && canUseWorker) {
+        console.log('create new worker');
+        var code = [
+          'var CONFETTI, IS_WORKER = 1, module = {};',
+          '(' + main.toString() + ')(this);',
+          'onmessage = function(msg) {',
+          'console.log(msg);',
+          '  if (msg.data.options) {',
+          '    CONFETTI(msg.data.options).then(function () { postMessage({ callback: msg.data.callback }); });',
+          '  } else {',
+          '    CONFETTI = module.exports.create(msg.data.canvas);',
+          '  }',
+          '}',
+        ].join('\n');
+        worker = new Worker(URL.createObjectURL(new Blob([code])));
+        decorate(worker);
+      }
+
+      return worker;
+    };
+  })();
+
   var defaults = {
     particleCount: 50,
     angle: 90,
@@ -52,23 +125,6 @@
       '#ff36ff'
     ]
   };
-
-  function noop() {}
-
-  // create a promise if it exists, otherwise, just
-  // call the function directly
-  function promise(func) {
-    var ModulePromise = module.exports.Promise;
-    var Prom = ModulePromise !== void 0 ? ModulePromise : global.Promise;
-
-    if (typeof Prom === 'function') {
-      return new Prom(func);
-    }
-
-    func(noop, noop);
-
-    return null;
-  }
 
   function convert(val, transform) {
     return transform ? transform(val) : val;
@@ -293,11 +349,14 @@
   function confettiCannon(canvas, globalOpts) {
     var isLibCanvas = !canvas;
     var allowResize = !!prop(globalOpts || {}, 'resize');
+    var shouldUseWorker = canUseWorker && !!prop(globalOpts || {}, 'useWorker');
     var resized = false;
     var animationObj;
+    var worker = shouldUseWorker ? getWorker() : null;
 
-    function fire(options) {
-      console.log(isWorker, options);
+    console.log('worker is', worker);
+
+    function fireLocal(options, done) {
       var particleCount = prop(options, 'particleCount', Math.floor);
       var angle = prop(options, 'angle', Number);
       var spread = prop(options, 'spread', Number);
@@ -305,20 +364,11 @@
       var decay = prop(options, 'decay', Number);
       var colors = prop(options, 'colors');
       var ticks = prop(options, 'ticks', Number);
-      var zIndex = prop(options, 'zIndex', Number);
       var shapes = prop(options, 'shapes');
       var origin = getOrigin(options);
 
       var temp = particleCount;
       var fettis = [];
-
-      if (isLibCanvas) {
-        canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
-      } else if (allowResize && !resized) {
-        // initialize the size of a user-supplied canvas
-        setCanvasRectSize(canvas);
-        resized = true;
-      }
 
       var startX = canvas.width * origin.x;
       var startY = canvas.height * origin.y;
@@ -345,19 +395,45 @@
         return animationObj.addFettis(fettis);
       }
 
-      if (isLibCanvas) {
-        document.body.appendChild(canvas);
-      }
-
-      animationObj = animate(canvas, fettis, isLibCanvas, (isLibCanvas || allowResize), function () {
-        animationObj = null;
-
-        if (isLibCanvas) {
-          document.body.removeChild(canvas);
-        }
-      });
+      animationObj = animate(canvas, fettis, isLibCanvas, (isLibCanvas || allowResize), done);
 
       return animationObj.promise;
+    }
+
+    function fire(options) {
+      var zIndex = prop(options, 'zIndex', Number);
+
+      if (isLibCanvas && animationObj) {
+        // use existing canvas from in-progress animation
+        canvas = animationObj.canvas;
+      } else if (isLibCanvas && !canvas) {
+        console.log('CREATING AND INITIALIZING CANVAS');
+        // create and initialize a new canvas
+        canvas = getCanvas(zIndex);
+        document.body.appendChild(canvas);
+
+        if (worker) {
+          worker.init(canvas);
+        }
+      } else if (!isLibCanvas && allowResize && !resized) {
+        // initialize the size of a user-supplied canvas
+        setCanvasRectSize(canvas);
+        resized = true;
+      }
+
+      function done() {
+        animationObj = null;
+
+        if (isLibCanvas && canvas.parent) {
+          document.body.removeChild(canvas);
+        }
+      }
+
+      if (worker) {
+        return worker.fire(options, done);
+      }
+
+      return fireLocal(options, done);
     }
 
     fire.reset = function () {
@@ -369,37 +445,8 @@
     return fire;
   }
 
-  module.exports = confettiCannon();
+  module.exports = confettiCannon(null, { useWorker: true, resize: true });
   module.exports.create = confettiCannon;
-  module.exports.async = (function () {
-    var canvas;
-
-    if (!isWorker && canUseWorker && !worker) {
-      console.log('creating worker');
-      var code = [
-        'var CONFETTI, IS_WORKER = 1, module = {};',
-        '(' + main.toString() + ')(this);',
-        'onmessage = function(msg) {',
-        'console.log(msg);',
-        '  if (msg.data.options) {',
-        '    CONFETTI(msg.data.options);',
-        '  } else {',
-        '    CONFETTI = module.exports.create(msg.data.canvas);',
-        '  }',
-        '}',
-      ].join('\n');
-      worker = new Worker(URL.createObjectURL(new Blob([code])));
-      canvas = getCanvas(1);
-      var offscreen = canvas.transferControlToOffscreen();
-      worker.postMessage({ canvas: offscreen }, [offscreen]);
-    }
-
-    return function (options) {
-      console.log('FIRE');
-      document.body.appendChild(canvas);
-      worker.postMessage({ options: options });
-    };
-  })();
 }((function () {
   if (typeof window !== 'undefined') {
     return window;
