@@ -78,19 +78,19 @@
 
     return function () {
       if (worker) {
-        console.log('return existing worker');
         return worker;
       }
 
       if (!isWorker && canUseWorker) {
-        console.log('create new worker');
         var code = [
           'var CONFETTI, IS_WORKER = 1, module = {};',
           '(' + main.toString() + ')(this);',
           'onmessage = function(msg) {',
           'console.log(msg);',
           '  if (msg.data.options) {',
-          '    CONFETTI(msg.data.options).then(function () { postMessage({ callback: msg.data.callback }); });',
+          '    CONFETTI(msg.data.options).then(function () {',
+          '      postMessage({ callback: msg.data.callback });',
+          '    });',
           '  } else {',
           '    CONFETTI = module.exports.create(msg.data.canvas);',
           '  }',
