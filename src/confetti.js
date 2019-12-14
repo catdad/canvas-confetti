@@ -400,4 +400,14 @@
       worker.postMessage({ options: options });
     };
   })();
-}(this));
+}((function () {
+  if (typeof window !== 'undefined') {
+    return window;
+  }
+
+  if (typeof self !== 'undefined') {
+    return self;
+  }
+
+  return this;
+})()));
