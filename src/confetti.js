@@ -350,11 +350,9 @@
     var isLibCanvas = !canvas;
     var allowResize = !!prop(globalOpts || {}, 'resize');
     var shouldUseWorker = canUseWorker && !!prop(globalOpts || {}, 'useWorker');
+    var worker = shouldUseWorker ? getWorker() : null;
     var resized = false;
     var animationObj;
-    var worker = shouldUseWorker ? getWorker() : null;
-
-    console.log('worker is', worker);
 
     function fireLocal(options, done) {
       var particleCount = prop(options, 'particleCount', Math.floor);
@@ -407,7 +405,6 @@
         // use existing canvas from in-progress animation
         canvas = animationObj.canvas;
       } else if (isLibCanvas && !canvas) {
-        console.log('CREATING AND INITIALIZING CANVAS');
         // create and initialize a new canvas
         canvas = getCanvas(zIndex);
         document.body.appendChild(canvas);
