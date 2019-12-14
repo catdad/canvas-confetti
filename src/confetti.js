@@ -1,6 +1,4 @@
-(function main(global) {
-  var undef = 'undefined';
-  var isWorker = typeof IS_WORKER !== undef;
+(function main(global, isWorker) {
   var canUseWorker = global.Worker &&
     global.Blob &&
     global.OffscreenCanvas &&
@@ -97,8 +95,8 @@
 
       if (!isWorker && canUseWorker) {
         var code = [
-          'var CONFETTI, IS_WORKER = 1, module = {};',
-          '(' + main.toString() + ')(this);',
+          'var CONFETTI, module = {};',
+          '(' + main.toString() + ')(this, true);',
           'onmessage = function(msg) {',
           'console.log(msg);',
           '  if (msg.data.options) {',
@@ -475,4 +473,4 @@
   }
 
   return this;
-})()));
+})(), false));
