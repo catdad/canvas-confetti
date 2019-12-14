@@ -2,11 +2,12 @@
   var undef = 'undefined';
   var worker;
   var isWorker = typeof IS_WORKER !== undef;
-  var canUseWorker = typeof Worker !== undef &&
-      typeof Blob !== undef &&
-      typeof OffscreenCanvas !== undef &&
-      typeof URL !== undef &&
-      !!URL.createObjectURL;
+  var canUseWorker = global.Worker &&
+    global.Blob &&
+    global.OffscreenCanvas &&
+    global.Promise &&
+    global.URL &&
+    global.URL.createObjectURL;
 
   var raf = (function () {
     var frame, cancel;
@@ -58,7 +59,7 @@
   // call the function directly
   function promise(func) {
     var ModulePromise = module.exports.Promise;
-    var Prom = Promise; // TODO: ModulePromise !== void 0 ? ModulePromise : window.Promise;
+    var Prom = ModulePromise !== void 0 ? ModulePromise : global.Promise;
 
     if (typeof Prom === 'function') {
       return new Prom(func);
@@ -379,7 +380,7 @@
         'var CANVAS, CONFETTI;',
         'var IS_WORKER = 1;',
         'var module = {};',
-        '(' + main.toString() + ')();',
+        '(' + main.toString() + ')(this);',
         'onmessage = function(msg) {',
         'console.log(msg);',
         '  if (msg.data.options) CONFETTI(msg.data.options);',
