@@ -49,6 +49,7 @@
 
   var getWorker = (function () {
     var worker;
+    var resolves = {};
 
     function decorate(worker) {
       worker.init = function initWorker(canvas) {
@@ -65,14 +66,27 @@
               return;
             }
 
+            delete resolves[id];
             worker.removeEventListener('message', workerDone);
+
             done();
             resolve();
           }
 
           worker.addEventListener('message', workerDone);
           worker.postMessage({ options: options, callback: id });
+
+          resolves[id] = workerDone.bind(null, { data: { callback: id }});
         });
+      };
+
+      worker.reset = function resetWorker() {
+        worker.postMessage({ reset: true });
+
+        for (var id in resolves) {
+          resolves[id]();
+          delete resolves[id];
+        }
       };
     }
 
@@ -91,6 +105,8 @@
           '    CONFETTI(msg.data.options).then(function () {',
           '      postMessage({ callback: msg.data.callback });',
           '    });',
+          '  } else if (msg.data.reset) {' +
+          '    CONFETTI.reset();',
           '  } else {',
           '    CONFETTI = module.exports.create(msg.data.canvas);',
           '  }',
@@ -435,6 +451,10 @@
     }
 
     fire.reset = function () {
+      if (worker) {
+        worker.reset();
+      }
+
       if (animationObj) {
         animationObj.reset();
       }
