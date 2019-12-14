@@ -377,14 +377,13 @@
     if (!isWorker && canUseWorker && !worker) {
       console.log('creating worker');
       var code = [
-        'var CANVAS, CONFETTI;',
-        'var IS_WORKER = 1;',
-        'var module = {};',
+        'var CONFETTI, IS_WORKER = 1, module = {};',
         '(' + main.toString() + ')(this);',
         'onmessage = function(msg) {',
         'console.log(msg);',
-        '  if (msg.data.options) CONFETTI(msg.data.options);',
-        '  else {',
+        '  if (msg.data.options) {',
+        '    CONFETTI(msg.data.options);',
+        '  } else {',
         '    CONFETTI = module.exports.create(msg.data.canvas);',
         '  }',
         '}',
