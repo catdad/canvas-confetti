@@ -151,8 +151,6 @@
   function getCanvas(zIndex) {
     var canvas = document.createElement('canvas');
 
-    setCanvasWindowSize(canvas);
-
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
     canvas.style.left = '0px';
@@ -234,12 +232,11 @@
     return fetti.tick < fetti.totalTicks;
   }
 
-  function animate(canvas, fettis, isLibCanvas, allowResize, done) {
+  function animate(canvas, fettis, allowResize, resizer, done) {
     var animatingFettis = fettis.slice();
     var context = canvas.getContext('2d');
     var width = canvas.width;
     var height = canvas.height;
-    var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
     var animationFrame;
     var destroy;
 
@@ -316,6 +313,7 @@
     var allowResize = !!prop(globalOpts || {}, 'resize');
     var resized = false;
     var animationObj;
+    var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
 
     function fire(options) {
       var particleCount = prop(options, 'particleCount', Math.floor);
@@ -334,9 +332,11 @@
 
       if (isLibCanvas) {
         canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
-      } else if (allowResize && !resized) {
+      }
+
+      if (allowResize && !resized) {
         // initialize the size of a user-supplied canvas
-        setCanvasRectSize(canvas);
+        resizer(canvas);
         resized = true;
       }
 
@@ -369,11 +369,12 @@
         document.body.appendChild(canvas);
       }
 
-      animationObj = animate(canvas, fettis, isLibCanvas, (isLibCanvas || allowResize), function () {
+      animationObj = animate(canvas, fettis, allowResize, resizer, function () {
         animationObj = null;
 
         if (isLibCanvas) {
           document.body.removeChild(canvas);
+          canvas = null;
         }
       });
 
@@ -389,6 +390,6 @@
     return fire;
   }
 
-  module.exports = confettiCannon();
+  module.exports = confettiCannon(null, { resize: true });
   module.exports.create = confettiCannon;
 }());
