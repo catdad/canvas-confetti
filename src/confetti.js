@@ -105,7 +105,7 @@
           '    });',
           '  } else if (msg.data.reset) {' +
           '    CONFETTI.reset();',
-          '  } else {',
+          '  } else if (msg.data.canvas) {',
           '    CONFETTI = module.exports.create(msg.data.canvas);',
           '  }',
           '}',
@@ -362,9 +362,9 @@
     var allowResize = !!prop(globalOpts || {}, 'resize');
     var shouldUseWorker = canUseWorker && !!prop(globalOpts || {}, 'useWorker');
     var worker = shouldUseWorker ? getWorker() : null;
-    var resized = false;
-    var animationObj;
     var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
+    var initialized = false;
+    var animationObj;
 
     function fireLocal(options, done) {
       var particleCount = prop(options, 'particleCount', Math.floor);
@@ -420,17 +420,18 @@
         // create and initialize a new canvas
         canvas = getCanvas(zIndex);
         document.body.appendChild(canvas);
-
-        if (worker) {
-          worker.init(canvas);
-        }
       }
 
-      if (allowResize && !resized) {
+      if (allowResize && !initialized) {
         // initialize the size of a user-supplied canvas
         resizer(canvas);
-        resized = true;
       }
+
+      if (worker && !initialized) {
+        worker.init(canvas);
+      }
+
+      initialized = true;
 
       function done() {
         animationObj = null;
@@ -438,6 +439,7 @@
         if (isLibCanvas && canvas) {
           document.body.removeChild(canvas);
           canvas = null;
+          initialized = false;
         }
       }
 
