@@ -55,7 +55,7 @@
         worker.postMessage({ canvas: offscreen }, [offscreen]);
       };
 
-      worker.fire = function fireWorker(options, done) {
+      worker.fire = function fireWorker(options, size, done) {
         var id = Math.random().toString(36).slice(2);
 
         return promise(function (resolve) {
@@ -281,42 +281,30 @@
     return fetti.tick < fetti.totalTicks;
   }
 
-  function animate(canvas, fettis, allowResize, resizer, done) {
+  function animate(canvas, fettis, resizer, size, done) {
     var animatingFettis = fettis.slice();
     var context = canvas.getContext('2d');
-    var width = canvas.width;
-    var height = canvas.height;
     var animationFrame;
     var destroy;
-
-    function onResize() {
-      // don't actually query the size here, since this
-      // can execute frequently and rapidly
-      width = height = null;
-    }
 
     var prom = promise(function (resolve) {
       function onDone() {
         animationFrame = destroy = null;
 
-        if (allowResize) {
-          global.removeEventListener('resize', onResize);
-        }
-
-        context.clearRect(0, 0, width, height);
+        context.clearRect(0, 0, size.width, size.height);
 
         done();
         resolve();
       }
 
       function update() {
-        if (!width && !height) {
+        if (!size.width && !size.height) {
           resizer(canvas);
-          width = canvas.width;
-          height = canvas.height;
+          size.width = canvas.width;
+          size.height = canvas.height;
         }
 
-        context.clearRect(0, 0, width, height);
+        context.clearRect(0, 0, size.width, size.height);
 
         animatingFettis = animatingFettis.filter(function (fetti) {
           return updateFetti(context, fetti);
@@ -332,10 +320,6 @@
       animationFrame = raf.frame(update);
       destroy = onDone;
     });
-
-    if (allowResize) {
-      global.addEventListener('resize', onResize, false);
-    }
 
     return {
       addFettis: function (fettis) {
@@ -366,7 +350,7 @@
     var initialized = false;
     var animationObj;
 
-    function fireLocal(options, done) {
+    function fireLocal(options, size, done) {
       var particleCount = prop(options, 'particleCount', Math.floor);
       var angle = prop(options, 'angle', Number);
       var spread = prop(options, 'spread', Number);
@@ -405,7 +389,7 @@
         return animationObj.addFettis(fettis);
       }
 
-      animationObj = animate(canvas, fettis, allowResize, resizer, done);
+      animationObj = animate(canvas, fettis, resizer, size , done);
 
       return animationObj.promise;
     }
@@ -427,14 +411,29 @@
         resizer(canvas);
       }
 
+      var size = {
+        width: canvas.width,
+        height: canvas.height
+      };
+
       if (worker && !initialized) {
         worker.init(canvas);
       }
 
       initialized = true;
 
+      function onResize() {
+        // don't actually query the size here, since this
+        // can execute frequently and rapidly
+        size.width = size.height = null;
+      }
+
       function done() {
         animationObj = null;
+
+        if (allowResize) {
+          global.removeEventListener('resize', onResize);
+        }
 
         if (isLibCanvas && canvas) {
           document.body.removeChild(canvas);
@@ -443,11 +442,15 @@
         }
       }
 
-      if (worker) {
-        return worker.fire(options, done);
+      if (allowResize) {
+        global.addEventListener('resize', onResize, false);
       }
 
-      return fireLocal(options, done);
+      if (worker) {
+        return worker.fire(options, size, done);
+      }
+
+      return fireLocal(options, size, done);
     }
 
     fire.reset = function () {
