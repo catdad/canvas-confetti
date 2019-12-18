@@ -72,7 +72,7 @@
           }
 
           worker.addEventListener('message', workerDone);
-          worker.postMessage({ options: options, callback: id });
+          worker.postMessage({ options: options || {}, callback: id });
 
           resolves[id] = workerDone.bind(null, { data: { callback: id }});
         });
