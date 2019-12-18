@@ -4,7 +4,7 @@
     global.OffscreenCanvas &&
     global.Promise &&
     global.URL &&
-    global.URL.createObjectURL;
+    !!global.URL.createObjectURL;
 
   function noop() {}
 
@@ -102,7 +102,7 @@
           '    CONFETTI(msg.data.options).then(function () {',
           '      postMessage({ callback: msg.data.callback });',
           '    });',
-          '  } else if (msg.data.reset) {' +
+          '  } else if (msg.data.reset) {',
           '    CONFETTI.reset();',
           '  } else if (msg.data.resize) {',
           '    SIZE.width = msg.data.resize.width;',
