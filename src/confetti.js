@@ -1,4 +1,4 @@
-(function main(global, isWorker) {
+(function main(global, isWorker, workerSize) {
   var canUseWorker = global.Worker &&
     global.Blob &&
     global.OffscreenCanvas &&
@@ -95,17 +95,21 @@
 
       if (!isWorker && canUseWorker) {
         var code = [
-          'var CONFETTI, module = {};',
-          '(' + main.toString() + ')(this, true);',
+          'var CONFETTI, SIZE = {}, module = {};',
+          '(' + main.toString() + ')(this, true, SIZE);',
           'onmessage = function(msg) {',
-          'console.log(msg);',
           '  if (msg.data.options) {',
           '    CONFETTI(msg.data.options).then(function () {',
           '      postMessage({ callback: msg.data.callback });',
           '    });',
           '  } else if (msg.data.reset) {' +
           '    CONFETTI.reset();',
+          '  } else if (msg.data.resize) {',
+          '    SIZE.width = msg.data.resize.width;',
+          '    SIZE.height = msg.data.resize.height;',
           '  } else if (msg.data.canvas) {',
+          '    SIZE.width = msg.data.canvas.width;',
+          '    SIZE.height = msg.data.canvas.height;',
           '    CONFETTI = module.exports.create(msg.data.canvas);',
           '  }',
           '}',
@@ -298,6 +302,11 @@
       }
 
       function update() {
+        if (isWorker && !(size.width === workerSize.width && size.height === workerSize.height)) {
+          size.width = canvas.width = workerSize.width;
+          size.height = canvas.height = workerSize.height;
+        }
+
         if (!size.width && !size.height) {
           resizer(canvas);
           size.width = canvas.width;
@@ -423,6 +432,13 @@
       initialized = true;
 
       function onResize() {
+        if (worker) {
+          var obj = {};
+          resizer(obj);
+          worker.postMessage({ resize: obj });
+          return;
+        }
+
         // don't actually query the size here, since this
         // can execute frequently and rapidly
         size.width = size.height = null;
