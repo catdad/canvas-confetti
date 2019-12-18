@@ -672,7 +672,9 @@ test('works using the browserify bundle', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.browserify.html');
 
   await page.evaluate(confetti({
-    colors: ['#00ff00']
+    colors: ['#00ff00'],
+    particleCount: 200,
+    spread: 270
   }));
 
   t.context.buffer = await page.screenshot({ type: 'png' });
