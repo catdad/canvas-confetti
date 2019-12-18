@@ -73,6 +73,8 @@ const testPage = async () => {
   const page = await browser.newPage();
   await page.setViewport({ width: 500, height: 500});
 
+  page.on('pageerror', err => console.error(err));
+
   return page;
 };
 
