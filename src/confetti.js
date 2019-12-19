@@ -433,6 +433,7 @@
 
       function onResize() {
         if (worker) {
+          // TODO this really shouldn't be immediate, because it is expensive
           var obj = {};
           resizer(obj);
           worker.postMessage({ resize: obj });
