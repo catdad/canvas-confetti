@@ -680,6 +680,8 @@ test('works using the browserify bundle', async t => {
     spread: 270
   })`);
 
+  await sleep(100);
+
   t.context.buffer = await page.screenshot({ type: 'png' });
   t.context.image = await reduceImg(t.context.buffer);
 
