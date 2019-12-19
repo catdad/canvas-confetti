@@ -24,6 +24,7 @@
   }
 
   var raf = (function () {
+    var TIME = Math.floor(1000 / 60);
     var frame, cancel;
     var frames = {};
     var lastFrameTime = 0;
@@ -33,7 +34,7 @@
         var id = Math.random();
 
         frames[id] = requestAnimationFrame(function onFrame(time) {
-          if (lastFrameTime + 15 < time) {
+          if (lastFrameTime + TIME - 1 < time) {
             lastFrameTime = time;
             delete frames[id];
 
@@ -52,7 +53,7 @@
       };
     } else {
       frame = function (cb) {
-        return setTimeout(cb, 1000 / 60);
+        return setTimeout(cb, TIME);
       };
       cancel = function (timer) {
         return clearTimeout(timer);
