@@ -25,13 +25,30 @@
 
   var raf = (function () {
     var frame, cancel;
+    var frames = {};
+    var lastFrameTime = 0;
 
     if (typeof requestAnimationFrame === 'function' && typeof cancelAnimationFrame === 'function') {
       frame = function (cb) {
-        return requestAnimationFrame(cb);
+        var id = Math.random();
+
+        frames[id] = requestAnimationFrame(function onFrame(time) {
+          if (lastFrameTime + 15 < time) {
+            lastFrameTime = time;
+            delete frames[id];
+
+            cb();
+          } else {
+            frames[id] = requestAnimationFrame(onFrame);
+          }
+        });
+
+        return id;
       };
-      cancel = function (timer) {
-        return cancelAnimationFrame(timer);
+      cancel = function (id) {
+        if (frames[id]) {
+          cancelAnimationFrame(frames[id]);
+        }
       };
     } else {
       frame = function (cb) {
