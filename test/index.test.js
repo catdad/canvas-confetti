@@ -673,11 +673,11 @@ test('calling `reset` method clears all existing confetti but more can be launch
 test('works using the browserify bundle', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.browserify.html');
 
-  await page.evaluate(confetti({
+  await page.evaluate(`void confetti({
     colors: ['#00ff00'],
     particleCount: 200,
     spread: 270
-  }));
+  })`);
 
   t.context.buffer = await page.screenshot({ type: 'png' });
   t.context.image = await reduceImg(t.context.buffer);
