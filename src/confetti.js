@@ -34,7 +34,7 @@
         var id = Math.random();
 
         frames[id] = requestAnimationFrame(function onFrame(time) {
-          if (lastFrameTime + TIME - 1 < time) {
+          if (lastFrameTime === time || lastFrameTime + TIME - 1 < time) {
             lastFrameTime = time;
             delete frames[id];
 
