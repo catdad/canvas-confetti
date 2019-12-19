@@ -76,12 +76,16 @@ _Canvas can be misunderstood a bit though, so let me explain why you might want 
 
 The following global options are available:
 * `resize` _Boolean (default: false)_: Whether to allow setting the canvas image size, as well as keep it correctly sized if the window changes size (e.g. resiging the window, rotating a mobile device, etc.). By default, the canvas size will not be modified.
+* `useWorker` _Boolean (default: false)_: Whether to use an asynchronous web worker to render the confetti animation, whenever possible. This is turned off by default, meaning that the animation will always execute on the main thread. If turned on and the browser supports it, the animation will execute off of the main thread so that it is not blocking any other work your page needs to do. If it is not supported by the browser, this value will be ignored.
 
 ```javascript
 var myCanvas = document.createElement('canvas');
 document.appendChild(myCanvas);
 
-var myConfetti = confetti.create(myCanvas, { resize: true });
+var myConfetti = confetti.create(myCanvas, {
+  resize: true,
+  useWorker: true
+});
 myConfetti({
   particleCount: 100,
   spread: 160
