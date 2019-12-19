@@ -1,4 +1,28 @@
-(function () {
+(function main(global, isWorker, workerSize) {
+  var canUseWorker = global.Worker &&
+    global.Blob &&
+    global.OffscreenCanvas &&
+    global.Promise &&
+    global.URL &&
+    !!global.URL.createObjectURL;
+
+  function noop() {}
+
+  // create a promise if it exists, otherwise, just
+  // call the function directly
+  function promise(func) {
+    var ModulePromise = module.exports.Promise;
+    var Prom = ModulePromise !== void 0 ? ModulePromise : global.Promise;
+
+    if (typeof Prom === 'function') {
+      return new Prom(func);
+    }
+
+    func(noop, noop);
+
+    return null;
+  }
+
   var raf = (function () {
     var frame, cancel;
 
@@ -21,6 +45,83 @@
     return { frame: frame, cancel: cancel };
   }());
 
+  var getWorker = (function () {
+    var worker;
+    var resolves = {};
+
+    function decorate(worker) {
+      worker.init = function initWorker(canvas) {
+        var offscreen = canvas.transferControlToOffscreen();
+        worker.postMessage({ canvas: offscreen }, [offscreen]);
+      };
+
+      worker.fire = function fireWorker(options, size, done) {
+        var id = Math.random().toString(36).slice(2);
+
+        return promise(function (resolve) {
+          function workerDone(msg) {
+            if (msg.data.callback !== id) {
+              return;
+            }
+
+            delete resolves[id];
+            worker.removeEventListener('message', workerDone);
+
+            done();
+            resolve();
+          }
+
+          worker.addEventListener('message', workerDone);
+          worker.postMessage({ options: options || {}, callback: id });
+
+          resolves[id] = workerDone.bind(null, { data: { callback: id }});
+        });
+      };
+
+      worker.reset = function resetWorker() {
+        worker.postMessage({ reset: true });
+
+        for (var id in resolves) {
+          resolves[id]();
+          delete resolves[id];
+        }
+      };
+    }
+
+    return function () {
+      if (worker) {
+        return worker;
+      }
+
+      if (!isWorker && canUseWorker) {
+        var code = [
+          'var CONFETTI, SIZE = {}, module = {};',
+          '(' + main.toString() + ')(this, true, SIZE);',
+          'onmessage = function(msg) {',
+          '  if (msg.data.options) {',
+          '    CONFETTI(msg.data.options).then(function () {',
+          '      postMessage({ callback: msg.data.callback });',
+          '    });',
+          '  } else if (msg.data.reset) {',
+          '    CONFETTI.reset();',
+          '  } else if (msg.data.resize) {',
+          '    SIZE.width = msg.data.resize.width;',
+          '    SIZE.height = msg.data.resize.height;',
+          '  } else if (msg.data.canvas) {',
+          '    SIZE.width = msg.data.canvas.width;',
+          '    SIZE.height = msg.data.canvas.height;',
+          '    CONFETTI = module.exports.create(msg.data.canvas);',
+          '  }',
+          '}',
+        ].join('\n');
+        worker = new Worker(URL.createObjectURL(new Blob([code])));
+        decorate(worker);
+      }
+
+      return worker;
+    };
+  })();
+
   var defaults = {
     particleCount: 50,
     angle: 90,
@@ -42,23 +143,6 @@
       '#ff36ff'
     ]
   };
-
-  function noop() {}
-
-  // create a promise if it exists, otherwise, just
-  // call the function directly
-  function promise(func) {
-    var ModulePromise = module.exports.Promise;
-    var Prom = ModulePromise !== void 0 ? ModulePromise : window.Promise;
-
-    if (typeof Prom === 'function') {
-      return new Prom(func);
-    }
-
-    func(noop, noop);
-
-    return null;
-  }
 
   function convert(val, transform) {
     return transform ? transform(val) : val;
@@ -119,8 +203,6 @@
 
   function getCanvas(zIndex) {
     var canvas = document.createElement('canvas');
-
-    setCanvasWindowSize(canvas);
 
     canvas.style.position = 'fixed';
     canvas.style.top = '0px';
@@ -203,43 +285,35 @@
     return fetti.tick < fetti.totalTicks;
   }
 
-  function animate(canvas, fettis, isLibCanvas, allowResize, done) {
+  function animate(canvas, fettis, resizer, size, done) {
     var animatingFettis = fettis.slice();
     var context = canvas.getContext('2d');
-    var width = canvas.width;
-    var height = canvas.height;
-    var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
     var animationFrame;
     var destroy;
-
-    function onResize() {
-      // don't actually query the size here, since this
-      // can execute frequently and rapidly
-      width = height = null;
-    }
 
     var prom = promise(function (resolve) {
       function onDone() {
         animationFrame = destroy = null;
 
-        if (allowResize) {
-          window.removeEventListener('resize', onResize);
-        }
-
-        context.clearRect(0, 0, width, height);
+        context.clearRect(0, 0, size.width, size.height);
 
         done();
         resolve();
       }
 
       function update() {
-        if (!width && !height) {
-          resizer(canvas);
-          width = canvas.width;
-          height = canvas.height;
+        if (isWorker && !(size.width === workerSize.width && size.height === workerSize.height)) {
+          size.width = canvas.width = workerSize.width;
+          size.height = canvas.height = workerSize.height;
         }
 
-        context.clearRect(0, 0, width, height);
+        if (!size.width && !size.height) {
+          resizer(canvas);
+          size.width = canvas.width;
+          size.height = canvas.height;
+        }
+
+        context.clearRect(0, 0, size.width, size.height);
 
         animatingFettis = animatingFettis.filter(function (fetti) {
           return updateFetti(context, fetti);
@@ -255,10 +329,6 @@
       animationFrame = raf.frame(update);
       destroy = onDone;
     });
-
-    if (allowResize) {
-      window.addEventListener('resize', onResize, false);
-    }
 
     return {
       addFettis: function (fettis) {
@@ -283,10 +353,13 @@
   function confettiCannon(canvas, globalOpts) {
     var isLibCanvas = !canvas;
     var allowResize = !!prop(globalOpts || {}, 'resize');
-    var resized = false;
+    var shouldUseWorker = canUseWorker && !!prop(globalOpts || {}, 'useWorker');
+    var worker = shouldUseWorker ? getWorker() : null;
+    var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
+    var initialized = false;
     var animationObj;
 
-    function fire(options) {
+    function fireLocal(options, size, done) {
       var particleCount = prop(options, 'particleCount', Math.floor);
       var angle = prop(options, 'angle', Number);
       var spread = prop(options, 'spread', Number);
@@ -294,20 +367,11 @@
       var decay = prop(options, 'decay', Number);
       var colors = prop(options, 'colors');
       var ticks = prop(options, 'ticks', Number);
-      var zIndex = prop(options, 'zIndex', Number);
       var shapes = prop(options, 'shapes');
       var origin = getOrigin(options);
 
       var temp = particleCount;
       var fettis = [];
-
-      if (isLibCanvas) {
-        canvas = animationObj ? animationObj.canvas : getCanvas(zIndex);
-      } else if (allowResize && !resized) {
-        // initialize the size of a user-supplied canvas
-        setCanvasRectSize(canvas);
-        resized = true;
-      }
 
       var startX = canvas.width * origin.x;
       var startY = canvas.height * origin.y;
@@ -334,22 +398,82 @@
         return animationObj.addFettis(fettis);
       }
 
-      if (isLibCanvas) {
-        document.body.appendChild(canvas);
-      }
-
-      animationObj = animate(canvas, fettis, isLibCanvas, (isLibCanvas || allowResize), function () {
-        animationObj = null;
-
-        if (isLibCanvas) {
-          document.body.removeChild(canvas);
-        }
-      });
+      animationObj = animate(canvas, fettis, resizer, size , done);
 
       return animationObj.promise;
     }
 
+    function fire(options) {
+      var zIndex = prop(options, 'zIndex', Number);
+
+      if (isLibCanvas && animationObj) {
+        // use existing canvas from in-progress animation
+        canvas = animationObj.canvas;
+      } else if (isLibCanvas && !canvas) {
+        // create and initialize a new canvas
+        canvas = getCanvas(zIndex);
+        document.body.appendChild(canvas);
+      }
+
+      if (allowResize && !initialized) {
+        // initialize the size of a user-supplied canvas
+        resizer(canvas);
+      }
+
+      var size = {
+        width: canvas.width,
+        height: canvas.height
+      };
+
+      if (worker && !initialized) {
+        worker.init(canvas);
+      }
+
+      initialized = true;
+
+      function onResize() {
+        if (worker) {
+          var obj = {};
+          resizer(obj);
+          worker.postMessage({ resize: obj });
+          return;
+        }
+
+        // don't actually query the size here, since this
+        // can execute frequently and rapidly
+        size.width = size.height = null;
+      }
+
+      function done() {
+        animationObj = null;
+
+        if (allowResize) {
+          global.removeEventListener('resize', onResize);
+        }
+
+        if (isLibCanvas && canvas) {
+          document.body.removeChild(canvas);
+          canvas = null;
+          initialized = false;
+        }
+      }
+
+      if (allowResize) {
+        global.addEventListener('resize', onResize, false);
+      }
+
+      if (worker) {
+        return worker.fire(options, size, done);
+      }
+
+      return fireLocal(options, size, done);
+    }
+
     fire.reset = function () {
+      if (worker) {
+        worker.reset();
+      }
+
       if (animationObj) {
         animationObj.reset();
       }
@@ -358,6 +482,16 @@
     return fire;
   }
 
-  module.exports = confettiCannon();
+  module.exports = confettiCannon(null, { useWorker: true, resize: true });
   module.exports.create = confettiCannon;
-}());
+}((function () {
+  if (typeof window !== 'undefined') {
+    return window;
+  }
+
+  if (typeof self !== 'undefined') {
+    return self;
+  }
+
+  return this;
+})(), false));
