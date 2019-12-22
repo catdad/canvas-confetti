@@ -30,7 +30,7 @@ You can then `require('canvas-confetti');` to use it in your project build. _Not
 You can also include this library in your HTML page directly from a CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@0.4.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.0.0/dist/confetti.browser.min.js"></script>
 ```
 
 _Note: you should use the latest version at the time that you include your project. You can see all versions [on the releases page](https://github.com/catdad/canvas-confetti/releases)._
@@ -76,12 +76,16 @@ _Canvas can be misunderstood a bit though, so let me explain why you might want 
 
 The following global options are available:
 * `resize` _Boolean (default: false)_: Whether to allow setting the canvas image size, as well as keep it correctly sized if the window changes size (e.g. resiging the window, rotating a mobile device, etc.). By default, the canvas size will not be modified.
+* `useWorker` _Boolean (default: false)_: Whether to use an asynchronous web worker to render the confetti animation, whenever possible. This is turned off by default, meaning that the animation will always execute on the main thread. If turned on and the browser supports it, the animation will execute off of the main thread so that it is not blocking any other work your page needs to do. If it is not supported by the browser, this value will be ignored.
 
 ```javascript
 var myCanvas = document.createElement('canvas');
 document.appendChild(myCanvas);
 
-var myConfetti = confetti.create(myCanvas, { resize: true });
+var myConfetti = confetti.create(myCanvas, {
+  resize: true,
+  useWorker: true
+});
 myConfetti({
   particleCount: 100,
   spread: 160
@@ -92,7 +96,7 @@ myConfetti({
 
 ### `confetti.reset()`
 
-Stops the animation and clears all confetti, as well as immediately resolves any outstanding promises. In the case of a separate confetti instance created with [`confetti.create`](#confetticreatecanvas-globaloptions--function), that instacne will have its own `reset` method.
+Stops the animation and clears all confetti, as well as immediately resolves any outstanding promises. In the case of a separate confetti instance created with [`confetti.create`](#confetticreatecanvas-globaloptions--function), that instance will have its own `reset` method.
 
 ```javascript
 confetti();

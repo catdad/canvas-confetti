@@ -17,7 +17,6 @@ const args = process.env.CI ? [
   '--no-sandbox', '--disable-setuid-sandbox'
 ] : [];
 const headless = process.env.CI ? true :
-  process.env['VISIBLE'] ? true :
   process.env['CONFETTI_SHOW'] ? false : true;
 
 const mkdir = async (dir) => {
@@ -73,6 +72,9 @@ const testPage = async () => {
   const browser = await testBrowser();
   const page = await browser.newPage();
   await page.setViewport({ width: 500, height: 500});
+
+  // eslint-disable-next-line no-console
+  page.on('pageerror', err => console.error(err));
 
   return page;
 };
@@ -238,7 +240,7 @@ test.afterEach.always(async t => {
   // this is allowed, but still needs the eslint plugin to be updated
   // https://github.com/avajs/eslint-plugin-ava/issues/176
   // eslint-disable-next-line ava/use-t-well
-  const name = t.title.replace(/^afterEach for /, '');
+  const name = t.title.replace(/^afterEach\.always hook for /, '');
 
   // save the raw buffer image, if one is present
   if (t.context.buffer) {
@@ -672,9 +674,13 @@ test('calling `reset` method clears all existing confetti but more can be launch
 test('works using the browserify bundle', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.browserify.html');
 
-  await page.evaluate(confetti({
-    colors: ['#00ff00']
-  }));
+  await page.evaluate(`void confetti({
+    colors: ['#00ff00'],
+    particleCount: 200,
+    spread: 270
+  })`);
+
+  await sleep(100);
 
   t.context.buffer = await page.screenshot({ type: 'png' });
   t.context.image = await reduceImg(t.context.buffer);
