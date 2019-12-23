@@ -1,4 +1,4 @@
-(function main(global, isWorker, workerSize) {
+(function main(global, module, isWorker, workerSize) {
   var canUseWorker = global.Worker &&
     global.Blob &&
     global.OffscreenCanvas &&
@@ -114,7 +114,7 @@
       if (!isWorker && canUseWorker) {
         var code = [
           'var CONFETTI, SIZE = {}, module = {};',
-          '(' + main.toString() + ')(this, true, SIZE);',
+          '(' + main.toString() + ')(this, module, true, SIZE);',
           'onmessage = function(msg) {',
           '  if (msg.data.options) {',
           '    CONFETTI(msg.data.options).then(function () {',
@@ -513,4 +513,4 @@
   }
 
   return this;
-})(), false));
+})(), module, false));
