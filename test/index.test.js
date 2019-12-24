@@ -691,6 +691,30 @@ test('works using the browserify bundle', async t => {
 });
 
 /*
+ * Minified tests
+ * using minification close to that of jsDelivr
+ */
+
+test('works using the terser minified and compressed code', async t => {
+  const page = t.context.page = await fixturePage('fixtures/page.minified.html');
+
+  await page.evaluate(`void confetti({
+    colors: ['#ff00ff'],
+    particleCount: 200,
+    spread: 270
+  })`);
+
+  await sleep(100);
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+
+  t.deepEqual(pixels, ['#ff00ff', '#ffffff']);
+});
+
+/*
  * ESM tests
  */
 

@@ -8,7 +8,8 @@
   "scripts": {
     "build": "node build/build.js",
     "browserify": "browserify --entry src/confetti.js --outfile temp/confetti.bundle.js --standalone confetti",
-    "pretest": "npm run build -s && npm run browserify -s",
+    "minify": "terser --compress --mangle -o temp/confetti.min.js -- dist/confetti.browser.js",
+    "pretest": "npm run build -s && npm run browserify -s && npm run -s minify",
     "test": "cd test && ava --verbose --serial",
     "lint": "eslint src/**/*.js test/**/*.js build/**/*.js",
     "dev": "static-server --port 9001",
@@ -36,7 +37,8 @@
     "puppeteer": "^1.0.0",
     "rootrequire": "^1.0.0",
     "send": "^0.16.1",
-    "static-server": "^3.0.0"
+    "static-server": "^3.0.0",
+    "terser": "^3.14.1"
   },
   "dependencies": {},
   "keywords": [
