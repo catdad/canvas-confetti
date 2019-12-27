@@ -1,4 +1,4 @@
-(function main(global, isWorker, workerSize) {
+(function main(global, module, isWorker, workerSize) {
   var canUseWorker = global.Worker &&
     global.Blob &&
     global.OffscreenCanvas &&
@@ -65,18 +65,27 @@
 
   var getWorker = (function () {
     var worker;
+    var prom;
     var resolves = {};
 
     function decorate(worker) {
+      function execute(options, callback) {
+        worker.postMessage({ options: options || {}, callback: callback });
+      }
       worker.init = function initWorker(canvas) {
         var offscreen = canvas.transferControlToOffscreen();
         worker.postMessage({ canvas: offscreen }, [offscreen]);
       };
 
       worker.fire = function fireWorker(options, size, done) {
+        if (prom) {
+          execute(options, null);
+          return prom;
+        }
+
         var id = Math.random().toString(36).slice(2);
 
-        return promise(function (resolve) {
+        prom = promise(function (resolve) {
           function workerDone(msg) {
             if (msg.data.callback !== id) {
               return;
@@ -85,15 +94,18 @@
             delete resolves[id];
             worker.removeEventListener('message', workerDone);
 
+            prom = null;
             done();
             resolve();
           }
 
           worker.addEventListener('message', workerDone);
-          worker.postMessage({ options: options || {}, callback: id });
+          execute(options, id);
 
           resolves[id] = workerDone.bind(null, { data: { callback: id }});
         });
+
+        return prom;
       };
 
       worker.reset = function resetWorker() {
@@ -114,11 +126,13 @@
       if (!isWorker && canUseWorker) {
         var code = [
           'var CONFETTI, SIZE = {}, module = {};',
-          '(' + main.toString() + ')(this, true, SIZE);',
+          '(' + main.toString() + ')(this, module, true, SIZE);',
           'onmessage = function(msg) {',
           '  if (msg.data.options) {',
           '    CONFETTI(msg.data.options).then(function () {',
-          '      postMessage({ callback: msg.data.callback });',
+          '      if (msg.data.callback) {',
+          '        postMessage({ callback: msg.data.callback });',
+          '      }',
           '    });',
           '  } else if (msg.data.reset) {',
           '    CONFETTI.reset();',
@@ -260,7 +274,8 @@
       tiltSin: 0,
       tiltCos: 0,
       wobbleX: 0,
-      wobbleY: 0
+      wobbleY: 0,
+      ovalScalar: 0.6
     };
   }
 
@@ -288,8 +303,8 @@
 
     if (fetti.shape === 'circle') {
       context.ellipse ?
-        context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * 0.6, Math.abs(y2 - y1) * 0.6, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
-        ellipse(context, fetti.x, fetti.y, Math.abs(x2 - x1) * 0.6, Math.abs(y2 - y1) * 0.6, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
+        context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
+        ellipse(context, fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
     } else {
       context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
       context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
@@ -513,4 +528,4 @@
   }
 
   return this;
-})(), false));
+})(), module, false));
