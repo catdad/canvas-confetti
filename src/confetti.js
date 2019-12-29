@@ -275,13 +275,14 @@
       tiltCos: 0,
       wobbleX: 0,
       wobbleY: 0,
+      gravity: 3,
       ovalScalar: 0.6
     };
   }
 
   function updateFetti(context, fetti) {
     fetti.x += Math.cos(fetti.angle2D) * fetti.velocity;
-    fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + 3; // + gravity
+    fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + fetti.gravity;
     fetti.wobble += 0.1;
     fetti.velocity *= fetti.decay;
     fetti.tiltAngle += 0.1;
