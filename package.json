@@ -45,5 +45,9 @@
     "canvas",
     "confetti",
     "animation"
-  ]
+  ],
+  "funding": {
+    "type": "donate",
+    "url": "https://www.paypal.me/kirilvatev"
+  }
 }
