@@ -160,6 +160,7 @@
     spread: 45,
     startVelocity: 45,
     decay: 0.9,
+    gravity: 1,
     ticks: 200,
     x: 0.5,
     y: 0.5,
