@@ -338,8 +338,8 @@
         </div>
         <div class="description">
           <p>
-            Why click a button repeatedly when you can have code do it for you? Shoot a firework
-            of confetti from a random location on the page 5 times per second.
+            Why click a button repeatedly when you can have code do it for you? Shoot some firework
+            of confetti from the sides of page so you can still read the content in the center.
           </p>
         </div>
       </div>
@@ -489,25 +489,26 @@
         });
       },
       fireworks: function fireworks() {
-        var end = Date.now() + (15 * 1000);
+        var duration = 15 * 1000;
+        var animationEnd = Date.now() + duration;
+        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+          return Math.random() * (max - min) + min;
+        }
 
         var interval = setInterval(function () {
-          if (Date.now() > end) {
+          var timeLeft = animationEnd - Date.now();
+
+          if (timeLeft <= 0) {
             return clearInterval(interval);
           }
 
-          confetti({
-            startVelocity: 30,
-            spread: 360,
-            ticks: 60,
-            shapes: ['square'],
-            origin: {
-              x: Math.random(),
-              // since they fall down, start a bit higher than random
-              y: Math.random() - 0.2
-            }
-          });
-        }, 200);
+          var particleCount = 50 * (timeLeft / duration);
+          // since particles fall down, start a bit higher than random
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 250);
       },
       snow: function snow() {
         var end = Date.now() + (15 * 1000);
@@ -519,7 +520,7 @@
             ticks: 300,
             origin: {
               x: Math.random(),
-              // since they fall down, start a bit higher than random
+              // since particles fall down, start a bit higher than random
               y: Math.random() - 0.2
             },
             colors: ['#ffffff'],
