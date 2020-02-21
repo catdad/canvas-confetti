@@ -457,46 +457,37 @@
       },
       realistic: function realistic() {
         var count = 200;
+        var origin = { y: 0.7 };
 
         confetti({
           particleCount: Math.floor(count * 0.25),
           spread: 26,
           startVelocity: 55,
-          origin: {
-            y: 0.7
-          },
+          origin: origin,
         });
         confetti({
           particleCount: Math.floor(count * 0.2),
           spread: 60,
-          origin: {
-            y: 0.7
-          },
+          origin: origin,
         });
         confetti({
           particleCount: Math.floor(count * 0.35),
           spread: 100,
           decay: 0.91,
-          origin: {
-            y: 0.7
-          },
+          origin: origin,
         });
         confetti({
           particleCount: Math.floor(count * 0.1),
           spread: 120,
           startVelocity: 25,
           decay: 0.92,
-          origin: {
-            y: 0.7
-          },
+          origin: origin,
         });
         confetti({
           particleCount: Math.floor(count * 0.1),
           spread: 120,
           startVelocity: 45,
-          origin: {
-            y: 0.7
-          },
+          origin: origin,
         });
       },
       fireworks: function fireworks() {
@@ -578,9 +569,7 @@
 
         canvas.confetti({
           spread: 70,
-          origin: {
-              y: 1.2
-          }
+          origin: { y: 1.2 }
         });
       }
     };
