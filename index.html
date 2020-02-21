@@ -598,7 +598,7 @@
     }
 
     function pretty(val) {
-      return js_beautify(val);
+      return js_beautify(val, { indent_size: 2, brace_style: 'preserve-inline', });
     }
 
     function getCode(name) {
@@ -620,6 +620,8 @@
       var editor = ace.edit(codeElem);
       editor.setTheme('ace/theme/monokai');
       editor.session.setMode('ace/mode/javascript');
+      editor.session.setUseSoftTabs(true);
+      editor.session.setTabSize(2);
 
       editor.session.setValue(getCode(name));
 
