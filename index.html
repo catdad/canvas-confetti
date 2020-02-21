@@ -511,23 +511,29 @@
         }, 250);
       },
       snow: function snow() {
-        var end = Date.now() + (15 * 1000);
+        var duration = 15 * 1000;
+        var animationEnd = Date.now() + duration;
+        var skew = 1;
 
         (function frame() {
+          var timeLeft = animationEnd - Date.now();
+          var ticks = Math.max(50, 300 * (timeLeft / duration));
+          skew = Math.max(0.8, skew - 0.001);
+
           confetti({
             particleCount: 1,
             startVelocity: 0,
-            ticks: 300,
+            ticks: ticks,
             origin: {
               x: Math.random(),
-              // since particles fall down, start a bit higher than random
-              y: Math.random() - 0.2
+              // since particles fall down, skew start toward the top
+              y: (Math.random() * skew) - 0.2
             },
             colors: ['#ffffff'],
             shapes: ['circle']
           });
 
-          if (Date.now() < end) {
+          if (timeLeft > 0) {
             requestAnimationFrame(frame);
           }
         }());
