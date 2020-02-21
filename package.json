@@ -1,6 +1,6 @@
 {
   "name": "canvas-confetti",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "performant confetti animation in the browser",
   "main": "src/confetti.js",
   "module": "dist/confetti.module.mjs",
@@ -44,6 +44,14 @@
   "keywords": [
     "canvas",
     "confetti",
-    "animation"
-  ]
+    "animation",
+    "burst",
+    "fireworks",
+    "snow",
+    "particles"
+  ],
+  "funding": {
+    "type": "donate",
+    "url": "https://www.paypal.me/kirilvatev"
+  }
 }

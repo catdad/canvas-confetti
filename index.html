@@ -281,7 +281,7 @@
     <div class="group" data-name="random">
       <div class="flex-rows">
         <div class="left">
-          <h2><a href="#random" id="random" class="anchor">Random Cannon</a></h2>
+          <h2><a href="#random" id="random" class="anchor">Random Direction</a></h2>
           <button class="run">
             Run
             <span class="icon">
@@ -293,6 +293,30 @@
           <p>
             Go crazy with some randomness. Shoot a random amount of confetti in random directions.
             (Go ahead... you know you want to click that button more than once.)
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="group" data-name="realistic">
+      <div class="flex-rows">
+        <div class="left">
+          <h2><a href="#realistic" id="realistic" class="anchor">Realistic Look</a></h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            If you happened to get curious and changed the particle count to 400 or so, you saw
+            something disappointing. An even "flattened cone" look to the confetti, making it look
+            way too perfect and ruining the illusion. We can fix that by mixing a few effects together.
           </p>
         </div>
       </div>
@@ -314,8 +338,8 @@
         </div>
         <div class="description">
           <p>
-            Why click a button repeatedly when you can have code do it for you? Shoot a firework
-            of confetti from a random location on the page 5 times per second.
+            Why click a button repeatedly when you can have code do it for you? Shoot some firework
+            of confetti from the sides of page so you can still read the content in the center.
           </p>
         </div>
       </div>
@@ -420,56 +444,96 @@
         });
       },
       random: function random() {
-        function r(min, max) {
+        function randomInRange(min, max) {
           return Math.random() * (max - min) + min;
         }
 
         confetti({
-          angle: r(55, 125),
-          spread: r(50, 70),
-          particleCount: r(50, 100),
+          angle: randomInRange(55, 125),
+          spread: randomInRange(50, 70),
+          particleCount: randomInRange(50, 100),
           origin: { y: 0.6 }
         });
       },
+      realistic: function realistic() {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+      },
       fireworks: function fireworks() {
-        var end = Date.now() + (15 * 1000);
+        var duration = 15 * 1000;
+        var animationEnd = Date.now() + duration;
+        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+        function randomInRange(min, max) {
+          return Math.random() * (max - min) + min;
+        }
 
         var interval = setInterval(function () {
-          if (Date.now() > end) {
+          var timeLeft = animationEnd - Date.now();
+
+          if (timeLeft <= 0) {
             return clearInterval(interval);
           }
 
-          confetti({
-            startVelocity: 30,
-            spread: 360,
-            ticks: 60,
-            shapes: ['square'],
-            origin: {
-              x: Math.random(),
-              // since they fall down, start a bit higher than random
-              y: Math.random() - 0.2
-            }
-          });
-        }, 200);
+          var particleCount = 50 * (timeLeft / duration);
+          // since particles fall down, start a bit higher than random
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 250);
       },
       snow: function snow() {
-        var end = Date.now() + (15 * 1000);
+        var duration = 15 * 1000;
+        var animationEnd = Date.now() + duration;
+        var skew = 1;
 
         (function frame() {
+          var timeLeft = animationEnd - Date.now();
+          var ticks = Math.max(50, 300 * (timeLeft / duration));
+          skew = Math.max(0.8, skew - 0.001);
+
           confetti({
             particleCount: 1,
             startVelocity: 0,
-            ticks: 300,
+            ticks: ticks,
             origin: {
               x: Math.random(),
-              // since they fall down, start a bit higher than random
-              y: Math.random() - 0.2
+              // since particles fall down, skew start toward the top
+              y: (Math.random() * skew) - 0.2
             },
             colors: ['#ffffff'],
             shapes: ['circle']
           });
 
-          if (Date.now() < end) {
+          if (timeLeft > 0) {
             requestAnimationFrame(frame);
           }
         }());
@@ -510,9 +574,7 @@
 
         canvas.confetti({
           spread: 70,
-          origin: {
-              y: 1.2
-          }
+          origin: { y: 1.2 }
         });
       }
     };
@@ -530,7 +592,7 @@
     }
 
     function pretty(val) {
-      return js_beautify(val);
+      return js_beautify(val, { indent_size: 2, brace_style: 'preserve-inline', });
     }
 
     function getCode(name) {
@@ -552,6 +614,8 @@
       var editor = ace.edit(codeElem);
       editor.setTheme('ace/theme/monokai');
       editor.session.setMode('ace/mode/javascript');
+      editor.session.setUseSoftTabs(true);
+      editor.session.setTabSize(2);
 
       editor.session.setValue(getCode(name));
 
