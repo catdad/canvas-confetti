@@ -30,7 +30,7 @@ You can then `require('canvas-confetti');` to use it in your project build. _Not
 You can also include this library in your HTML page directly from a CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.0.3/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.1.0/dist/confetti.browser.min.js"></script>
 ```
 
 _Note: you should use the latest version at the time that you include your project. You can see all versions [on the releases page](https://github.com/catdad/canvas-confetti/releases)._
@@ -60,6 +60,7 @@ The `confetti` parameter is a single optional `options` object, which has the fo
 - `spread` _Number (default: 45)_: How far off center the confetti can go, in degrees. 45 means the confetti will launch at the defined `angle` plus or minus 22.5 degrees.
 - `startVelocity` _Number (default: 45)_: How fast the confetti will start going, in pixels.
 - `decay` _Number (default: 0.9)_: How quickly the confetti will lose speed. Keep this number between 0 and 1, otherwise the confetti will gain speed. Better yet, just never change it.
+- `gravity` _Number (default: 1)_: How quickly the particles are pulled down. 1 is full gravity, 0.5 is half gravity, etc., but there are no limits. You can even make particles go up if you'd like.
 - `ticks` _Number (default: 200)_: How many times the confetti will move. This is abstract... but play with it if the confetti disappear too quickly for you.
 - `origin` _Object_: Where to start firing confetti from. Feel free to launch off-screen if you'd like.
   - `origin.x` _Number (default: 0.5)_: The `x` position on the page, with `0` being the left edge and `1` being the right edge.
