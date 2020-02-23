@@ -160,6 +160,7 @@
     spread: 45,
     startVelocity: 45,
     decay: 0.9,
+    gravity: 1,
     ticks: 200,
     x: 0.5,
     y: 0.5,
@@ -275,7 +276,7 @@
       tiltCos: 0,
       wobbleX: 0,
       wobbleY: 0,
-      gravity: 3,
+      gravity: opts.gravity * 3,
       ovalScalar: 0.6
     };
   }
@@ -399,6 +400,7 @@
       var spread = prop(options, 'spread', Number);
       var startVelocity = prop(options, 'startVelocity', Number);
       var decay = prop(options, 'decay', Number);
+      var gravity = prop(options, 'gravity', Number);
       var colors = prop(options, 'colors');
       var ticks = prop(options, 'ticks', Number);
       var shapes = prop(options, 'shapes');
@@ -421,7 +423,8 @@
             color: colors[temp % colors.length],
             shape: shapes[randomInt(0, shapes.length)],
             ticks: ticks,
-            decay: decay
+            decay: decay,
+            gravity: gravity
           })
         );
       }
