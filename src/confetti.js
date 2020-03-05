@@ -471,9 +471,22 @@
       function onResize() {
         if (worker) {
           // TODO this really shouldn't be immediate, because it is expensive
-          var obj = {};
+          var obj = {
+            getBoundingClientRect: function () {
+              if (!isLibCanvas) {
+                return canvas.getBoundingClientRect();
+              }
+            }
+          };
+
           resizer(obj);
-          worker.postMessage({ resize: obj });
+
+          worker.postMessage({
+            resize: {
+              width: obj.width,
+              height: obj.height
+            }
+          });
           return;
         }
 

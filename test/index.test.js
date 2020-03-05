@@ -10,6 +10,8 @@ import root from 'rootrequire';
 import jimp from 'jimp';
 
 const PORT = 9999;
+const width = 500;
+const height = 500;
 
 // Docker-based CIs need this disabled
 // https://github.com/Quramy/puppeteer-example/blob/c28a5aa52fe3968c2d6cfca362ec28c36963be26/README.md#with-docker-based-ci-services
@@ -71,7 +73,7 @@ const testBrowser = (() => {
 const testPage = async () => {
   const browser = await testBrowser();
   const page = await browser.newPage();
-  await page.setViewport({ width: 500, height: 500});
+  await page.setViewport({ width, height });
 
   // eslint-disable-next-line no-console
   page.on('pageerror', err => console.error(err));
@@ -443,8 +445,6 @@ test('removes the canvas when done', async t => {
 });
 
 test('handles window resizes', async t => {
-  const width = 500;
-  const height = 500;
   const time = 50;
 
   const page = t.context.page = await fixturePage();
@@ -519,7 +519,10 @@ test('stops and removes canvas immediately when `reset` is called', async t => {
  * Custom canvas
  */
 
-const injectCanvas = async (page, allowResize = true, createName = 'confetti.create') => {
+const injectCanvas = async (page, opts = {}, createName = 'confetti.create') => {
+  const allowResize = 'allowResize' in opts ? opts.allowResize : true;
+  const useWorker = 'useWorker' in opts ? opts.useWorker : false;
+
   await page.evaluate(`
     var canvas = document.createElement('canvas');
     canvas.style.width = '100%';
@@ -527,7 +530,10 @@ const injectCanvas = async (page, allowResize = true, createName = 'confetti.cre
 
     document.body.appendChild(canvas);
 
-    window.myConfetti = ${createName}(canvas, { resize: ${!!allowResize} });
+    window.myConfetti = ${createName}(canvas, {
+      resize: ${!!allowResize},
+      useWorker: ${!!useWorker}
+    });
   `);
 };
 
@@ -558,7 +564,7 @@ test('can create instances of confetti in separate canvas', async t => {
 
 test('can use a custom canvas without resizing', async t => {
   const page = t.context.page = await fixturePage();
-  await injectCanvas(page, false);
+  await injectCanvas(page, { allowResize: false });
 
   const beforeSize = await getCanvasSize(page);
 
@@ -574,6 +580,98 @@ test('can use a custom canvas without resizing', async t => {
 
   t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
   t.deepEqual(beforeSize, afterSize);
+});
+
+const resizeTest = async (t, createOpts, createName = 'confetti.create') => {
+  const time = 50;
+
+  const page = t.context.page = await fixturePage();
+  await page.setViewport({ width: width / 2, height });
+
+  let fireOpts = {
+    colors: ['#0000ff'],
+    origin: { x: 1, y: 0 },
+    angle: 0,
+    startVelocity: 0,
+    particleCount: 2
+  };
+
+  // continuously animate more and more confetti
+  // for 10 seconds... that should be longer than
+  // this test... we won't wait for it anyway
+  page.evaluate(`
+    var canvas = document.createElement('canvas');
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+
+    document.body.appendChild(canvas);
+
+    var myConfetti = ${createName}(canvas, ${JSON.stringify(createOpts)});
+
+    var opts = ${JSON.stringify(fireOpts)};
+    var end = Date.now() + (10 * 1000);
+
+    var promise = myConfetti(opts);
+
+    var interval = setInterval(function() {
+      if (Date.now() > end) {
+        return clearInterval(interval);
+      }
+
+      myConfetti(opts);
+    }, ${time});
+  `);
+
+  await sleep(time * 4);
+  await page.setViewport({ width, height });
+  await sleep(time * 4);
+
+  t.context.buffer = await page.screenshot({ type: 'png' });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  // chop this image into thirds
+  let widthThird = Math.floor(width / 3);
+  let first = t.context.image.clone().crop(widthThird * 0, 0, widthThird, height);
+  let second = t.context.image.clone().crop(widthThird * 1, 0, widthThird, height);
+  let third = t.context.image.clone().crop(widthThird * 2, 0, widthThird, height);
+
+  // the first will be white, the second and third will have confetti in them
+  t.deepEqual(await uniqueColors(first), ['#ffffff']);
+  t.deepEqual(await uniqueColors(second), ['#0000ff', '#ffffff']);
+  t.deepEqual(await uniqueColors(third), ['#0000ff', '#ffffff']);
+};
+
+test('resizes the custom canvas when the window resizes', async t => {
+  await resizeTest(t, {
+    resize: true
+  });
+});
+
+test('resizes the custom canvas when the window resizes and a worker is used', async t => {
+  await resizeTest(t, {
+    resize: true,
+    useWorker: true
+  });
+});
+
+test('can use a custom canvas with workers and resize it', async t => {
+  const page = t.context.page = await fixturePage();
+  await injectCanvas(page, {
+    allowResize: true,
+    useWorker: true
+  });
+
+  const beforeSize = await getCanvasSize(page);
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff0000']
+  }, 'myConfetti');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const afterSize = await getCanvasSize(page);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
+  t.notDeepEqual(beforeSize, afterSize);
 });
 
 test('shoots confetti repeatedly in defaut and custom canvas using requestAnimationFrame', async t => {
@@ -736,7 +834,7 @@ test('the esm module exposed confetti as the default', async t => {
 test('the esm module exposed confetti.create as create', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
-  await injectCanvas(page, true, 'createAlias');
+  await injectCanvas(page, { allowResize: true }, 'createAlias');
 
   t.context.buffer = await confettiImage(page, {
     colors: ['#ff00ff']
