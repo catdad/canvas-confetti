@@ -10,6 +10,8 @@ import root from 'rootrequire';
 import jimp from 'jimp';
 
 const PORT = 9999;
+const width = 500;
+const height = 500;
 
 // Docker-based CIs need this disabled
 // https://github.com/Quramy/puppeteer-example/blob/c28a5aa52fe3968c2d6cfca362ec28c36963be26/README.md#with-docker-based-ci-services
@@ -71,7 +73,7 @@ const testBrowser = (() => {
 const testPage = async () => {
   const browser = await testBrowser();
   const page = await browser.newPage();
-  await page.setViewport({ width: 500, height: 500});
+  await page.setViewport({ width, height });
 
   // eslint-disable-next-line no-console
   page.on('pageerror', err => console.error(err));
@@ -443,8 +445,6 @@ test('removes the canvas when done', async t => {
 });
 
 test('handles window resizes', async t => {
-  const width = 500;
-  const height = 500;
   const time = 50;
 
   const page = t.context.page = await fixturePage();
