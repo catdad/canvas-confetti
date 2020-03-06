@@ -740,6 +740,46 @@ test('shoots confetti repeatedly in defaut and custom canvas using requestAnimat
   t.deepEqual(await uniqueColors(await reduceImg(img4)), ['#0000ff', '#ff0000', '#ffffff']);
 });
 
+test('can initialize the same canvas multiple times when using a worker', async t => {
+  const page = t.context.page = await fixturePage();
+  await page.evaluate(`
+    var canvas = document.createElement('canvas');
+    canvas.id = 'testcanvas';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+
+    document.body.appendChild(canvas);
+  `);
+
+  await page.evaluate(`
+    var canvas = document.querySelector('#testcanvas');
+    var instance1 = confetti.create(canvas, { resize: true, useWorker: true });
+  `);
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff0000'],
+    startVelocity: 2,
+    spread: 360,
+  }, 'instance1');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
+
+  await page.evaluate(`
+    var canvas = document.querySelector('#testcanvas');
+    var instance2 = confetti.create(canvas, { resize: true, useWorker: true });
+  `);
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff00ff'],
+    startVelocity: 2,
+    spread: 360,
+  }, 'instance2');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ff00ff', '#ffffff']);
+});
+
 test('calling `reset` method clears all existing confetti but more can be launched after', async t => {
   const page = t.context.page = await fixturePage();
   await injectCanvas(page);
