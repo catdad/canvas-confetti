@@ -391,7 +391,7 @@
     var shouldUseWorker = canUseWorker && !!prop(globalOpts || {}, 'useWorker');
     var worker = shouldUseWorker ? getWorker() : null;
     var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
-    var initialized = canvas ? !!canvas.__confetti_initialized : false;
+    var initialized = (canvas && worker) ? !!canvas.__confetti_initialized : false;
     var animationObj;
 
     function fireLocal(options, size, done) {

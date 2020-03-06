@@ -777,7 +777,50 @@ test('can initialize the same canvas multiple times when using a worker', async 
   }, 'instance2');
   t.context.image = await reduceImg(t.context.buffer);
 
+  // note: canvas is owned by the worker, so an existing animation will continue
   t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ff00ff', '#ffffff']);
+});
+
+test('can initialize the same canvas multiple times without using a worker', async t => {
+  const page = t.context.page = await fixturePage();
+  await page.evaluate(`
+    var canvas = document.createElement('canvas');
+    canvas.id = 'testcanvas';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+
+    document.body.appendChild(canvas);
+  `);
+
+  await page.evaluate(`
+    var canvas = document.querySelector('#testcanvas');
+    var instance1 = confetti.create(canvas, { resize: true, useWorker: false });
+  `);
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff0000'],
+    startVelocity: 2,
+    spread: 360,
+  }, 'instance1');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ffffff']);
+
+  await page.evaluate(`
+    var canvas = document.querySelector('#testcanvas');
+    var instance2 = confetti.create(canvas, { resize: true, useWorker: false });
+  `);
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#ff00ff'],
+    startVelocity: 2,
+    spread: 360,
+  }, 'instance2');
+  t.context.image = await reduceImg(t.context.buffer);
+
+  // note: canvas can only be owned by one instance in the main thread,
+  // so the animation is reset
+  t.deepEqual(await uniqueColors(t.context.image), ['#ff00ff', '#ffffff']);
 });
 
 test('calling `reset` method clears all existing confetti but more can be launched after', async t => {
