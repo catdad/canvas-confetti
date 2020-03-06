@@ -79,6 +79,8 @@ The following global options are available:
 * `resize` _Boolean (default: false)_: Whether to allow setting the canvas image size, as well as keep it correctly sized if the window changes size (e.g. resiging the window, rotating a mobile device, etc.). By default, the canvas size will not be modified.
 * `useWorker` _Boolean (default: false)_: Whether to use an asynchronous web worker to render the confetti animation, whenever possible. This is turned off by default, meaning that the animation will always execute on the main thread. If turned on and the browser supports it, the animation will execute off of the main thread so that it is not blocking any other work your page needs to do. If it is not supported by the browser, this value will be ignored.
 
+_**Important: If you use `useWorker: true`, I own your canvas now. You must not try to use the canvas in any way (other than I guess removing it from the DOM), as it will throw an error -- this includes even initializing confetti again with the same canvas. When using workers for rendering, control of the canvas must be transfered to the web worker, preventing any usage of that canvas on the main thread. If you must manipulate the canvas in any way, do not use this option.**_
+
 ```javascript
 var myCanvas = document.createElement('canvas');
 document.appendChild(myCanvas);
