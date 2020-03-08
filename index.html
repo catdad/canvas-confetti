@@ -569,8 +569,8 @@
       custom: function() {
         var canvas = document.getElementById('my-canvas');
 
-        // save this function... we'll save it to the canvas itself for
-        // the purpose of this demo
+        // you should  only initialize a canvas once, so save this function
+        // we'll save it to the canvas itself for the purpose of this demo
         canvas.confetti = canvas.confetti || confetti.create(canvas, { resize: true });
 
         canvas.confetti({

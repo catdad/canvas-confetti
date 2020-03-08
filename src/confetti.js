@@ -1,10 +1,13 @@
 (function main(global, module, isWorker, workerSize) {
-  var canUseWorker = global.Worker &&
+  var canUseWorker = !!(
+    global.Worker &&
     global.Blob &&
-    global.OffscreenCanvas &&
     global.Promise &&
+    global.OffscreenCanvas &&
+    global.HTMLCanvasElement &&
+    global.HTMLCanvasElement.prototype.transferControlToOffscreen &&
     global.URL &&
-    !!global.URL.createObjectURL;
+    global.URL.createObjectURL);
 
   function noop() {}
 
@@ -391,7 +394,7 @@
     var shouldUseWorker = canUseWorker && !!prop(globalOpts || {}, 'useWorker');
     var worker = shouldUseWorker ? getWorker() : null;
     var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
-    var initialized = false;
+    var initialized = (canvas && worker) ? !!canvas.__confetti_initialized : false;
     var animationObj;
 
     function fireLocal(options, size, done) {
@@ -467,6 +470,10 @@
       }
 
       initialized = true;
+
+      if (worker) {
+        canvas.__confetti_initialized = true;
+      }
 
       function onResize() {
         if (worker) {
