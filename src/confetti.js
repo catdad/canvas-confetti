@@ -1,10 +1,13 @@
 (function main(global, module, isWorker, workerSize) {
-  var canUseWorker = global.Worker &&
+  var canUseWorker = !!(
+    global.Worker &&
     global.Blob &&
-    global.OffscreenCanvas &&
     global.Promise &&
+    global.OffscreenCanvas &&
+    global.HTMLCanvasElement &&
+    global.HTMLCanvasElement.prototype.transferControlToOffscreen &&
     global.URL &&
-    !!global.URL.createObjectURL;
+    global.URL.createObjectURL);
 
   function noop() {}
 
