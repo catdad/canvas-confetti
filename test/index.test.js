@@ -321,7 +321,7 @@ test('shoots emoji confetti', async t => {
 
   const pixels = await uniqueColors(t.context.image);
 
-  t.deepEqual(pixels, ['#0000ff', '#ffffff']);
+  t.deepEqual(pixels, ['#000000', '#ffffff']);
 });
 
 test('shoots confetti to the left', async t => {
