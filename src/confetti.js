@@ -331,7 +331,7 @@
     var animationFrame;
     var destroy;
 
-    context.font = "4em Arial";
+    context.font = "3em Arial";
 
     var prom = promise(function (resolve) {
       function onDone() {
