@@ -315,13 +315,13 @@ test('shoots emoji confetti', async t => {
   const page = t.context.page = await fixturePage();
 
   t.context.buffer = await confettiImage(page, {
-    shapes: ['emoji:👻']
+    shapes: ['emoji:🦄']
   });
   t.context.image = await reduceImg(t.context.buffer);
 
   const pixels = await uniqueColors(t.context.image);
 
-  t.deepEqual(pixels, ['#000000', '#ffffff']);
+  t.true(pixels.length > 2);
 });
 
 test('shoots confetti to the left', async t => {
