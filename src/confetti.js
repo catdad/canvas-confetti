@@ -153,8 +153,7 @@
           worker = new Worker(URL.createObjectURL(new Blob([code])));
         } catch (e) {
           // eslint-disable-next-line no-console
-          var log = typeof console !== undefined && typeof console.warn === 'function' ? console.warn : noop;
-          log('🎊 Count not load worker', e);
+          typeof console !== undefined && typeof console.warn === 'function' ? console.warn('🎊 Count not load worker', e) : null;
 
           return null;
         }
