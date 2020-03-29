@@ -12,7 +12,7 @@
     "pretest": "npm run build -s && npm run browserify -s && npm run -s minify",
     "test": "cd test && ava --verbose --serial",
     "lint": "eslint src/**/*.js test/**/*.js build/**/*.js",
-    "dev": "static-server --port 9001",
+    "dev": "node build/serve.js",
     "devtest": "cross-env CONFETTI_SHOW=1 npm test",
     "citest": "npm run test"
   },
