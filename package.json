@@ -37,7 +37,6 @@
     "puppeteer": "^1.0.0",
     "rootrequire": "^1.0.0",
     "send": "^0.16.1",
-    "static-server": "^3.0.0",
     "terser": "^3.14.1"
   },
   "dependencies": {},
