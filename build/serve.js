@@ -9,7 +9,7 @@ http.createServer(function (req, res) {
   const url = req.url === '/' ? '/index.html' : req.url;
   const file = path.resolve(root, url.slice(1));
 
-  console.log(req.method, url, file);
+  console.log(req.method, url, '->', file);
 
   const cspRules = [
     `default-src 'self' https://cdnjs.cloudflare.com`,
