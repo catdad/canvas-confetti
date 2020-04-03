@@ -185,7 +185,9 @@
       '#fcff42',
       '#ffa62d',
       '#ff36ff'
-    ]
+    ],
+    // probably should be true, but back-compat
+    disableForReducedMotion: false
   };
 
   function convert(val, transform) {
@@ -399,10 +401,12 @@
   function confettiCannon(canvas, globalOpts) {
     var isLibCanvas = !canvas;
     var allowResize = !!prop(globalOpts || {}, 'resize');
+    var globalDisableForReducedMotion = prop(globalOpts, 'disableForReducedMotion', Boolean);
     var shouldUseWorker = canUseWorker && !!prop(globalOpts || {}, 'useWorker');
     var worker = shouldUseWorker ? getWorker() : null;
     var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
     var initialized = (canvas && worker) ? !!canvas.__confetti_initialized : false;
+    var preferLessMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion)').matches;
     var animationObj;
 
     function fireLocal(options, size, done) {
@@ -452,7 +456,14 @@
     }
 
     function fire(options) {
+      var disableForReducedMotion = globalDisableForReducedMotion || prop(options, 'disableForReducedMotion', Boolean);
       var zIndex = prop(options, 'zIndex', Number);
+
+      if (disableForReducedMotion && preferLessMotion) {
+        return promise(function (resolve) {
+          resolve();
+        });
+      }
 
       if (isLibCanvas && animationObj) {
         // use existing canvas from in-progress animation
