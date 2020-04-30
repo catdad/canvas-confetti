@@ -290,7 +290,8 @@
       wobbleX: 0,
       wobbleY: 0,
       gravity: opts.gravity * 3,
-      ovalScalar: 0.6
+      ovalScalar: 0.6,
+      scalar: 5
     };
   }
 
@@ -303,8 +304,8 @@
     fetti.tiltSin = Math.sin(fetti.tiltAngle);
     fetti.tiltCos = Math.cos(fetti.tiltAngle);
     fetti.random = Math.random() + 5;
-    fetti.wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
-    fetti.wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
+    fetti.wobbleX = fetti.x + ((10 * fetti.scalar) * Math.cos(fetti.wobble));
+    fetti.wobbleY = fetti.y + ((10 * fetti.scalar) * Math.sin(fetti.wobble));
 
     var progress = (fetti.tick++) / fetti.totalTicks;
 
