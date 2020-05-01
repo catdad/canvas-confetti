@@ -276,6 +276,7 @@
       x: opts.x,
       y: opts.y,
       wobble: Math.random() * 10,
+      wobbleSpeed: Math.min(0.11, Math.random() * 0.1 + 0.05),
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: Math.random() * Math.PI,
@@ -298,7 +299,7 @@
   function updateFetti(context, fetti) {
     fetti.x += Math.cos(fetti.angle2D) * fetti.velocity;
     fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + fetti.gravity;
-    fetti.wobble += 0.1;
+    fetti.wobble += fetti.wobbleSpeed;
     fetti.velocity *= fetti.decay;
     fetti.tiltAngle += 0.1;
     fetti.tiltSin = Math.sin(fetti.tiltAngle);
