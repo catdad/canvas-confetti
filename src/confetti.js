@@ -284,7 +284,7 @@
       tick: 0,
       totalTicks: opts.ticks,
       decay: opts.decay,
-      random: Math.random() + 5,
+      random: Math.random() + 2,
       tiltSin: 0,
       tiltCos: 0,
       wobbleX: 0,
@@ -303,7 +303,7 @@
     fetti.tiltAngle += 0.1;
     fetti.tiltSin = Math.sin(fetti.tiltAngle);
     fetti.tiltCos = Math.cos(fetti.tiltAngle);
-    fetti.random = Math.random() + 5;
+    fetti.random = Math.random() + 2;
     fetti.wobbleX = fetti.x + ((10 * fetti.scalar) * Math.cos(fetti.wobble));
     fetti.wobbleY = fetti.y + ((10 * fetti.scalar) * Math.sin(fetti.wobble));
 
