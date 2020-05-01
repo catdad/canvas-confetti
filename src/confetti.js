@@ -291,7 +291,7 @@
       wobbleY: 0,
       gravity: opts.gravity * 3,
       ovalScalar: 0.6,
-      scalar: 5
+      scalar: 1
     };
   }
 
