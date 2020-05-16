@@ -272,6 +272,12 @@
     var radAngle = opts.angle * (Math.PI / 180);
     var radSpread = opts.spread * (Math.PI / 180);
 
+    var draw = null;
+
+    if (typeof opts.shape === 'function') {
+      draw = opts.shape();
+    }
+
     return {
       x: opts.x,
       y: opts.y,
@@ -281,6 +287,7 @@
       tiltAngle: Math.random() * Math.PI,
       color: hexToRgb(opts.color),
       shape: opts.shape,
+      draw: draw,
       tick: 0,
       totalTicks: opts.ticks,
       decay: opts.decay,
@@ -297,38 +304,43 @@
   function updateFetti(context, fetti) {
     fetti.x += Math.cos(fetti.angle2D) * fetti.velocity;
     fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + fetti.gravity;
-    fetti.wobble += 0.1;
     fetti.velocity *= fetti.decay;
-    fetti.tiltAngle += 0.1;
-    fetti.tiltSin = Math.sin(fetti.tiltAngle);
-    fetti.tiltCos = Math.cos(fetti.tiltAngle);
-    fetti.random = Math.random() + 5;
-    fetti.wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
-    fetti.wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
 
     var progress = (fetti.tick++) / fetti.totalTicks;
 
-    var x1 = fetti.x + (fetti.random * fetti.tiltCos);
-    var y1 = fetti.y + (fetti.random * fetti.tiltSin);
-    var x2 = fetti.wobbleX + (fetti.random * fetti.tiltCos);
-    var y2 = fetti.wobbleY + (fetti.random * fetti.tiltSin);
-
-    context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
-    context.beginPath();
-
-    if (fetti.shape === 'circle') {
-      context.ellipse ?
-        context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
-        ellipse(context, fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
+    if (typeof fetti.draw === 'function') {
+      fetti.draw(context, fetti.x, fetti.y);
     } else {
-      context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
-      context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
-      context.lineTo(Math.floor(x2), Math.floor(y2));
-      context.lineTo(Math.floor(x1), Math.floor(fetti.wobbleY));
-    }
+      fetti.wobble += 0.1;
+      fetti.tiltAngle += 0.1;
+      fetti.tiltSin = Math.sin(fetti.tiltAngle);
+      fetti.tiltCos = Math.cos(fetti.tiltAngle);
+      fetti.random = Math.random() + 5;
+      fetti.wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
+      fetti.wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
 
-    context.closePath();
-    context.fill();
+      var x1 = fetti.x + (fetti.random * fetti.tiltCos);
+      var y1 = fetti.y + (fetti.random * fetti.tiltSin);
+      var x2 = fetti.wobbleX + (fetti.random * fetti.tiltCos);
+      var y2 = fetti.wobbleY + (fetti.random * fetti.tiltSin);
+
+      context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
+      context.beginPath();
+
+      if (fetti.shape === 'circle') {
+        context.ellipse ?
+          context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
+          ellipse(context, fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
+      } else {
+        context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
+        context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
+        context.lineTo(Math.floor(x2), Math.floor(y2));
+        context.lineTo(Math.floor(x1), Math.floor(fetti.wobbleY));
+      }
+
+      context.closePath();
+      context.fill();
+    }
 
     return fetti.tick < fetti.totalTicks;
   }

@@ -82,12 +82,36 @@
         finalCtx.drawImage(img, 0, 0, size, size, i * size, 0, size, size);
       });
     }, Promise.resolve()).then(function () {
-      return final.toDataURL();
+      return { size: size, frames: frames, data: final.toDataURL() };
+    });
+  }
+
+  function load(sprite) {
+    var size = sprite.size;
+    var frames = sprite.frames;
+
+    var width = size * frames;
+
+    return loadImage(sprite.data).then(function (img) {
+      return function init() {
+        var sx = 0;
+
+        return function draw(context, x, y) {
+          context.drawImage(img, sx, 0, size, size, x, y, size, size);
+
+          sx += size;
+
+          if (sx === width) {
+            sx = 0;
+          }
+        };
+      };
     });
   }
 
   module.exports = module.exports || {};
   module.exports.sprite = sprite;
+  module.exports.load = load;
 }((function () {
   if (typeof window !== 'undefined') {
     return window;
