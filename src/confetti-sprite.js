@@ -72,18 +72,16 @@
     var final = getCanvas(size * frames, size);
     var finalCtx = final.getContext('2d');
 
-    return new Array(frames).fill(1).reduce(function (prom, url, i) {
-      return prom.then(function () {
-        tempCtx.clearRect(0, 0, size, size);
-        draw(0, tempCtx, char, fetti);
+    console.time('sprite');
+    new Array(frames).fill(1).forEach(function (url, i) {
+      tempCtx.clearRect(0, 0, size, size);
+      draw(0, tempCtx, char, fetti);
 
-        return loadImage(temp.toDataURL());
-      }).then(function (img) {
-        finalCtx.drawImage(img, 0, 0, size, size, i * size, 0, size, size);
-      });
-    }, Promise.resolve()).then(function () {
-      return { size: size, frames: frames, data: final.toDataURL() };
+      finalCtx.drawImage(temp, 0, 0, size, size, i * size, 0, size, size);
     });
+    console.timeEnd('sprite');
+
+    return Promise.resolve({ size: size, frames: frames, data: final.toDataURL() });
   }
 
   function load(sprite) {
