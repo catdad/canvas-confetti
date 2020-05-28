@@ -1,5 +1,7 @@
 # 🎊 canvas confetti 🎊
 
+[![canvas confetti logo](https://cdn.jsdelivr.net/gh/catdad-experiments/catdad-experiments-org@5ed78b/canvas-confetti/logo.jpg)](https://github.com/catdad/canvas-confetti/)
+
 [![travis][travis.svg]][travis.link]
 [![jsdelivr][jsdelivr.svg]][jsdelivr.link]
 [![npm-downloads][npm-downloads.svg]][npm.link]
