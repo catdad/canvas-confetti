@@ -85,7 +85,7 @@ _Canvas can be misunderstood a bit though, so let me explain why you might want 
 Note also that you should persist the custom instance and avoid initializing an instance of confetti with the same canvas element more than once.
 
 The following global options are available:
-* `resize` _Boolean (default: false)_: Whether to allow setting the canvas image size, as well as keep it correctly sized if the window changes size (e.g. resiging the window, rotating a mobile device, etc.). By default, the canvas size will not be modified.
+* `resize` _Boolean (default: false)_: Whether to allow setting the canvas image size, as well as keep it correctly sized if the window changes size (e.g. resizing the window, rotating a mobile device, etc.). By default, the canvas size will not be modified.
 * `useWorker` _Boolean (default: false)_: Whether to use an asynchronous web worker to render the confetti animation, whenever possible. This is turned off by default, meaning that the animation will always execute on the main thread. If turned on and the browser supports it, the animation will execute off of the main thread so that it is not blocking any other work your page needs to do. Using this option will also modify the canvas, but more on that directly below -- do read it. If it is not supported by the browser, this value will be ignored.
 * `disableForReducedMotion` _Boolean (default: false)_: Disables confetti entirely for users that [prefer reduced motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion). When set to true, use of this confetti instance will always respect a user's request for reduced motion and disable confetti for them.
 
