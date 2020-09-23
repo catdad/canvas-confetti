@@ -47,8 +47,4 @@ fixtures/
 index.html
 
 # dotfiles don't need to be in npm
-.brackets.json
-.editorconfig
-.eslintrc*
-.travis.yml
-.gitattributes
+.*
