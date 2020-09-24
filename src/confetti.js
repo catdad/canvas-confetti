@@ -320,6 +320,8 @@
       context.ellipse ?
         context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
         ellipse(context, fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
+    } else if (fetti.shape.substring(0, 6) === 'emoji:') {
+      context.fillText(fetti.shape.substring(6) , x1, y1);
     } else {
       context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
       context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
@@ -338,6 +340,8 @@
     var context = canvas.getContext('2d');
     var animationFrame;
     var destroy;
+
+    context.font = "3em Arial";
 
     var prom = promise(function (resolve) {
       function onDone() {

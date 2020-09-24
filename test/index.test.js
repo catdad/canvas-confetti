@@ -311,6 +311,19 @@ test('shoots circle confetti', async t => {
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
 });
 
+test('shoots emoji confetti', async t => {
+  const page = t.context.page = await fixturePage();
+
+  t.context.buffer = await confettiImage(page, {
+    shapes: ['emoji:🦄']
+  });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+
+  t.true(pixels.length > 2);
+});
+
 test('shoots confetti to the left', async t => {
   const page = t.context.page = await fixturePage();
 
