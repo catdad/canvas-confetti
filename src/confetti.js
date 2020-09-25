@@ -187,7 +187,8 @@
       '#ff36ff'
     ],
     // probably should be true, but back-compat
-    disableForReducedMotion: false
+    disableForReducedMotion: false,
+    scalar: 1
   };
 
   function convert(val, transform) {
@@ -290,7 +291,8 @@
       wobbleX: 0,
       wobbleY: 0,
       gravity: opts.gravity * 3,
-      ovalScalar: 0.6
+      ovalScalar: 0.6,
+      scalar: opts.scalar
     };
   }
 
@@ -303,8 +305,8 @@
     fetti.tiltSin = Math.sin(fetti.tiltAngle);
     fetti.tiltCos = Math.cos(fetti.tiltAngle);
     fetti.random = Math.random() + 5;
-    fetti.wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
-    fetti.wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
+    fetti.wobbleX = fetti.x + ((10 * fetti.scalar) * Math.cos(fetti.wobble));
+    fetti.wobbleY = fetti.y + ((10 * fetti.scalar) * Math.sin(fetti.wobble));
 
     var progress = (fetti.tick++) / fetti.totalTicks;
 
@@ -419,6 +421,7 @@
       var colors = prop(options, 'colors');
       var ticks = prop(options, 'ticks', Number);
       var shapes = prop(options, 'shapes');
+      var scalar = prop(options, 'scalar');
       var origin = getOrigin(options);
 
       var temp = particleCount;
@@ -439,7 +442,8 @@
             shape: shapes[randomInt(0, shapes.length)],
             ticks: ticks,
             decay: decay,
-            gravity: gravity
+            gravity: gravity,
+            scalar: scalar
           })
         );
       }
