@@ -1,6 +1,6 @@
 {
   "name": "canvas-confetti",
-  "version": "1.1.2",
+  "version": "1.3.0",
   "description": "performant confetti animation in the browser",
   "main": "src/confetti.js",
   "module": "dist/confetti.module.mjs",
@@ -12,7 +12,7 @@
     "pretest": "npm run build -s && npm run browserify -s && npm run -s minify",
     "test": "cd test && ava --verbose --serial",
     "lint": "eslint src/**/*.js test/**/*.js build/**/*.js",
-    "dev": "static-server --port 9001",
+    "dev": "node build/serve.js",
     "devtest": "cross-env CONFETTI_SHOW=1 npm test",
     "citest": "npm run test"
   },
@@ -37,7 +37,6 @@
     "puppeteer": "^1.0.0",
     "rootrequire": "^1.0.0",
     "send": "^0.16.1",
-    "static-server": "^3.0.0",
     "terser": "^3.14.1"
   },
   "dependencies": {},

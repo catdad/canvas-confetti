@@ -172,6 +172,21 @@ const uniqueColorsBySide = async (buffer) => {
   };
 };
 
+const totalPixels = async(buffer) => {
+  const image = await readImage(buffer);
+  let pixels = 0;
+  image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
+    const r = image.bitmap.data[idx + 0];
+    const g = image.bitmap.data[idx + 1];
+    const b = image.bitmap.data[idx + 2];
+
+    if (r === 255 && g === 255 && b === 255) { return; }
+
+    pixels++;
+  });
+  return pixels;
+};
+
 const removeOpacity = async (buffer) => {
   const image = await readImage(buffer);
   image.rgba(false).background(0xFFFFFFFF);
@@ -309,6 +324,37 @@ test('shoots circle confetti', async t => {
   const pixels = await uniqueColors(t.context.image);
 
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
+});
+
+test('shoots default scaled confetti', async t => {
+  const page = t.context.page = await fixturePage();
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#0000ff'],
+    shapes: ['circle'],
+    particleCount: 10
+  });
+  t.context.image = await removeOpacity(t.context.buffer);
+
+  const pixels = await totalPixels(t.context.image);
+
+  t.is(pixels > 100 && pixels < 500, true);
+});
+
+test('shoots larger scaled confetti', async t => {
+  const page = t.context.page = await fixturePage();
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#0000ff'],
+    shapes: ['circle'],
+    scalar: 10,
+    particleCount: 10
+  });
+  t.context.image = await removeOpacity(t.context.buffer);
+
+  const pixels = await totalPixels(t.context.image);
+
+  t.is(pixels > 2000, true);
 });
 
 test('shoots confetti to the left', async t => {

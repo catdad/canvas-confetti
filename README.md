@@ -1,5 +1,7 @@
 # 🎊 canvas confetti 🎊
 
+[![canvas confetti logo](https://cdn.jsdelivr.net/gh/catdad-experiments/catdad-experiments-org@5ed78b/canvas-confetti/logo.jpg)](https://github.com/catdad/canvas-confetti/)
+
 [![travis][travis.svg]][travis.link]
 [![jsdelivr][jsdelivr.svg]][jsdelivr.link]
 [![npm-downloads][npm-downloads.svg]][npm.link]
@@ -30,10 +32,14 @@ You can then `require('canvas-confetti');` to use it in your project build. _Not
 You can also include this library in your HTML page directly from a CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.1.2/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.3.0/dist/confetti.browser.min.js"></script>
 ```
 
 _Note: you should use the latest version at the time that you include your project. You can see all versions [on the releases page](https://github.com/catdad/canvas-confetti/releases)._
+
+## Reduced Motion
+
+Thank you for joining me in this very important message about motion on your website. See, [not everyone likes it, and some actually prefer no motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion). They have [ways to tell us about it](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) and we should listen. While I don't want to go as far as tell you not to have confetti on your page just yet, I do want to make it easy for you to respect what your users want. There is a `disableForReducedMotion` option you can use so that users that have trouble with chaotic animations don't need to struggle on your website. This is disabled by default, but I am considering changing that in a future major release. If you have strong feelings about this, [please let me know](https://github.com/catdad/canvas-confetti/issues/new). For now, please confetti responsibly.
 
 ## API
 
@@ -67,7 +73,9 @@ The `confetti` parameter is a single optional `options` object, which has the fo
   - `origin.y` _Number (default: 0.5)_: The `y` position on the page, with `0` being the top edge and `1` being the bottom edge.
 - `colors` _Array&lt;String&gt;_: An array of color strings, in the HEX format... you know, like `#bada55`.
 - `shapes` _Array&lt;String&gt;_: An array of shapes for the confetti. The possible values are `square` and `circle`. The default is to use both shapes in an even mix. You can even change the mix by providing a value such as `['circle', 'circle', 'square']` to use two third circles and one third squares.
+- `scalar` _Number (default: 1)_: Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
 - `zIndex` _Integer (default: 100)_: The confetti should be on top, after all. But if you have a crazy high page, you can set it even higher.
+- `disableForReducedMotion` _Boolean (default: false)_: Disables confetti entirely for users that [prefer reduced motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion). The `confetti()` promise will resolve immediately in this case.
 
 ### `confetti.create(canvas, [globalOptions])` → `function`
 
@@ -78,8 +86,9 @@ _Canvas can be misunderstood a bit though, so let me explain why you might want 
 Note also that you should persist the custom instance and avoid initializing an instance of confetti with the same canvas element more than once.
 
 The following global options are available:
-* `resize` _Boolean (default: false)_: Whether to allow setting the canvas image size, as well as keep it correctly sized if the window changes size (e.g. resiging the window, rotating a mobile device, etc.). By default, the canvas size will not be modified.
+* `resize` _Boolean (default: false)_: Whether to allow setting the canvas image size, as well as keep it correctly sized if the window changes size (e.g. resizing the window, rotating a mobile device, etc.). By default, the canvas size will not be modified.
 * `useWorker` _Boolean (default: false)_: Whether to use an asynchronous web worker to render the confetti animation, whenever possible. This is turned off by default, meaning that the animation will always execute on the main thread. If turned on and the browser supports it, the animation will execute off of the main thread so that it is not blocking any other work your page needs to do. Using this option will also modify the canvas, but more on that directly below -- do read it. If it is not supported by the browser, this value will be ignored.
+* `disableForReducedMotion` _Boolean (default: false)_: Disables confetti entirely for users that [prefer reduced motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion). When set to true, use of this confetti instance will always respect a user's request for reduced motion and disable confetti for them.
 
 _**Important: If you use `useWorker: true`, I own your canvas now. It's mine now and I can do whatever I want with it (don't worry... I'll just put confetti inside it, I promise). You must not try to use the canvas in any way (other than I guess removing it from the DOM), as it will throw an error. When using workers for rendering, control of the canvas must be transfered to the web worker, preventing any usage of that canvas on the main thread. If you must manipulate the canvas in any way, do not use this option.**_
 

@@ -149,7 +149,15 @@
           '  }',
           '}',
         ].join('\n');
-        worker = new Worker(URL.createObjectURL(new Blob([code])));
+        try {
+          worker = new Worker(URL.createObjectURL(new Blob([code])));
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          typeof console !== undefined && typeof console.warn === 'function' ? console.warn('🎊 Could not load worker', e) : null;
+
+          return null;
+        }
+
         decorate(worker);
       }
 
@@ -177,7 +185,10 @@
       '#fcff42',
       '#ffa62d',
       '#ff36ff'
-    ]
+    ],
+    // probably should be true, but back-compat
+    disableForReducedMotion: false,
+    scalar: 1
   };
 
   function convert(val, transform) {
@@ -280,7 +291,8 @@
       wobbleX: 0,
       wobbleY: 0,
       gravity: opts.gravity * 3,
-      ovalScalar: 0.6
+      ovalScalar: 0.6,
+      scalar: opts.scalar
     };
   }
 
@@ -293,8 +305,8 @@
     fetti.tiltSin = Math.sin(fetti.tiltAngle);
     fetti.tiltCos = Math.cos(fetti.tiltAngle);
     fetti.random = Math.random() + 5;
-    fetti.wobbleX = fetti.x + (10 * Math.cos(fetti.wobble));
-    fetti.wobbleY = fetti.y + (10 * Math.sin(fetti.wobble));
+    fetti.wobbleX = fetti.x + ((10 * fetti.scalar) * Math.cos(fetti.wobble));
+    fetti.wobbleY = fetti.y + ((10 * fetti.scalar) * Math.sin(fetti.wobble));
 
     var progress = (fetti.tick++) / fetti.totalTicks;
 
@@ -391,10 +403,12 @@
   function confettiCannon(canvas, globalOpts) {
     var isLibCanvas = !canvas;
     var allowResize = !!prop(globalOpts || {}, 'resize');
+    var globalDisableForReducedMotion = prop(globalOpts, 'disableForReducedMotion', Boolean);
     var shouldUseWorker = canUseWorker && !!prop(globalOpts || {}, 'useWorker');
     var worker = shouldUseWorker ? getWorker() : null;
     var resizer = isLibCanvas ? setCanvasWindowSize : setCanvasRectSize;
     var initialized = (canvas && worker) ? !!canvas.__confetti_initialized : false;
+    var preferLessMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion)').matches;
     var animationObj;
 
     function fireLocal(options, size, done) {
@@ -407,6 +421,7 @@
       var colors = prop(options, 'colors');
       var ticks = prop(options, 'ticks', Number);
       var shapes = prop(options, 'shapes');
+      var scalar = prop(options, 'scalar');
       var origin = getOrigin(options);
 
       var temp = particleCount;
@@ -427,7 +442,8 @@
             shape: shapes[randomInt(0, shapes.length)],
             ticks: ticks,
             decay: decay,
-            gravity: gravity
+            gravity: gravity,
+            scalar: scalar
           })
         );
       }
@@ -444,7 +460,14 @@
     }
 
     function fire(options) {
+      var disableForReducedMotion = globalDisableForReducedMotion || prop(options, 'disableForReducedMotion', Boolean);
       var zIndex = prop(options, 'zIndex', Number);
+
+      if (disableForReducedMotion && preferLessMotion) {
+        return promise(function (resolve) {
+          resolve();
+        });
+      }
 
       if (isLibCanvas && animationObj) {
         // use existing canvas from in-progress animation
