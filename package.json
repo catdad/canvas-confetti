@@ -1,6 +1,6 @@
 {
   "name": "canvas-confetti",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "performant confetti animation in the browser",
   "main": "src/confetti.js",
   "module": "dist/confetti.module.mjs",

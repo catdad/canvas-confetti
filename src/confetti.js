@@ -153,7 +153,7 @@
           worker = new Worker(URL.createObjectURL(new Blob([code])));
         } catch (e) {
           // eslint-disable-next-line no-console
-          typeof console !== undefined && typeof console.warn === 'function' ? console.warn('🎊 Count not load worker', e) : null;
+          typeof console !== undefined && typeof console.warn === 'function' ? console.warn('🎊 Could not load worker', e) : null;
 
           return null;
         }
@@ -187,7 +187,8 @@
       '#ff36ff'
     ],
     // probably should be true, but back-compat
-    disableForReducedMotion: false
+    disableForReducedMotion: false,
+    scalar: 1
   };
 
   function convert(val, transform) {
@@ -292,7 +293,7 @@
       wobbleY: 0,
       gravity: opts.gravity * 3,
       ovalScalar: 0.6,
-      scalar: 1
+      scalar: opts.scalar
     };
   }
 
@@ -421,6 +422,7 @@
       var colors = prop(options, 'colors');
       var ticks = prop(options, 'ticks', Number);
       var shapes = prop(options, 'shapes');
+      var scalar = prop(options, 'scalar');
       var origin = getOrigin(options);
 
       var temp = particleCount;
@@ -441,7 +443,8 @@
             shape: shapes[randomInt(0, shapes.length)],
             ticks: ticks,
             decay: decay,
-            gravity: gravity
+            gravity: gravity,
+            scalar: scalar
           })
         );
       }
