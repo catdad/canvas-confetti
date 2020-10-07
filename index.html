@@ -517,6 +517,10 @@
         var animationEnd = Date.now() + duration;
         var skew = 1;
 
+        function randomInRange(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
         (function frame() {
           var timeLeft = animationEnd - Date.now();
           var ticks = Math.max(200, 500 * (timeLeft / duration));
@@ -533,7 +537,8 @@
               y: (Math.random() * skew) - 0.2
             },
             colors: ['#ffffff'],
-            shapes: ['circle']
+            shapes: ['circle'],
+            scalar: randomInRange(0.4, 1)
           });
 
           if (timeLeft > 0) {
