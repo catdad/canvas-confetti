@@ -582,18 +582,6 @@
       }
     };
 
-    function auto(mode, count, time) {
-      count = count || 10;
-
-      var interval = setInterval(function () {
-        if (count--) {
-          return modes[mode]();
-        }
-
-        clearInterval(interval);
-      }, time || 200);
-    }
-
     function pretty(val) {
       return js_beautify(val, { indent_size: 2, brace_style: 'preserve-inline', });
     }
