@@ -11,7 +11,7 @@
 
   <title>🎊</title>
 
-  <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
 
   <style>
     html, body {
@@ -220,8 +220,8 @@
     window.confetti = module.exports;
   </script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.0/ace.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.0/ace.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.7.5/beautify.min.js"></script>
 </head>
 <body>
 
@@ -597,39 +597,41 @@
       return pretty(code);
     }
 
-    [].forEach.call(document.querySelectorAll('.group'), function (group) {
-      var name = group.getAttribute('data-name');
-      var button = group.querySelector('.run');
-      var codeElem = group.querySelector('.editor');
+    window.onload = function () {
+      [].forEach.call(document.querySelectorAll('.group'), function (group) {
+        var name = group.getAttribute('data-name');
+        var button = group.querySelector('.run');
+        var codeElem = group.querySelector('.editor');
 
-      var editor = ace.edit(codeElem);
-      editor.setTheme('ace/theme/monokai');
-      editor.session.setMode('ace/mode/javascript');
-      editor.session.setUseSoftTabs(true);
-      editor.session.setTabSize(2);
+        var editor = ace.edit(codeElem);
+        editor.setTheme('ace/theme/monokai');
+        editor.session.setMode('ace/mode/javascript');
+        editor.session.setUseSoftTabs(true);
+        editor.session.setTabSize(2);
 
-      editor.session.setValue(getCode(name));
+        editor.session.setValue(getCode(name));
 
-      var count = editor.session.getLength();
+        var count = editor.session.getLength();
 
-      // set height so that all code is visible
-      codeElem.style.minHeight = (14 * count) + 1 + 'px';
-      codeElem.style.height = (count) + 'rem';
+        // set height so that all code is visible
+        codeElem.style.minHeight = (14 * count) + 1 + 'px';
+        codeElem.style.height = (count) + 'rem';
 
-      button.onclick = function (ev) {
-        // stop mobile browsers from zooming when clicking
-        // buttons repeatedly really fast
-        ev.preventDefault();
+        button.onclick = function (ev) {
+          // stop mobile browsers from zooming when clicking
+          // buttons repeatedly really fast
+          ev.preventDefault();
 
-        try {
-          eval(editor.getValue());
-        } catch (e) {
-          console.error(e);
-        }
-      };
-    });
+          try {
+            eval(editor.getValue());
+          } catch (e) {
+            console.error(e);
+          }
+        };
+      });
+    };
   </script>
 
-  <script src="/analytics.js"></script>
+  <script src="/analytics.js" async></script>
 </body>
 </html>
