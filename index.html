@@ -19,11 +19,29 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      background: #212121;
 
-      color: #eee;
       font-size: 1em;
       font-family: 'Noto Sans', sans-serif;
+    }
+
+    :root {
+      --primary-color: #eeeeee;
+      --secondary-color: #363636;
+      --secondary-variant-color: #272727;
+      --background-color: #212121;
+      --inner-color: #ffffff;
+      --border-color: #555651;
+    }
+
+    [data-theme="light"] {
+      --primary-color: #212121;
+      --background-color: #f5f6f7;
+    }
+
+    body {
+      background: var(--background-color);
+
+      color: var(--primary-color);
     }
 
     * {
@@ -34,16 +52,97 @@
       display: none;
     }
 
-    a.github-corner {
+    header {
       position: absolute;
       top: 0;
+      left: 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+      height: 64px;
+    }
+
+    .theme-switch {
+      position: relative;
+      margin-right: 24px;
+      width: 56px;
+      height: 24px;
+    }
+
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
       right: 0;
-      width: 80px;
-      height: 80px;
+      bottom: 0;
+      border-radius: 32px;
+      background-color: var(--primary-color);
+      transition: 0.6s;
+      -webkit-transition: 0.6s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 32px;
+      width: 32px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      margin: auto 0;
+      transition: 0.6s;
+      -webkit-transition: 0.6s;
+      box-shadow: 0 0 16px var(--secondary-color);
+      background: var(--inner-color) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='16' height='16'%3E%3Cpath fill-rule='evenodd' d='M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    input:checked + .slider {
+      background-color: var(--secondary-color);
+    }
+
+    input:focus + .slider {
+      box-shadow: 0 0 4px var(--border-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+      -webkit-transform: translateX(24px);
+      -ms-transform: translateX(24px);
+      background: var(--inner-color) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='16' height='16'%3E%3Cpath fill-rule='evenodd' d='M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .github-icon {
+      position: relative;
+      display: block;
+      width: 40px;
+      height: 40px;
+      margin-right: 12px;
+    }
+
+    .github-icon svg.icon {
+      fill: var(--primary-color);
     }
 
     h1, h2, .center {
       text-align: center;
+    }
+
+    h1 {
+      margin-top: 64px;
     }
 
     h2 {
@@ -68,7 +167,7 @@
       margin: 40px 0;
       padding-top: 16px;
 
-      border-top: 1px solid #3e3e3e;
+      border-top: 1px solid var(--border-color);
       border-radius: 20px;
     }
 
@@ -76,11 +175,11 @@
       padding: 10px 6px;
       margin: 0.75em 0;
 
-      background: rgba(255,255,255,0.1);
+      background: var(--secondary-color);
       border: none;
       outline: none;
 
-      color: #eee;
+      color: var(--inner-color);
       font-weight: bold;
       cursor: pointer;
       user-select: none;
@@ -100,11 +199,14 @@
     }
 
     .editor.ace_dark.ace_editor {
-      background-color: #363636;
+      background-color: var(--secondary-color);
     }
     .editor.ace_dark .ace_gutter {
-      color: #8b8b8b;
-      background: #272727;
+      background: var(--secondary-variant-color);
+    }
+    .editor.ace_dark .ace_gutter .ace_gutter-cell {
+      color: var(--inner-color);
+      opacity: 0.6;
     }
 
     .flex-rows {
@@ -149,7 +251,7 @@
       text-align: center;
       line-height: 2;
 
-      background: rgba(255,255,255,0.1);
+      background: var(--secondary-color);
     }
 
     footer span {
@@ -169,12 +271,12 @@
       width: 100%;
       height: 100%;
 
-      fill: #e5e5e5;
+      fill: var(--inner-color);
     }
 
     footer a {
       text-decoration: none;
-      color: white;
+      color: var(--inner-color);
       opacity: 0.85;
       will-change: opacity;
     }
@@ -188,7 +290,7 @@
       width: 100%;
       max-width: 1000px;
       height: 380px;
-      background: #363636;
+      background: var(--secondary-color);
     }
 
     @media (min-width: 44em) {
@@ -241,16 +343,22 @@
         <path d="M2 2L8 6L2 10" />
       </symbol>
 
-      <symbol id="octo" viewBox="0 0 80 80">
-       <!-- Adapted from Tim Holman's GitHub Corners - https://github.com/tholman/github-corners -->
-        <path d="M0 0L36.8 36.8 45.3 45.3 80 80 80 0 0 0ZM40.6 34.6C36.3 31.7 38.1 28.8 38.1 28.8 39 26.6 38.7 25.3 38.7 25.3 38.4 23 39.7 24.6 39.7 24.6 41 26.2 40.3 28.2 40.3 28.2 39.6 30.7 41 32.2 42.3 32.9L42.9 32.3C43.8 31.7 44.8 31.4 45.4 31.4 42.9 27.8 40.6 23.7 46.1 18.2 47.7 16.6 49.3 16 51.2 16 51.5 15.4 52.2 13.8 55 12.5 55 12.5 56.6 13.4 57.3 17.6 58.6 18.2 59.8 19.2 61.1 20.5 62.4 21.8 63.4 23 64 24.3 68.5 25.3 69.4 26.6 69.4 26.6 68.2 29.1 66.6 30.1 65.9 30.1 65.9 32 65.3 33.6 63.7 35.2 58.6 40.3 54.1 38.6 50.6 36 50.6 37 50.2 38 49 39.4Q45.9 42.8 45.2 43.6C44.7 44.2 45.3 45.3 45.3 45.3L36.8 36.8C36.8 36.8 37.8 37.4 38.4 36.8L40.6 34.6Z"/>
+      <symbol id="octo" viewBox="0 0 16 16">
+        <!-- Icon from GitHub Octicons - https://github.com/primer/octicons/ -->
+        <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
       </symbol>
     </defs>
   </svg>
 
-  <a class="github-corner" href="https://github.com/catdad/canvas-confetti" aria-label="View source on Github">
-    <svg class="icon"><use xlink:href="#octo"></use></svg>
-  </a>
+  <header>
+    <label id="themeSwitch" class="theme-switch">
+      <input type="checkbox" id="slider">
+      <span class="slider"></span>
+    </label>
+    <a class="github-icon" href="https://github.com/catdad/canvas-confetti" aria-label="View source on Github">
+      <svg class="icon"><use xlink:href="#octo"></use></svg>
+    </a>
+  </header>
 
   <h1>Canvas Confetti</h1>
 
@@ -435,6 +543,10 @@
   </footer>
 
   <script>
+    document.getElementById('themeSwitch').addEventListener('change', function (event) {
+        (event.target.checked) ? document.body.setAttribute('data-theme', 'light') : document.body.removeAttribute('data-theme');
+    });
+
     var modes = {
       cannon: function cannon() {
         confetti({
