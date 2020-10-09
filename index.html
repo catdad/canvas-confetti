@@ -543,8 +543,13 @@
   </footer>
 
   <script>
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      document.body.setAttribute('data-theme', 'light');
+      document.getElementById('slider').checked = true;
+    }
+
     document.getElementById('themeSwitch').addEventListener('change', function (event) {
-        (event.target.checked) ? document.body.setAttribute('data-theme', 'light') : document.body.removeAttribute('data-theme');
+      (event.target.checked) ? document.body.setAttribute('data-theme', 'light') : document.body.removeAttribute('data-theme');
     });
 
     var modes = {
