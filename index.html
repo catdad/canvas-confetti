@@ -77,6 +77,7 @@
       border: none;
       outline: none;
       margin-right: 12px;
+      cursor: pointer;
     }
 
     .theme:after {
@@ -146,7 +147,10 @@
 
     .run {
       padding: 10px 6px;
-      margin: 0.75em 0;
+      margin: 0.75em auto;
+      max-width: 200px;
+      width: 100%;
+      display: inline-block;
 
       background: var(--secondary-color);
       border: none;
@@ -157,7 +161,7 @@
       cursor: pointer;
       user-select: none;
 
-      opacity: 0.6;
+      opacity: 0.8;
       transition: opacity 100ms ease;
     }
 
@@ -173,13 +177,6 @@
 
     .editor.ace_dark.ace_editor {
       background-color: var(--secondary-color);
-    }
-    .editor.ace_dark .ace_gutter {
-      background: var(--secondary-variant-color);
-    }
-    .editor.ace_dark .ace_gutter .ace_gutter-cell {
-      color: var(--inner-color);
-      opacity: 0.6;
     }
 
     .flex-rows {
@@ -324,8 +321,8 @@
   </svg>
 
   <header>
-    <button id="themeToggle" class="theme"></button>
-    <a class="github-icon" href="https://github.com/catdad/canvas-confetti" aria-label="View source on Github">
+    <button id="themeToggle" title="Switch Theme" class="theme"></button>
+    <a class="github-icon" title="Visit on GitHub" href="https://github.com/catdad/canvas-confetti" aria-label="View source on Github">
       <svg class="icon"><use xlink:href="#octo"></use></svg>
     </a>
   </header>
