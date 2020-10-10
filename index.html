@@ -545,7 +545,13 @@
   </footer>
 
   <script>
+    var editors = [];
     var activeTheme = 'dark';
+    var themes = {
+      light: 'ace/theme/xcode',
+      dark: 'ace/theme/monokai'
+    };
+
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
       activeTheme = 'light';
       document.body.setAttribute('data-theme', 'light');
@@ -555,7 +561,10 @@
     document.getElementById('themeSwitch').addEventListener('change', function (event) {
       activeTheme === 'light' ? activeTheme = 'dark' : activeTheme = 'light';
       (event.target.checked) ? document.body.setAttribute('data-theme', 'light') : document.body.removeAttribute('data-theme');
-      renderEditors();
+
+      editors.forEach(function(editor) {
+        editor.setTheme(themes[activeTheme]);
+      });
     });
 
     var modes = {
@@ -756,6 +765,8 @@
             console.error(e);
           }
         };
+
+        editors.push(editor);
       });
     };
   </script>
