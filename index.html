@@ -519,6 +519,7 @@
   <script>
     var editors = [];
     var activeTheme = 'dark';
+    var lastSavedTheme = localStorage.getItem('theme');
     var themes = {
       light: 'ace/theme/xcode',
       dark: 'ace/theme/monokai'
@@ -536,7 +537,9 @@
     if (window.matchMedia) {
       var mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
 
-      if (mediaQuery.matches) {
+      if (lastSavedTheme && lastSavedTheme === 'light') {
+        setTheme('light');
+      } else if (mediaQuery.matches) {
         setTheme('light');
       }
 
@@ -546,7 +549,9 @@
     }
 
     document.getElementById('themeToggle').addEventListener('click', function (event) {
-      setTheme(activeTheme === 'light' ? 'dark' : 'light');
+      var nextTheme = activeTheme === 'light' ? 'dark' : 'light';
+      setTheme(nextTheme);
+      localStorage.setItem('theme', nextTheme);
     });
 
     var modes = {
