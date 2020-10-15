@@ -206,6 +206,10 @@
     );
   }
 
+  function onlyPositiveInt(number){
+    return number < 0 ? 0 : Math.floor(number);
+  }
+
   function randomInt(min, max) {
     // [min, max)
     return Math.floor(Math.random() * (max - min)) + min;
@@ -412,7 +416,7 @@
     var animationObj;
 
     function fireLocal(options, size, done) {
-      var particleCount = prop(options, 'particleCount', Math.floor);
+      var particleCount = prop(options, 'particleCount', onlyPositiveInt);
       var angle = prop(options, 'angle', Number);
       var spread = prop(options, 'spread', Number);
       var startVelocity = prop(options, 'startVelocity', Number);
