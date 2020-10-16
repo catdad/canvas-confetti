@@ -519,7 +519,7 @@
   <script>
     var editors = [];
     var activeTheme = 'dark';
-    var lastSavedTheme = localStorage.getItem('theme');
+    var lastSavedTheme = localStorage.getItem('canvas-confetti/theme');
     var themes = {
       light: 'ace/theme/xcode',
       dark: 'ace/theme/monokai'
@@ -551,7 +551,7 @@
     document.getElementById('themeToggle').addEventListener('click', function (event) {
       var nextTheme = activeTheme === 'light' ? 'dark' : 'light';
       setTheme(nextTheme);
-      localStorage.setItem('theme', nextTheme);
+      localStorage.setItem('canvas-confetti/theme', nextTheme);
     });
 
     var modes = {
