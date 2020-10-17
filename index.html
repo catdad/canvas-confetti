@@ -536,6 +536,7 @@
         document.body.removeAttribute('auto-theme');
         activeTheme = theme;
       }
+
       document.body.setAttribute('data-theme', activeTheme);
 
       editors.forEach(function(editor) {
@@ -543,28 +544,31 @@
       });
     };
 
-    var updateTheme = function () {
-      switch (currentStep) {
+    var updateTheme = function (step) {
+      currentStep = step;
+
+      switch (step) {
         case 0:
+          setTheme(true);
+          prefersColorScheme.addEventListener('change', setTheme);
+          break;
+        case 1:
           setTheme(false, 'dark');
           prefersColorScheme.removeListener(setTheme);
           break;
-        case 1:
+        case 2:
           setTheme(false, 'light');
           prefersColorScheme.removeListener(setTheme);
           break;
-        case 2:
-            setTheme(true);
-            prefersColorScheme.addEventListener('change', setTheme);
       }
+
+      localStorage.setItem('canvas-confetti/theme', currentStep);
     }
 
-    if (currentStep !== 0) { updateTheme(); }
+    updateTheme(currentStep);
 
     document.getElementById('themeToggle').addEventListener('click', function (event) {
-      currentStep === 2 ? currentStep = 0 : currentStep++;
-      localStorage.setItem('canvas-confetti/theme', currentStep);
-      updateTheme();
+      updateTheme(++currentStep % 3);
     });
 
     var modes = {
