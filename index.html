@@ -522,16 +522,20 @@
     var editors = [];
     var activeTheme = 'dark';
     var currentStep = parseInt(localStorage.getItem('canvas-confetti/theme'), 10) || 0;
-    var prefersColorScheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)');
+    var prefersLightTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)');
     var themes = {
       light: 'ace/theme/xcode',
       dark: 'ace/theme/monokai'
     };
 
+    var getPreferedTheme = function () {
+      return prefersLightTheme ? prefersLightTheme.matches ? 'light' : 'dark' : 'dark';
+    };
+
     var setTheme = function (isAuto, theme) {
       if (isAuto) {
         document.body.setAttribute('auto-theme', true);
-        activeTheme = prefersColorScheme.matches ? 'light' : 'dark';
+        activeTheme = getPreferedTheme();
       } else {
         document.body.removeAttribute('auto-theme');
         activeTheme = theme;
@@ -550,15 +554,12 @@
       switch (step) {
         case 0:
           setTheme(true);
-          prefersColorScheme.addEventListener('change', setTheme);
+          prefersLightTheme && prefersLightTheme.addEventListener('change', setTheme);
           break;
         case 1:
-          setTheme(false, 'dark');
-          prefersColorScheme.removeListener(setTheme);
-          break;
         case 2:
-          setTheme(false, 'light');
-          prefersColorScheme.removeListener(setTheme);
+          setTheme(false, step === 1 ? 'dark' : 'light');
+          prefersLightTheme && prefersLightTheme.removeListener(setTheme);
           break;
       }
 
