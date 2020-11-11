@@ -4,6 +4,7 @@
     global.Blob &&
     global.Promise &&
     global.OffscreenCanvas &&
+    global.OffscreenCanvasRenderingContext2D &&
     global.HTMLCanvasElement &&
     global.HTMLCanvasElement.prototype.transferControlToOffscreen &&
     global.URL &&
