@@ -323,7 +323,12 @@
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
     context.beginPath();
 
-    if (fetti.shape === 'circle') {
+    if (fetti.shape === 'raindrop') {
+        context.font = '24px serif'
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText('💧', fetti.x, fetti.y);
+    } else if (fetti.shape === 'circle') {
       context.ellipse ?
         context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
         ellipse(context, fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
