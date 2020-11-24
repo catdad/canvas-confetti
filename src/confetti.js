@@ -324,7 +324,8 @@
     context.beginPath();
 
     if (fetti.shape === 'raindrop') {
-        context.font = '24px serif'
+        var fontSize = fetti.scalar * 24;
+        context.font = fontSize.toString() + 'px serif';
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.fillText('💧', fetti.x, fetti.y);
