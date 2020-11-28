@@ -69,7 +69,7 @@ The `confetti` parameter is a single optional `options` object, which has the fo
 - `origin` _Object_: Where to start firing confetti from. Feel free to launch off-screen if you'd like.
   - `origin.x` _Number (default: 0.5)_: The `x` position on the page, with `0` being the left edge and `1` being the right edge.
   - `origin.y` _Number (default: 0.5)_: The `y` position on the page, with `0` being the top edge and `1` being the bottom edge.
-- `colors` _Array&lt;String&gt;_: An array of color strings, in the HEX format... you know, like `#bada55`.
+- `colors` _Array&lt;String&gt;_: An array of color strings, in the HEX, RGB or RGBA format.
 - `shapes` _Array&lt;String&gt;_: An array of shapes for the confetti. The possible values are `square` and `circle`. The default is to use both shapes in an even mix. You can even change the mix by providing a value such as `['circle', 'circle', 'square']` to use two third circles and one third squares.
 - `scalar` _Number (default: 1)_: Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
 - `zIndex` _Integer (default: 100)_: The confetti should be on top, after all. But if you have a crazy high page, you can set it even higher.

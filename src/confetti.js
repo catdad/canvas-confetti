@@ -220,18 +220,57 @@
     return parseInt(str, 16);
   }
 
-  function hexToRgb(str) {
-    var val = String(str).replace(/[^0-9a-f]/gi, '');
+  function isHexColor(str) {
+    return /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(str);
+  }
 
-    if (val.length < 6) {
+  function isRgbColor(str) {
+    return /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.test(str);
+  }
+
+  function isRgbaColor(str) {
+    return /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/.test(str);
+  }
+
+  function strToRgba(str) {
+    if (isHexColor(str)) {
+      var val = String(str).replace(/[^0-9a-f]/gi, '');
+
+      if (val.length < 6) {
         val = val[0]+val[0]+val[1]+val[1]+val[2]+val[2];
+      }
+
+      return {
+        r: toDecimal(val.substring(0,2)),
+        g: toDecimal(val.substring(2,4)),
+        b: toDecimal(val.substring(4,6)),
+        a: 1
+      };
     }
 
-    return {
-      r: toDecimal(val.substring(0,2)),
-      g: toDecimal(val.substring(2,4)),
-      b: toDecimal(val.substring(4,6))
-    };
+    if (isRgbColor(str)) {
+      var rgb = str.match(/\d+/g);
+
+      return {
+        r: rgb[0],
+        g: rgb[1],
+        b: rgb[2],
+        a: 1
+      };
+    }
+
+    if (isRgbaColor(str)) {
+      var rgba = str.match(/(0\.\d)|(\d+)/g);
+
+      return {
+        r: rgba[0],
+        g: rgba[1],
+        b: rgba[2],
+        a: rgba[3]
+      };
+    }
+
+    throw new Error('Support only HEX, RGB or RGBA format color');
   }
 
   function getOrigin(options) {
@@ -285,7 +324,7 @@
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: Math.random() * Math.PI,
-      color: hexToRgb(opts.color),
+      color: strToRgba(opts.color),
       shape: opts.shape,
       tick: 0,
       totalTicks: opts.ticks,
@@ -320,7 +359,7 @@
     var x2 = fetti.wobbleX + (fetti.random * fetti.tiltCos);
     var y2 = fetti.wobbleY + (fetti.random * fetti.tiltSin);
 
-    context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
+    context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (fetti.color.a - progress) + ')';
     context.beginPath();
 
     if (fetti.shape === 'circle') {

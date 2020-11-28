@@ -41,3 +41,6 @@ coverage/
 shots/
 dist/
 temp/
+
+# webstorm
+.idea
