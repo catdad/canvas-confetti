@@ -220,6 +220,10 @@
     return parseInt(str, 16);
   }
 
+  function colorsToRgb(colors) {
+    return colors.map(hexToRgb);
+  }
+  
   function hexToRgb(str) {
     var val = String(str).replace(/[^0-9a-f]/gi, '');
 
@@ -285,7 +289,7 @@
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: Math.random() * Math.PI,
-      color: hexToRgb(opts.color),
+      color: opts.color,
       shape: opts.shape,
       tick: 0,
       totalTicks: opts.ticks,
@@ -423,7 +427,7 @@
       var startVelocity = prop(options, 'startVelocity', Number);
       var decay = prop(options, 'decay', Number);
       var gravity = prop(options, 'gravity', Number);
-      var colors = prop(options, 'colors');
+      var colors = prop(options, 'colors', colorsToRgb);
       var ticks = prop(options, 'ticks', Number);
       var shapes = prop(options, 'shapes');
       var scalar = prop(options, 'scalar');
