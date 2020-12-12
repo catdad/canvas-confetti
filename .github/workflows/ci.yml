@@ -4,7 +4,10 @@ on:
   push:
   pull_request:
     branches: [master]
-    
+
+env:
+  FORCE_COLOR: 1
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -14,6 +17,7 @@ jobs:
         with:
           node-version: 12
       - run: npm install
+      - run: npm run lint
       - run: npm test
   publish-npm:
     needs: test
