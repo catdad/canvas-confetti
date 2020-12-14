@@ -14,14 +14,52 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --primary-color: #eeeeee;
+      --secondary-color: #363636;
+      --secondary-variant-color: #272727;
+      --background-color: #212121;
+      --inner-color: #ffffff;
+      --border-color: #555651;
+
+      /* icons by Google - Material Design
+       * https://material.io/resources/icons/?style=baseline
+       */
+      --switch-moon-white: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' %3E%3Cpath fill='%23eeeeee' d='M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6c3.31 0 6 2.69 6 6s-2.69 6-6 6z'%3E%3C/path%3E%3C/svg%3E");
+      --switch-sun-black: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' %3E%3Cpath fill='%23212121' d='M20 15.31L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z'%3E%3C/path%3E%3C/svg%3E");
+      --switch-auto-white: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' %3E%3Cpath fill='%23eeeeee' d='M10.85 12.65h2.3L12 9l-1.15 3.65zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM14.3 16l-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9z'%3E%3C/path%3E%3C/svg%3E");
+      --switch-auto-black: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' %3E%3Cpath fill='%23212121' d='M10.85 12.65h2.3L12 9l-1.15 3.65zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM14.3 16l-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9h-1.9z'%3E%3C/path%3E%3C/svg%3E");
+
+      --theme-switch: var(--switch-moon-white);
+    }
+
+    [data-theme="light"] {
+      --primary-color: #212121;
+      --secondary-color: #ffffff;
+      --background-color: #f0f0f0;
+      --inner-color: #363636;
+
+      --theme-switch: var(--switch-sun-black);
+    }
+
+    [auto-theme] {
+      --theme-switch: var(--switch-auto-white);
+    }
+
+    [data-theme="light"][auto-theme] {
+      --theme-switch: var(--switch-auto-black);
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      background: #212121;
+    }
 
-      color: #eee;
+    body {
+      background: var(--background-color);
+      color: var(--primary-color);
       font-size: 1em;
       font-family: 'Noto Sans', sans-serif;
     }
@@ -34,16 +72,61 @@
       display: none;
     }
 
-    a.github-corner {
+    header {
       position: absolute;
       top: 0;
-      right: 0;
-      width: 80px;
-      height: 80px;
+      left: 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+      height: 64px;
+    }
+
+    .theme {
+      --size: 28px;
+      position: relative;
+      display: inline-block;
+      width: var(--size);
+      height: var(--size);
+      background: none;
+      border: none;
+      outline: none;
+      margin-right: 12px;
+      cursor: pointer;
+    }
+
+    .theme:after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: "";
+      width: var(--size);
+      height: var(--size);
+      background-repeat: no-repeat;
+      background-position: center;
+      background: var(--theme-switch);
+    }
+
+    .github-icon {
+      --size: 36px;
+      position: relative;
+      display: block;
+      width: var(--size);
+      height: var(--size);
+      margin-right: 12px;
+    }
+
+    .github-icon svg.icon {
+      fill: var(--primary-color);
     }
 
     h1, h2, .center {
       text-align: center;
+    }
+
+    h1 {
+      margin-top: 64px;
     }
 
     h2 {
@@ -68,24 +151,27 @@
       margin: 40px 0;
       padding-top: 16px;
 
-      border-top: 1px solid #3e3e3e;
+      border-top: 1px solid var(--border-color);
       border-radius: 20px;
     }
 
     .run {
       padding: 10px 6px;
-      margin: 0.75em 0;
+      margin: 0.75em auto;
+      max-width: 200px;
+      width: 100%;
+      display: inline-block;
 
-      background: rgba(255,255,255,0.1);
+      background: var(--secondary-color);
       border: none;
       outline: none;
 
-      color: #eee;
+      color: var(--inner-color);
       font-weight: bold;
       cursor: pointer;
       user-select: none;
 
-      opacity: 0.6;
+      opacity: 0.8;
       transition: opacity 100ms ease;
     }
 
@@ -100,11 +186,14 @@
     }
 
     .editor.ace_dark.ace_editor {
-      background-color: #363636;
+      background-color: var(--secondary-color);
     }
     .editor.ace_dark .ace_gutter {
-      color: #8b8b8b;
-      background: #272727;
+      background: var(--secondary-variant-color);
+    }
+    .editor.ace_dark .ace_gutter .ace_gutter-cell {
+      color: var(--inner-color);
+      opacity: 0.6;
     }
 
     .flex-rows {
@@ -149,7 +238,7 @@
       text-align: center;
       line-height: 2;
 
-      background: rgba(255,255,255,0.1);
+      background: var(--secondary-color);
     }
 
     footer span {
@@ -169,12 +258,12 @@
       width: 100%;
       height: 100%;
 
-      fill: #e5e5e5;
+      fill: var(--inner-color);
     }
 
     footer a {
       text-decoration: none;
-      color: white;
+      color: var(--inner-color);
       opacity: 0.85;
       will-change: opacity;
     }
@@ -188,7 +277,7 @@
       width: 100%;
       max-width: 1000px;
       height: 380px;
-      background: #363636;
+      background: var(--secondary-color);
     }
 
     @media (min-width: 44em) {
@@ -241,16 +330,19 @@
         <path d="M2 2L8 6L2 10" />
       </symbol>
 
-      <symbol id="octo" viewBox="0 0 80 80">
-       <!-- Adapted from Tim Holman's GitHub Corners - https://github.com/tholman/github-corners -->
-        <path d="M0 0L36.8 36.8 45.3 45.3 80 80 80 0 0 0ZM40.6 34.6C36.3 31.7 38.1 28.8 38.1 28.8 39 26.6 38.7 25.3 38.7 25.3 38.4 23 39.7 24.6 39.7 24.6 41 26.2 40.3 28.2 40.3 28.2 39.6 30.7 41 32.2 42.3 32.9L42.9 32.3C43.8 31.7 44.8 31.4 45.4 31.4 42.9 27.8 40.6 23.7 46.1 18.2 47.7 16.6 49.3 16 51.2 16 51.5 15.4 52.2 13.8 55 12.5 55 12.5 56.6 13.4 57.3 17.6 58.6 18.2 59.8 19.2 61.1 20.5 62.4 21.8 63.4 23 64 24.3 68.5 25.3 69.4 26.6 69.4 26.6 68.2 29.1 66.6 30.1 65.9 30.1 65.9 32 65.3 33.6 63.7 35.2 58.6 40.3 54.1 38.6 50.6 36 50.6 37 50.2 38 49 39.4Q45.9 42.8 45.2 43.6C44.7 44.2 45.3 45.3 45.3 45.3L36.8 36.8C36.8 36.8 37.8 37.4 38.4 36.8L40.6 34.6Z"/>
+      <symbol id="octo" viewBox="0 0 16 16">
+        <!-- Icon from GitHub Octicons - https://github.com/primer/octicons/ -->
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
       </symbol>
     </defs>
   </svg>
 
-  <a class="github-corner" href="https://github.com/catdad/canvas-confetti" aria-label="View source on Github">
-    <svg class="icon"><use xlink:href="#octo"></use></svg>
-  </a>
+  <header>
+    <button id="themeToggle" title="Switch Theme" class="theme"></button>
+    <a class="github-icon" title="Visit on GitHub" href="https://github.com/catdad/canvas-confetti" aria-label="View source on Github">
+      <svg class="icon"><use xlink:href="#octo"></use></svg>
+    </a>
+  </header>
 
   <h1>Canvas Confetti</h1>
 
@@ -435,6 +527,59 @@
   </footer>
 
   <script>
+    var editors = [];
+    var activeTheme = 'dark';
+    var currentStep = parseInt(localStorage.getItem('canvas-confetti/theme'), 10) || 0;
+    var prefersLightTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)');
+    var themes = {
+      light: 'ace/theme/xcode',
+      dark: 'ace/theme/monokai'
+    };
+
+    var getPreferedTheme = function () {
+      return prefersLightTheme ? prefersLightTheme.matches ? 'light' : 'dark' : 'dark';
+    };
+
+    var setTheme = function (isAuto, theme) {
+      if (isAuto) {
+        document.body.setAttribute('auto-theme', true);
+        activeTheme = getPreferedTheme();
+      } else {
+        document.body.removeAttribute('auto-theme');
+        activeTheme = theme;
+      }
+
+      document.body.setAttribute('data-theme', activeTheme);
+
+      editors.forEach(function(editor) {
+        editor.setTheme(themes[activeTheme]);
+      });
+    };
+
+    var updateTheme = function (step) {
+      currentStep = step;
+
+      switch (step) {
+        case 0:
+          setTheme(true);
+          prefersLightTheme && prefersLightTheme.addEventListener('change', setTheme);
+          break;
+        case 1:
+        case 2:
+          setTheme(false, step === 1 ? 'dark' : 'light');
+          prefersLightTheme && prefersLightTheme.removeListener(setTheme);
+          break;
+      }
+
+      localStorage.setItem('canvas-confetti/theme', currentStep);
+    }
+
+    updateTheme(currentStep);
+
+    document.getElementById('themeToggle').addEventListener('click', function (event) {
+      updateTheme(++currentStep % 3);
+    });
+
     var modes = {
       cannon: function cannon() {
         confetti({
@@ -609,7 +754,7 @@
         var codeElem = group.querySelector('.editor');
 
         var editor = ace.edit(codeElem);
-        editor.setTheme('ace/theme/monokai');
+        editor.setTheme(themes[activeTheme]);
         editor.session.setMode('ace/mode/javascript');
         editor.session.setUseSoftTabs(true);
         editor.session.setTabSize(2);
@@ -633,6 +778,8 @@
             console.error(e);
           }
         };
+
+        editors.push(editor);
       });
     };
   </script>
