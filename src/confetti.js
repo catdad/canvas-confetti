@@ -583,5 +583,5 @@
     return self;
   }
 
-  return this;
+  return this || {};
 })(), module, false));
