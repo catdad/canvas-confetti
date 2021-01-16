@@ -223,7 +223,7 @@
   function colorsToRgb(colors) {
     return colors.map(hexToRgb);
   }
-  
+
   function hexToRgb(str) {
     var val = String(str).replace(/[^0-9a-f]/gi, '');
 
