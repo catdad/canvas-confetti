@@ -675,7 +675,6 @@
             particleCount: 1,
             startVelocity: 0,
             ticks: ticks,
-            gravity: 0.5,
             origin: {
               x: Math.random(),
               // since particles fall down, skew start toward the top
@@ -683,7 +682,9 @@
             },
             colors: ['#ffffff'],
             shapes: ['circle'],
-            scalar: randomInRange(0.4, 1)
+            gravity: randomInRange(0.4, 0.6),
+            scalar: randomInRange(0.4, 1),
+            drift: randomInRange(-0.4, 0.4)
           });
 
           if (timeLeft > 0) {
