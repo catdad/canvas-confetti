@@ -289,7 +289,7 @@
       wobbleSpeed: Math.min(0.11, Math.random() * 0.1 + 0.05),
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
-      tiltAngle: (Math.random() * (0.6 - 0.4) + 0.4) * Math.PI,
+      tiltAngle: (Math.random() * (0.75 - 0.25) + 0.25) * Math.PI,
       color: opts.color,
       shape: opts.shape,
       tick: 0,
