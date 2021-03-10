@@ -173,6 +173,7 @@
     startVelocity: 45,
     decay: 0.9,
     gravity: 1,
+    drift: 0,
     ticks: 200,
     x: 0.5,
     y: 0.5,
@@ -295,6 +296,7 @@
       tick: 0,
       totalTicks: opts.ticks,
       decay: opts.decay,
+      drift: opts.drift,
       random: Math.random() + 2,
       tiltSin: 0,
       tiltCos: 0,
@@ -307,7 +309,7 @@
   }
 
   function updateFetti(context, fetti) {
-    fetti.x += Math.cos(fetti.angle2D) * fetti.velocity;
+    fetti.x += Math.cos(fetti.angle2D) * fetti.velocity + fetti.drift;
     fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + fetti.gravity;
     fetti.wobble += fetti.wobbleSpeed;
     fetti.velocity *= fetti.decay;
@@ -428,6 +430,7 @@
       var startVelocity = prop(options, 'startVelocity', Number);
       var decay = prop(options, 'decay', Number);
       var gravity = prop(options, 'gravity', Number);
+      var drift = prop(options, 'drift', Number);
       var colors = prop(options, 'colors', colorsToRgb);
       var ticks = prop(options, 'ticks', Number);
       var shapes = prop(options, 'shapes');
@@ -453,6 +456,7 @@
             ticks: ticks,
             decay: decay,
             gravity: gravity,
+            drift: drift,
             scalar: scalar
           })
         );
