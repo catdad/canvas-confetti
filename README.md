@@ -93,7 +93,7 @@ _**Important: If you use `useWorker: true`, I own your canvas now. It's mine now
 
 ```javascript
 var myCanvas = document.createElement('canvas');
-document.appendChild(myCanvas);
+document.body.appendChild(myCanvas);
 
 var myConfetti = confetti.create(myCanvas, {
   resize: true,
@@ -121,7 +121,7 @@ setTimeout(() => {
 
 ```javascript
 var myCanvas = document.createElement('canvas');
-document.appendChild(myCanvas);
+document.body.appendChild(myCanvas);
 
 var myConfetti = confetti.create(myCanvas, { resize: true });
 
