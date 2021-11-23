@@ -191,7 +191,8 @@
     // probably should be true, but back-compat
     disableForReducedMotion: false,
     scalar: 1,
-    wobble: 1
+    wobble: 1,
+    wobbleSpeed: () => (Math.min(0.11, Math.random() * 0.1 + 0.05))
   };
 
   function convert(val, transform) {
@@ -288,7 +289,7 @@
       x: opts.x,
       y: opts.y,
       wobble: opts.wobble,
-      wobbleSpeed: Math.min(0.11, Math.random() * 0.1 + 0.05),
+      wobbleSpeed: typeof opts.wobbleSpeed === 'function' ? opts.wobbleSpeed() : opts.wobbleSpeed,
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: (Math.random() * (0.75 - 0.25) + 0.25) * Math.PI,
@@ -442,6 +443,7 @@
       var shapes = prop(options, 'shapes');
       var scalar = prop(options, 'scalar');
       var wobble = prop(options, 'wobble', Number);
+      var wobbleSpeed = prop(options, 'wobbleSpeed');
       var origin = getOrigin(options);
 
       var temp = particleCount;
@@ -465,7 +467,8 @@
             gravity: gravity,
             drift: drift,
             scalar: scalar,
-            wobble: wobble
+            wobble: wobble,
+            wobbleSpeed: wobbleSpeed
           })
         );
       }
