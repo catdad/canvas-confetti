@@ -75,6 +75,9 @@ The `confetti` parameter is a single optional `options` object, which has the fo
 - `scalar` _Number (default: 1)_: Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
 - `zIndex` _Integer (default: 100)_: The confetti should be on top, after all. But if you have a crazy high page, you can set it even higher.
 - `disableForReducedMotion` _Boolean (default: false)_: Disables confetti entirely for users that [prefer reduced motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion). The `confetti()` promise will resolve immediately in this case.
+- `disableWobble` _Boolean (default: false)_: Disables the confetti wobble effect.
+- `wobbleSpeed` _Number (default: Math.random() * 0.1 + 0.05)_: How fast the confetti should wobble
+
 
 ### `confetti.create(canvas, [globalOptions])` → `function`
 

@@ -191,8 +191,8 @@
     // probably should be true, but back-compat
     disableForReducedMotion: false,
     scalar: 1,
-    wobble: 1,
-    wobbleSpeed: () => (Math.min(0.11, Math.random() * 0.1 + 0.05))
+    disableWobble: false,
+    wobbleSpeed: Math.random() * 0.1 + 0.05
   };
 
   function convert(val, transform) {
@@ -288,8 +288,9 @@
     return {
       x: opts.x,
       y: opts.y,
-      wobble: opts.wobble,
-      wobbleSpeed: typeof opts.wobbleSpeed === 'function' ? opts.wobbleSpeed() : opts.wobbleSpeed,
+      disableWobble: opts.disableWobble,
+      wobble: opts.disableWobble ? 0 : Math.random() * 10,
+      wobbleSpeed: Math.random() * opts.wobbleSpeed,
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: (Math.random() * (0.75 - 0.25) + 0.25) * Math.PI,
@@ -318,10 +319,11 @@
     fetti.tiltSin = Math.sin(fetti.tiltAngle);
     fetti.tiltCos = Math.cos(fetti.tiltAngle);
     fetti.random = Math.random() + 2;
-    fetti.wobbleX = fetti.x + (10 * fetti.scalar);
-    fetti.wobbleY = fetti.y + (10 * fetti.scalar);
 
-    if (fetti.wobble) {
+    if (fetti.disableWobble) {
+      fetti.wobbleX = fetti.x + (10 * fetti.scalar);
+      fetti.wobbleY = fetti.y + (10 * fetti.scalar);
+    } else {
       fetti.wobble += fetti.wobbleSpeed;
       fetti.wobbleX = fetti.x + ((10 * fetti.scalar) * Math.cos(fetti.wobble));
       fetti.wobbleY = fetti.y + ((10 * fetti.scalar) * Math.sin(fetti.wobble));
@@ -442,8 +444,8 @@
       var ticks = prop(options, 'ticks', Number);
       var shapes = prop(options, 'shapes');
       var scalar = prop(options, 'scalar');
-      var wobble = prop(options, 'wobble', Number);
-      var wobbleSpeed = prop(options, 'wobbleSpeed');
+      var disableWobble = prop(options, 'disableWobble', Boolean);
+      var wobbleSpeed = prop(options, 'wobbleSpeed', Number);
       var origin = getOrigin(options);
 
       var temp = particleCount;
@@ -467,7 +469,7 @@
             gravity: gravity,
             drift: drift,
             scalar: scalar,
-            wobble: wobble,
+            disableWobble: disableWobble,
             wobbleSpeed: wobbleSpeed
           })
         );
