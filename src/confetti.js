@@ -173,6 +173,7 @@
     startVelocity: 45,
     decay: 0.9,
     gravity: 1,
+    drift: 0,
     ticks: 200,
     x: 0.5,
     y: 0.5,
@@ -223,7 +224,7 @@
   function colorsToRgb(colors) {
     return colors.map(hexToRgb);
   }
-  
+
   function hexToRgb(str) {
     var val = String(str).replace(/[^0-9a-f]/gi, '');
 
@@ -286,15 +287,17 @@
       x: opts.x,
       y: opts.y,
       wobble: Math.random() * 10,
+      wobbleSpeed: Math.min(0.11, Math.random() * 0.1 + 0.05),
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
-      tiltAngle: Math.random() * Math.PI,
+      tiltAngle: (Math.random() * (0.75 - 0.25) + 0.25) * Math.PI,
       color: opts.color,
       shape: opts.shape,
       tick: 0,
       totalTicks: opts.ticks,
       decay: opts.decay,
-      random: Math.random() + 5,
+      drift: opts.drift,
+      random: Math.random() + 2,
       tiltSin: 0,
       tiltCos: 0,
       wobbleX: 0,
@@ -306,14 +309,14 @@
   }
 
   function updateFetti(context, fetti) {
-    fetti.x += Math.cos(fetti.angle2D) * fetti.velocity;
+    fetti.x += Math.cos(fetti.angle2D) * fetti.velocity + fetti.drift;
     fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + fetti.gravity;
-    fetti.wobble += 0.1;
+    fetti.wobble += fetti.wobbleSpeed;
     fetti.velocity *= fetti.decay;
     fetti.tiltAngle += 0.1;
     fetti.tiltSin = Math.sin(fetti.tiltAngle);
     fetti.tiltCos = Math.cos(fetti.tiltAngle);
-    fetti.random = Math.random() + 5;
+    fetti.random = Math.random() + 2;
     fetti.wobbleX = fetti.x + ((10 * fetti.scalar) * Math.cos(fetti.wobble));
     fetti.wobbleY = fetti.y + ((10 * fetti.scalar) * Math.sin(fetti.wobble));
 
@@ -427,6 +430,7 @@
       var startVelocity = prop(options, 'startVelocity', Number);
       var decay = prop(options, 'decay', Number);
       var gravity = prop(options, 'gravity', Number);
+      var drift = prop(options, 'drift', Number);
       var colors = prop(options, 'colors', colorsToRgb);
       var ticks = prop(options, 'ticks', Number);
       var shapes = prop(options, 'shapes');
@@ -452,6 +456,7 @@
             ticks: ticks,
             decay: decay,
             gravity: gravity,
+            drift: drift,
             scalar: scalar
           })
         );
@@ -572,7 +577,21 @@
     return fire;
   }
 
-  module.exports = confettiCannon(null, { useWorker: true, resize: true });
+  // Make default export lazy to defer worker creation until called.
+  var defaultFire;
+  function getDefaultFire() {
+    if (!defaultFire) {
+      defaultFire = confettiCannon(null, { useWorker: true, resize: true });
+    }
+    return defaultFire;
+  }
+
+  module.exports = function() {
+    return getDefaultFire().apply(this, arguments);
+  };
+  module.exports.reset = function() {
+    getDefaultFire().reset();
+  };
   module.exports.create = confettiCannon;
 }((function () {
   if (typeof window !== 'undefined') {
@@ -583,5 +602,5 @@
     return self;
   }
 
-  return this;
+  return this || {};
 })(), module, false));
