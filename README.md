@@ -1,12 +1,12 @@
 # [![Canvas Confetti](https://cdn.jsdelivr.net/gh/catdad-experiments/catdad-experiments-org@5ed78b/canvas-confetti/logo.jpg)](https://github.com/catdad/canvas-confetti/)
 
-[![travis][travis.svg]][travis.link]
+[![github actions ci][ci.svg]][ci.link]
 [![jsdelivr][jsdelivr.svg]][jsdelivr.link]
 [![npm-downloads][npm-downloads.svg]][npm.link]
 [![npm-version][npm-version.svg]][npm.link]
 
-[travis.svg]: https://travis-ci.org/catdad/canvas-confetti.svg?branch=master
-[travis.link]: https://travis-ci.org/catdad/canvas-confetti
+[ci.svg]: https://github.com/catdad/canvas-confetti/actions/workflows/ci.yml/badge.svg
+[ci.link]: https://github.com/catdad/canvas-confetti/actions/workflows/ci.yml?query=branch%3Amaster
 [jsdelivr.svg]: https://data.jsdelivr.com/v1/package/npm/canvas-confetti/badge?style=rounded
 [jsdelivr.link]: https://www.jsdelivr.com/package/npm/canvas-confetti
 [npm-downloads.svg]: https://img.shields.io/npm/dm/canvas-confetti.svg
