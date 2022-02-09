@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+env:
+  FORCE_COLOR: 1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+      - run: npm install
+      - run: npm run lint
+      - run: npm test
+      - run: npm pack --dry-run
+      - run: npm publish
+        if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'pull_request'
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}

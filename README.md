@@ -1,12 +1,12 @@
 # [![Canvas Confetti](https://cdn.jsdelivr.net/gh/catdad-experiments/catdad-experiments-org@5ed78b/canvas-confetti/logo.jpg)](https://github.com/catdad/canvas-confetti/)
 
-[![travis][travis.svg]][travis.link]
+[![github actions ci][ci.svg]][ci.link]
 [![jsdelivr][jsdelivr.svg]][jsdelivr.link]
 [![npm-downloads][npm-downloads.svg]][npm.link]
 [![npm-version][npm-version.svg]][npm.link]
 
-[travis.svg]: https://travis-ci.org/catdad/canvas-confetti.svg?branch=master
-[travis.link]: https://travis-ci.org/catdad/canvas-confetti
+[ci.svg]: https://github.com/catdad/canvas-confetti/actions/workflows/ci.yml/badge.svg
+[ci.link]: https://github.com/catdad/canvas-confetti/actions/workflows/ci.yml?query=branch%3Amaster
 [jsdelivr.svg]: https://data.jsdelivr.com/v1/package/npm/canvas-confetti/badge?style=rounded
 [jsdelivr.link]: https://www.jsdelivr.com/package/npm/canvas-confetti
 [npm-downloads.svg]: https://img.shields.io/npm/dm/canvas-confetti.svg
@@ -30,7 +30,7 @@ You can then `require('canvas-confetti');` to use it in your project build. _Not
 You can also include this library in your HTML page directly from a CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 ```
 
 _Note: you should use the latest version at the time that you include your project. You can see all versions [on the releases page](https://github.com/catdad/canvas-confetti/releases)._
@@ -89,11 +89,11 @@ The following global options are available:
 * `useWorker` _Boolean (default: false)_: Whether to use an asynchronous web worker to render the confetti animation, whenever possible. This is turned off by default, meaning that the animation will always execute on the main thread. If turned on and the browser supports it, the animation will execute off of the main thread so that it is not blocking any other work your page needs to do. Using this option will also modify the canvas, but more on that directly below -- do read it. If it is not supported by the browser, this value will be ignored.
 * `disableForReducedMotion` _Boolean (default: false)_: Disables confetti entirely for users that [prefer reduced motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion). When set to true, use of this confetti instance will always respect a user's request for reduced motion and disable confetti for them.
 
-_**Important: If you use `useWorker: true`, I own your canvas now. It's mine now and I can do whatever I want with it (don't worry... I'll just put confetti inside it, I promise). You must not try to use the canvas in any way (other than I guess removing it from the DOM), as it will throw an error. When using workers for rendering, control of the canvas must be transfered to the web worker, preventing any usage of that canvas on the main thread. If you must manipulate the canvas in any way, do not use this option.**_
+_**Important: If you use `useWorker: true`, I own your canvas now. It's mine now and I can do whatever I want with it (don't worry... I'll just put confetti inside it, I promise). You must not try to use the canvas in any way (other than I guess removing it from the DOM), as it will throw an error. When using workers for rendering, control of the canvas must be transferred to the web worker, preventing any usage of that canvas on the main thread. If you must manipulate the canvas in any way, do not use this option.**_
 
 ```javascript
 var myCanvas = document.createElement('canvas');
-document.appendChild(myCanvas);
+document.body.appendChild(myCanvas);
 
 var myConfetti = confetti.create(myCanvas, {
   resize: true,
@@ -121,7 +121,7 @@ setTimeout(() => {
 
 ```javascript
 var myCanvas = document.createElement('canvas');
-document.appendChild(myCanvas);
+document.body.appendChild(myCanvas);
 
 var myConfetti = confetti.create(myCanvas, { resize: true });
 
