@@ -347,7 +347,7 @@ test('shoots larger scaled confetti', async t => {
   t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff'],
     shapes: ['circle'],
-    scalar: 10,
+    scalar: [10],
     particleCount: 10
   });
   t.context.image = await removeOpacity(t.context.buffer);
