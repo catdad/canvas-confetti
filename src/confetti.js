@@ -190,7 +190,7 @@
     ],
     // probably should be true, but back-compat
     disableForReducedMotion: false,
-    scalar: 1
+    scalar: [1]
   };
 
   function convert(val, transform) {
@@ -457,7 +457,7 @@
             decay: decay,
             gravity: gravity,
             drift: drift,
-            scalar: scalar
+            scalar: scalar[randomInt(0, scalar.length)]
           })
         );
       }
