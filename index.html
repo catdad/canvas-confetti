@@ -463,6 +463,28 @@
   </div>
 
   <div class="container">
+    <div class="group" data-name="stars">
+      <div class="flex-rows">
+        <div class="left">
+          <h2><a href="#stars" id="stars" class="anchor">Stars</a></h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            Or celebrate with a burst of stars!
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
     <div class="group" data-name="continuous">
       <div class="flex-rows">
         <div class="left">
@@ -691,6 +713,16 @@
             requestAnimationFrame(frame);
           }
         }());
+      },
+      stars: function stars() {
+        confetti({
+          particleCount: 100,
+          spread: 360,
+          ticks: 50,
+          gravity: 0,
+          shapes: ['star'],
+          colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
+        });
       },
       continuous: function continuous() {
         var end = Date.now() + (15 * 1000);
