@@ -10,6 +10,8 @@
     global.URL &&
     global.URL.createObjectURL);
 
+  var canUsePaths = typeof Path2D === 'function';
+
   function noop() {}
 
   // create a promise if it exists, otherwise, just
@@ -291,6 +293,7 @@
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: (Math.random() * (0.75 - 0.25) + 0.25) * Math.PI,
+      tiltAngleSpeed: 0.1,
       color: opts.color,
       shape: opts.shape,
       tick: 0,
@@ -313,7 +316,7 @@
     fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + fetti.gravity;
     fetti.wobble += fetti.wobbleSpeed;
     fetti.velocity *= fetti.decay;
-    fetti.tiltAngle += 0.1;
+    fetti.tiltAngle += fetti.tiltAngleSpeed;
     fetti.tiltSin = Math.sin(fetti.tiltAngle);
     fetti.tiltCos = Math.cos(fetti.tiltAngle);
     fetti.random = Math.random() + 2;
@@ -328,9 +331,19 @@
     var y2 = fetti.wobbleY + (fetti.random * fetti.tiltSin);
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
+
     context.beginPath();
 
-    if (fetti.shape === 'circle') {
+    if (canUsePaths && fetti.shape instanceof Path2D) {
+      context.fill(transformPath2D(
+        fetti.shape,
+        fetti.x + fetti.wobble,
+        fetti.y + fetti.wobble,
+        Math.abs(x2 - x1) * 0.2,
+        Math.abs(y2 - y1) * 0.2,
+        Math.PI / 10 * fetti.wobble
+      ));
+    } else if (fetti.shape === 'circle') {
       context.ellipse ?
         context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
         ellipse(context, fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
@@ -606,6 +619,62 @@
     return defaultFire;
   }
 
+  function transformPath2D(path2d, x, y, scaleX, scaleY, rotation) {
+    var matrix = new DOMMatrix('translate(' + x + 'px, ' + y + 'px) rotate(' + rotation + 'rad) scale(' + (scaleX * 0.5) + ', ' + (scaleY * 0.5) + ')');
+
+    var transformed = new Path2D();
+    transformed.addPath(path2d, matrix);
+
+    return transformed;
+  }
+
+  function scalePath2D(path2d, scale) {
+    var matrix = new DOMMatrix('scale(' + scale + ')');
+
+    var scaledPath2D = new Path2D();
+    scaledPath2D.addPath(path2d, matrix);
+
+    return scaledPath2D;
+  }
+
+  function createPathFetti(path, width, height) {
+    if (!canUsePaths) {
+      throw new Error('path confetti are not supported in this browser');
+    }
+
+    var path2d = new Path2D(path);
+    var tempCanvas = document.createElement('canvas');
+    var tempCtx = tempCanvas.getContext('2d');
+
+    if (!width || !height) {
+      // attempt to figure out the width of the path, up to 1000x1000
+      var maxSize = 1000;
+      var minX = maxSize;
+      var minY = maxSize;
+      var maxX = 0;
+      var maxY = 0;
+
+      for (var x = 0; x < maxSize; x++) {
+        for (var y = 0; y < maxSize; y++) {
+          if (tempCtx.isPointInPath(path2d, x, y, 'nonzero')) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+
+      width = width || maxX - minX;
+      height = height || maxY - minY;
+    }
+
+    var maxDesiredSize = 10;
+    var scale = Math.min(maxDesiredSize/width, maxDesiredSize/height);
+
+    return scalePath2D(path2d, scale);
+  }
+
   module.exports = function() {
     return getDefaultFire().apply(this, arguments);
   };
@@ -613,6 +682,7 @@
     getDefaultFire().reset();
   };
   module.exports.create = confettiCannon;
+  module.exports.shapeFromPath = createPathFetti;
 }((function () {
   if (typeof window !== 'undefined') {
     return window;
