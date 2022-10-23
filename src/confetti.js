@@ -308,10 +308,6 @@
     };
   }
 
-  function drawStar(context, cx, cy, spikes, outerRadius, innerRadius){
-
-  }
-
   function updateFetti(context, fetti) {
     fetti.x += Math.cos(fetti.angle2D) * fetti.velocity + fetti.drift;
     fetti.y += Math.sin(fetti.angle2D) * fetti.velocity + fetti.gravity;
