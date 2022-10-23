@@ -309,27 +309,22 @@
   }
 
   function drawStar(context, cx, cy, spikes, outerRadius, innerRadius){
-    context.save();
-    
-    var rot=Math.PI/2*3;
-    var x=cx;
-    var y=cy;
-    var step=Math.PI/spikes;
+    var rot = Math.PI / 2 * 3;
+    var x = cx;
+    var y = cy;
+    var step = Math.PI / spikes;
 
-    for(var i=0; i<spikes; i++){
-      x=cx+Math.cos(rot)*outerRadius;
-      y=cy+Math.sin(rot)*outerRadius;
-      context.lineTo(x,y);
-      rot+=step;
+    while (spikes--) {
+      x = cx + Math.cos(rot) * outerRadius;
+      y = cy + Math.sin(rot) * outerRadius;
+      context.lineTo(x, y);
+      rot += step;
 
-      x=cx+Math.cos(rot)*innerRadius;
-      y=cy+Math.sin(rot)*innerRadius;
-      context.lineTo(x,y);
-      rot+=step;
+      x = cx + Math.cos(rot) * innerRadius;
+      y = cy + Math.sin(rot) * innerRadius;
+      context.lineTo(x, y);
+      rot += step;
     }
-    context.lineTo(cx,cy-outerRadius);
-
-    context.restore();
   }
 
   function updateFetti(context, fetti) {
