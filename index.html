@@ -417,6 +417,31 @@
   </div>
 
   <div class="container">
+    <div class="group" data-name="stars">
+      <div class="flex-rows">
+        <div class="left">
+          <h2><a href="#stars" id="stars" class="anchor">Stars</a></h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            You can combine multiple calls to confetti with any settings in order to create
+            a more complex effect. Go ahead, combine different shapes, sizes, etc. Stagger them
+            for an extra boost of excitement.
+          </p>
+          <p class="center">✨ Celebrate with a burst of stars! ✨</p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
     <div class="group" data-name="fireworks">
       <div class="flex-rows">
         <div class="left">
@@ -455,28 +480,6 @@
           <p>
             The effect is not limited to crazy rapid fire of confetti though. You can create a
             wintery mood with gently falling particles across the entire page.
-          </p>
-        </div>
-      </div>
-      <div class="editor"></div>
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="group" data-name="stars">
-      <div class="flex-rows">
-        <div class="left">
-          <h2><a href="#stars" id="stars" class="anchor">Stars</a></h2>
-          <button class="run">
-            Run
-            <span class="icon">
-              <svg class="icon"><use xlink:href="#run"></use></svg>
-            </span>
-          </button>
-        </div>
-        <div class="description">
-          <p>
-            Or celebrate with a burst of stars!
           </p>
         </div>
       </div>
@@ -715,16 +718,35 @@
         }());
       },
       stars: function stars() {
-        confetti({
-          particleCount: 100,
+        var defaults = {
           spread: 360,
           ticks: 50,
           gravity: 0,
           decay: 0.94,
           startVelocity: 30,
           shapes: ['star'],
-          colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
-        });
+          colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8']
+        };
+
+        function shoot() {
+          confetti({
+            ...defaults,
+            particleCount: 40,
+            scalar: 1.2,
+            shapes: ['star']
+          });
+
+          confetti({
+            ...defaults,
+            particleCount: 10,
+            scalar: 0.75,
+            shapes: ['circle']
+          });
+        }
+
+        setTimeout(shoot, 0);
+        setTimeout(shoot, 100);
+        setTimeout(shoot, 200);
       },
       continuous: function continuous() {
         var end = Date.now() + (15 * 1000);
