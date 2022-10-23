@@ -139,7 +139,7 @@
           '      }',
           '    });',
           '  } else if (msg.data.reset) {',
-          '    CONFETTI.reset();',
+          '    CONFETTI && CONFETTI.reset();',
           '  } else if (msg.data.resize) {',
           '    SIZE.width = msg.data.resize.width;',
           '    SIZE.height = msg.data.resize.height;',
