@@ -309,22 +309,7 @@
   }
 
   function drawStar(context, cx, cy, spikes, outerRadius, innerRadius){
-    var rot = Math.PI / 2 * 3;
-    var x = cx;
-    var y = cy;
-    var step = Math.PI / spikes;
 
-    while (spikes--) {
-      x = cx + Math.cos(rot) * outerRadius;
-      y = cy + Math.sin(rot) * outerRadius;
-      context.lineTo(x, y);
-      rot += step;
-
-      x = cx + Math.cos(rot) * innerRadius;
-      y = cy + Math.sin(rot) * innerRadius;
-      context.lineTo(x, y);
-      rot += step;
-    }
   }
 
   function updateFetti(context, fetti) {
@@ -354,7 +339,25 @@
         context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
         ellipse(context, fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
     } else if (fetti.shape === 'star') {
-      drawStar(context, fetti.x, fetti.y, 5, 4 * fetti.scalar, 8 * fetti.scalar);
+      var rot = Math.PI / 2 * 3;
+      var innerRadius = 4 * fetti.scalar;
+      var outerRadius = 8 * fetti.scalar;
+      var x = fetti.x;
+      var y = fetti.y;
+      var spikes = 5;
+      var step = Math.PI / spikes;
+
+      while (spikes--) {
+        x = fetti.x + Math.cos(rot) * outerRadius;
+        y = fetti.y + Math.sin(rot) * outerRadius;
+        context.lineTo(x, y);
+        rot += step;
+
+        x = fetti.x + Math.cos(rot) * innerRadius;
+        y = fetti.y + Math.sin(rot) * innerRadius;
+        context.lineTo(x, y);
+        rot += step;
+      }
     } else {
       context.moveTo(Math.floor(fetti.x), Math.floor(fetti.y));
       context.lineTo(Math.floor(fetti.wobbleX), Math.floor(y1));
