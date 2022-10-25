@@ -326,6 +326,20 @@ test('shoots circle confetti', async t => {
   t.deepEqual(pixels, ['#0000ff', '#ffffff']);
 });
 
+test('shoots star confetti', async t => {
+  const page = t.context.page = await fixturePage();
+
+  t.context.buffer = await confettiImage(page, {
+    colors: ['#0000ff'],
+    shapes: ['star']
+  });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+
+  t.deepEqual(pixels, ['#0000ff', '#ffffff']);
+});
+
 test('shoots default scaled confetti', async t => {
   const page = t.context.page = await fixturePage();
 
@@ -980,4 +994,3 @@ test('exposed confetti method has a `reset` property', async t => {
 
   t.is(await page.evaluate(`typeof confettiAlias.reset`), 'function');
 });
-
