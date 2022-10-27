@@ -10,7 +10,7 @@
     global.URL &&
     global.URL.createObjectURL);
 
-  var canUsePaths = typeof Path2D === 'function';
+  var canUsePaths = typeof Path2D === 'function' && typeof DOMMatrix === 'function';
 
   function noop() {}
 
