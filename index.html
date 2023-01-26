@@ -455,7 +455,7 @@
         </div>
         <div class="description">
           <p>
-            Lets try to make love and not war, using hearts is the way to go. Useful for Valetine's.
+            What better way to feel the love than a shower of hearts. Useful for Valentine's day.
           </p>
         </div>
       </div>
@@ -705,33 +705,35 @@
         }, 250);
       },
       hearts: function hearts() {
-        var duration = 15 * 1000;
-        var animationEnd = Date.now() + duration;
-        var defaults = {
+        const duration = 15 * 1000
+        const animationEnd = Date.now() + duration
+        const defaults = {
           startVelocity: 30,
-          spread: 360,
-          ticks: 100,
-          zIndex: 0,
+          angle: 90,
+          spread: 90,
+          ticks: 1000,
+          particleCount: 20,
+          zIndex: 1000,
           shapes: ['heart'],
           colors: ['B40800','DC362D','C21912','8F0700']
-        };
-
-        function randomInRange(min, max) {
-          return Math.random() * (max - min) + min;
         }
 
-        var interval = setInterval(function () {
-          var timeLeft = animationEnd - Date.now();
+        const interval = setInterval(function () {
+          const timeLeft = animationEnd - Date.now()
 
           if (timeLeft <= 0) {
-            return clearInterval(interval);
+            return clearInterval(interval)
           }
 
-          var particleCount = 50 * (timeLeft / duration);
           // since particles fall down, start a bit higher than random
-          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-        }, 250);
+          for (let i = 0; i <= 1; i += 0.25) {
+            confetti(
+              Object.assign({}, defaults, {
+                origin: { x: i, y: 0 }
+              })
+            )
+          }
+        }, 1500)
       },
       snow: function snow() {
         var duration = 15 * 1000;
