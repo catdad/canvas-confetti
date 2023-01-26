@@ -442,6 +442,28 @@
   </div>
 
   <div class="container">
+    <div class="group" data-name="hearts">
+      <div class="flex-rows">
+        <div class="left">
+          <h2><a href="#hearts" id="hearts" class="anchor">Hearts</a></h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            Lets try to make love and not war, using hearts is the way to go. Useful for Valetine's.
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
     <div class="group" data-name="fireworks">
       <div class="flex-rows">
         <div class="left">
@@ -682,6 +704,35 @@
           confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
         }, 250);
       },
+      hearts: function hearts() {
+        var duration = 15 * 1000;
+        var animationEnd = Date.now() + duration;
+        var defaults = {
+          startVelocity: 30,
+          spread: 360,
+          ticks: 100,
+          zIndex: 0,
+          shapes: ['heart'],
+          colors: ['B40800','DC362D','C21912','8F0700']
+        };
+
+        function randomInRange(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+        var interval = setInterval(function () {
+          var timeLeft = animationEnd - Date.now();
+
+          if (timeLeft <= 0) {
+            return clearInterval(interval);
+          }
+
+          var particleCount = 50 * (timeLeft / duration);
+          // since particles fall down, start a bit higher than random
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 250);
+      },
       snow: function snow() {
         var duration = 15 * 1000;
         var animationEnd = Date.now() + duration;
@@ -724,7 +775,7 @@
           gravity: 0,
           decay: 0.94,
           startVelocity: 30,
-          shapes: ['star'],
+          shapes: ['heart'],
           colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8']
         };
 
