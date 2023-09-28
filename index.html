@@ -526,8 +526,10 @@
         </div>
         <div class="description">
           <p>
-            custom shapes using paths
+            Celebrate some holidays with holiday-appropriate shapes! You can use any SVG path
+            to make a confetti out of it.
           </p>
+          <p class="center">🎃👻🎄💜</p>
         </div>
       </div>
       <div class="editor"></div>
@@ -810,36 +812,50 @@
         });
       },
       paths: function() {
-        // note: we want to generate the shapes just once, since it is rather expensive,
-        // and I bet you are going to click this button more than once...
-        // the shapes will be generated the first time and then reused
-        // `confetti.customShapes` is not required, though you definitely
-        // should cache the shapes in your code
-        confetti.customShapes = confetti.customShapes || {};
+        // note: you generally want to generate the shapes just once, since it is rather expensive,
+        // but this is a demo, so we won't do that to make it easier for you to play with it
+
         // ghost shape from https://thenounproject.com/icon/ghost-5253385/
-        confetti.customShapes.ghost = confetti.customShapes.ghost || confetti.shapeFromPath('M367.5 35a175.2 175.2 0 0 0-175 175v123.8c.1 39.4-15.5 77.1-43.4 104.9a44 44 0 0 0 37.4 74.8l6-.7c23-3.4 46.4-3 69.3.8l27.6 4.6a264 264 0 0 0 86 0l20.8-3.5c27-4.6 54.8-4.1 81.7 1.3a54 54 0 0 0 64.6-53V210a175.2 175.2 0 0 0-175-175zm-35 157.5c0-19.3 11.8-35 26.3-35s26.2 15.8 26.2 35-11.8 35-26.3 35-26.2-15.7-26.2-35zm70 192.5c-19.3 0-35-27.4-35-61.3s15.8-61.2 35-61.2 35 27.4 35 61.3-15.7 61.2-35 61.2zm43.8-157.5c-14.5 0-26.3-15.7-26.3-35s11.8-35 26.3-35 26.2 15.8 26.2 35-11.8 35-26.3 35z');
+        var ghost = confetti.shapeFromPath('M367.5 35a175.2 175.2 0 0 0-175 175v123.8c.1 39.4-15.5 77.1-43.4 104.9a44 44 0 0 0 37.4 74.8l6-.7c23-3.4 46.4-3 69.3.8l27.6 4.6a264 264 0 0 0 86 0l20.8-3.5c27-4.6 54.8-4.1 81.7 1.3a54 54 0 0 0 64.6-53V210a175.2 175.2 0 0 0-175-175zm-35 157.5c0-19.3 11.8-35 26.3-35s26.2 15.8 26.2 35-11.8 35-26.3 35-26.2-15.7-26.2-35zm70 192.5c-19.3 0-35-27.4-35-61.3s15.8-61.2 35-61.2 35 27.4 35 61.3-15.7 61.2-35 61.2zm43.8-157.5c-14.5 0-26.3-15.7-26.3-35s11.8-35 26.3-35 26.2 15.8 26.2 35-11.8 35-26.3 35z', 485, 405);
         // pumpkin shape from https://thenounproject.com/icon/pumpkin-5253388/
-        confetti.customShapes.pumpkin = confetti.customShapes.pumpkin || confetti.shapeFromPath('M449.4 142c-5 0-10 .3-15 1a183 183 0 0 0-66.9-19.1V87.5a17.5 17.5 0 1 0-35 0v36.4a183 183 0 0 0-67 19c-4.9-.6-9.9-1-14.8-1C170.3 142 105 219.6 105 315s65.3 173 145.7 173c5 0 10-.3 14.8-1a184.7 184.7 0 0 0 169 0c4.9.7 9.9 1 14.9 1 80.3 0 145.6-77.6 145.6-173s-65.3-173-145.7-173zm-220 138 27.4-40.4a11.6 11.6 0 0 1 16.4-2.7l54.7 40.3a11.3 11.3 0 0 1-7 20.3H239a11.3 11.3 0 0 1-9.6-17.5zM444 383.8l-43.7 17.5a17.7 17.7 0 0 1-13 0l-37.3-15-37.2 15a17.8 17.8 0 0 1-13 0L256 383.8a17.5 17.5 0 0 1 13-32.6l37.3 15 37.2-15c4.2-1.6 8.8-1.6 13 0l37.3 15 37.2-15a17.5 17.5 0 0 1 13 32.6zm17-86.3h-82a11.3 11.3 0 0 1-6.9-20.4l54.7-40.3a11.6 11.6 0 0 1 16.4 2.8l27.4 40.4a11.3 11.3 0 0 1-9.6 17.5z');
+        var pumpkin = confetti.shapeFromPath('M449.4 142c-5 0-10 .3-15 1a183 183 0 0 0-66.9-19.1V87.5a17.5 17.5 0 1 0-35 0v36.4a183 183 0 0 0-67 19c-4.9-.6-9.9-1-14.8-1C170.3 142 105 219.6 105 315s65.3 173 145.7 173c5 0 10-.3 14.8-1a184.7 184.7 0 0 0 169 0c4.9.7 9.9 1 14.9 1 80.3 0 145.6-77.6 145.6-173s-65.3-173-145.7-173zm-220 138 27.4-40.4a11.6 11.6 0 0 1 16.4-2.7l54.7 40.3a11.3 11.3 0 0 1-7 20.3H239a11.3 11.3 0 0 1-9.6-17.5zM444 383.8l-43.7 17.5a17.7 17.7 0 0 1-13 0l-37.3-15-37.2 15a17.8 17.8 0 0 1-13 0L256 383.8a17.5 17.5 0 0 1 13-32.6l37.3 15 37.2-15c4.2-1.6 8.8-1.6 13 0l37.3 15 37.2-15a17.5 17.5 0 0 1 13 32.6zm17-86.3h-82a11.3 11.3 0 0 1-6.9-20.4l54.7-40.3a11.6 11.6 0 0 1 16.4 2.8l27.4 40.4a11.3 11.3 0 0 1-9.6 17.5z', 437, 490);
+        // tree shape from https://thenounproject.com/icon/pine-tree-1471679/
+        var tree = confetti.shapeFromPath('M120 240c-41,14 -91,18 -120,1 29,-10 57,-22 81,-40 -18,2 -37,3 -55,-3 25,-14 48,-30 66,-51 -11,5 -26,8 -45,7 20,-14 40,-30 57,-49 -13,1 -26,2 -38,-1 18,-11 35,-25 51,-43 -13,3 -24,5 -35,6 21,-19 40,-41 53,-67 14,26 32,48 54,67 -11,-1 -23,-3 -35,-6 15,18 32,32 51,43 -13,3 -26,2 -38,1 17,19 36,35 56,49 -19,1 -33,-2 -45,-7 19,21 42,37 67,51 -19,6 -37,5 -56,3 25,18 53,30 82,40 -30,17 -79,13 -120,-1l0 41 -31 0 0 -41z', 281, 271);
+        // heart shape from https://thenounproject.com/icon/heart-1545381/
+        var heart = confetti.shapeFromPath('M167 72c19,-38 37,-56 75,-56 42,0 76,33 76,75 0,76 -76,151 -151,227 -76,-76 -151,-151 -151,-227 0,-42 33,-75 75,-75 38,0 57,18 76,56z', 302, 302);
 
         var oranges = ['#ffc100', '#ff9a00', '#ff7400', '#ff4d00', '#ff0000'];
         var grayscale = ['#ffffff', '#bbbbbb', '#888888', '#555555', '#333333'];
+        var greens = ['#8d960f', '#be0f10', '#445404'];
+        var pinks = ['#f93963', '#a10864', '#ee0b93'];
 
         var defaults = {
           scalar: 1.25,
           spread: 270,
-          particleCount: 30,
-          origin: { y: 0.4 }
+          particleCount: 20,
+          origin: { y: 0.4 },
+          startVelocity: 35
         };
 
         confetti({
           ...defaults,
-          shapes: [ confetti.customShapes.ghost ],
+          shapes: [ ghost ],
           colors: grayscale
         });
         confetti({
           ...defaults,
-          shapes: [ confetti.customShapes.pumpkin ],
+          shapes: [ pumpkin ],
           colors: oranges
+        });
+        confetti({
+          ...defaults,
+          shapes: [ tree ],
+          colors: greens
+        });
+        confetti({
+          ...defaults,
+          shapes: [ heart ],
+          colors: pinks
         });
       }
     };
