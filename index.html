@@ -824,11 +824,6 @@
         // heart shape from https://thenounproject.com/icon/heart-1545381/
         var heart = confetti.shapeFromPath('M167 72c19,-38 37,-56 75,-56 42,0 76,33 76,75 0,76 -76,151 -151,227 -76,-76 -151,-151 -151,-227 0,-42 33,-75 75,-75 38,0 57,18 76,56z', 302, 302);
 
-        var oranges = ['#ffc100', '#ff9a00', '#ff7400', '#ff4d00', '#ff0000'];
-        var grayscale = ['#ffffff', '#bbbbbb', '#888888', '#555555', '#333333'];
-        var greens = ['#8d960f', '#be0f10', '#445404'];
-        var pinks = ['#f93963', '#a10864', '#ee0b93'];
-
         var defaults = {
           scalar: 1.25,
           spread: 270,
@@ -840,22 +835,22 @@
         confetti({
           ...defaults,
           shapes: [ ghost ],
-          colors: grayscale
+          colors: ['#ffffff', '#888888', '#333333']
         });
         confetti({
           ...defaults,
           shapes: [ pumpkin ],
-          colors: oranges
+          colors: ['#ff9a00', '#ff7400', '#ff4d00']
         });
         confetti({
           ...defaults,
           shapes: [ tree ],
-          colors: greens
+          colors: ['#8d960f', '#be0f10', '#445404']
         });
         confetti({
           ...defaults,
           shapes: [ heart ],
-          colors: pinks
+          colors: ['#f93963', '#a10864', '#ee0b93']
         });
       }
     };
