@@ -448,6 +448,7 @@
   function confettiCannon(canvas, globalOpts) {
     var isLibCanvas = !canvas;
     var allowResize = !!prop(globalOpts || {}, 'resize');
+    var hasResizeEventRegistered = false;
     var globalDisableForReducedMotion = prop(globalOpts, 'disableForReducedMotion', Boolean);
     var shouldUseWorker = canUseWorker && !!prop(globalOpts || {}, 'useWorker');
     var worker = shouldUseWorker ? getWorker() : null;
@@ -576,6 +577,7 @@
         animationObj = null;
 
         if (allowResize) {
+          hasResizeEventRegistered = false;
           global.removeEventListener('resize', onResize);
         }
 
@@ -586,7 +588,8 @@
         }
       }
 
-      if (allowResize) {
+      if (allowResize && !hasResizeEventRegistered) {
+        hasResizeEventRegistered = true;
         global.addEventListener('resize', onResize, false);
       }
 

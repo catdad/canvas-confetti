@@ -25,7 +25,7 @@ http.createServer(function (req, res) {
 
   send(req, file).pipe(res);
 }).listen(PORT, () => {
-  console.log(`listening on port ${PORT}`);
+  console.log(`listening at http://localhost:${PORT}`);
 });
 
 
