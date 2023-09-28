@@ -334,13 +334,14 @@
 
     context.beginPath();
 
-    if (canUsePaths && fetti.shape instanceof Path2D) {
+    if (canUsePaths && typeof fetti.shape.path === 'string' && typeof fetti.shape.scale === 'number') {
+      var path = scalePath2D(new Path2D(fetti.shape.path), fetti.shape.scale);
       context.fill(transformPath2D(
-        fetti.shape,
+        path,
         fetti.x + fetti.wobble,
         fetti.y + fetti.wobble,
-        Math.abs(x2 - x1) * 0.2,
-        Math.abs(y2 - y1) * 0.2,
+        Math.abs(x2 - x1) * 0.15,
+        Math.abs(y2 - y1) * 0.15,
         Math.PI / 10 * fetti.wobble
       ));
     } else if (fetti.shape === 'circle') {
@@ -623,7 +624,17 @@
   }
 
   function transformPath2D(path2d, x, y, scaleX, scaleY, rotation) {
-    var matrix = new DOMMatrix('translate(' + x + 'px, ' + y + 'px) rotate(' + rotation + 'rad) scale(' + (scaleX * 0.5) + ', ' + (scaleY * 0.5) + ')');
+    // this would be ideal, but it does not work in workers
+    // var matrix = new DOMMatrix('translate(' + x + 'px, ' + y + 'px) rotate(' + rotation + 'rad) scale(' + (scaleX) + ', ' + (scaleY) + ')');
+
+    // see https://developer.mozilla.org/en-US/docs/Web/API/DOMMatrix/DOMMatrix
+    var matrix = new DOMMatrix();
+    matrix.a = Math.cos(rotation) * scaleX;
+    matrix.b = Math.sin(rotation) * scaleX;
+    matrix.c = -Math.sin(rotation) * scaleY;
+    matrix.d = Math.cos(rotation) * scaleY;
+    matrix.e = x;
+    matrix.f = y;
 
     var transformed = new Path2D();
     transformed.addPath(path2d, matrix);
@@ -632,7 +643,13 @@
   }
 
   function scalePath2D(path2d, scale) {
-    var matrix = new DOMMatrix('scale(' + scale + ')');
+    // workers can't use:
+    // * new DOMMatrix(scale, 0, 0, scale, 0, 0);
+    // * new DOMMatrix(`scale(${scale})`);
+    // so create an empty one and add the necessary values
+    var matrix = new DOMMatrix();
+    matrix.a = scale;
+    matrix.d = scale;
 
     var scaledPath2D = new Path2D();
     scaledPath2D.addPath(path2d, matrix);
@@ -674,6 +691,13 @@
 
     var maxDesiredSize = 10;
     var scale = Math.min(maxDesiredSize/width, maxDesiredSize/height);
+
+    return {
+      path: path,
+      width: width,
+      height: height,
+      scale: scale
+    };
 
     return scalePath2D(path2d, scale);
   }
