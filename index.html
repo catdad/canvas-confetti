@@ -812,8 +812,9 @@
       paths: function() {
         // note: we want to generate the shapes just once, since it is rather expensive,
         // and I bet you are going to click this button more than once...
-        // the shapes will be generated the first time and then reused `confetti.customShapes`
-        // is not required, though you definitely should cache the shapes in your code
+        // the shapes will be generated the first time and then reused
+        // `confetti.customShapes` is not required, though you definitely
+        // should cache the shapes in your code
         confetti.customShapes = confetti.customShapes || {};
         // ghost shape from https://thenounproject.com/icon/ghost-5253385/
         confetti.customShapes.ghost = confetti.customShapes.ghost || confetti.shapeFromPath('M367.5 35a175.2 175.2 0 0 0-175 175v123.8c.1 39.4-15.5 77.1-43.4 104.9a44 44 0 0 0 37.4 74.8l6-.7c23-3.4 46.4-3 69.3.8l27.6 4.6a264 264 0 0 0 86 0l20.8-3.5c27-4.6 54.8-4.1 81.7 1.3a54 54 0 0 0 64.6-53V210a175.2 175.2 0 0 0-175-175zm-35 157.5c0-19.3 11.8-35 26.3-35s26.2 15.8 26.2 35-11.8 35-26.3 35-26.2-15.7-26.2-35zm70 192.5c-19.3 0-35-27.4-35-61.3s15.8-61.2 35-61.2 35 27.4 35 61.3-15.7 61.2-35 61.2zm43.8-157.5c-14.5 0-26.3-15.7-26.3-35s11.8-35 26.3-35 26.2 15.8 26.2 35-11.8 35-26.3 35z');
