@@ -335,13 +335,12 @@
     context.beginPath();
 
     if (canUsePaths && typeof fetti.shape.path === 'string' && typeof fetti.shape.scale === 'number') {
-      var path = scalePath2D(new Path2D(fetti.shape.path), fetti.shape.scale);
       context.fill(transformPath2D(
-        path,
+        fetti.shape.path,
         fetti.x + fetti.wobble,
         fetti.y + fetti.wobble,
-        Math.abs(x2 - x1) * 0.15,
-        Math.abs(y2 - y1) * 0.15,
+        Math.abs(x2 - x1) * 0.15 * fetti.shape.scale,
+        Math.abs(y2 - y1) * 0.15 * fetti.shape.scale,
         Math.PI / 10 * fetti.wobble
       ));
     } else if (fetti.shape === 'circle') {
@@ -623,7 +622,9 @@
     return defaultFire;
   }
 
-  function transformPath2D(path2d, x, y, scaleX, scaleY, rotation) {
+  function transformPath2D(pathString, x, y, scaleX, scaleY, rotation) {
+    var path2d = new Path2D(pathString);
+
     // this would be ideal, but it does not work in workers
     // var matrix = new DOMMatrix('translate(' + x + 'px, ' + y + 'px) rotate(' + rotation + 'rad) scale(' + (scaleX) + ', ' + (scaleY) + ')');
 
@@ -640,21 +641,6 @@
     transformed.addPath(path2d, matrix);
 
     return transformed;
-  }
-
-  function scalePath2D(path2d, scale) {
-    // workers can't use:
-    // * new DOMMatrix(scale, 0, 0, scale, 0, 0);
-    // * new DOMMatrix(`scale(${scale})`);
-    // so create an empty one and add the necessary values
-    var matrix = new DOMMatrix();
-    matrix.a = scale;
-    matrix.d = scale;
-
-    var scaledPath2D = new Path2D();
-    scaledPath2D.addPath(path2d, matrix);
-
-    return scaledPath2D;
   }
 
   function createPathFetti(path, width, height) {
@@ -698,8 +684,6 @@
       height: height,
       scale: scale
     };
-
-    return scalePath2D(path2d, scale);
   }
 
   module.exports = function() {
