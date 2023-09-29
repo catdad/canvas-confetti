@@ -529,7 +529,7 @@
             Celebrate some holidays with holiday-appropriate shapes! You can use any SVG path
             to make a confetti out of it.
           </p>
-          <p class="center">🎃👻🎄💜</p>
+          <p class="center">🎃🎄💜</p>
         </div>
       </div>
       <div class="editor"></div>
@@ -816,11 +816,6 @@
         // performance reasons it is best to use it once in development and save
         // the result to avoid the performance penalty at runtime
 
-        // ghost shape from https://thenounproject.com/icon/ghost-5253385/
-        var ghost = confetti.shapeFromPath({
-          path: 'M367.5 35a175.2 175.2 0 0 0-175 175v123.8c.1 39.4-15.5 77.1-43.4 104.9a44 44 0 0 0 37.4 74.8l6-.7c23-3.4 46.4-3 69.3.8l27.6 4.6a264 264 0 0 0 86 0l20.8-3.5c27-4.6 54.8-4.1 81.7 1.3a54 54 0 0 0 64.6-53V210a175.2 175.2 0 0 0-175-175zm-35 157.5c0-19.3 11.8-35 26.3-35s26.2 15.8 26.2 35-11.8 35-26.3 35-26.2-15.7-26.2-35zm70 192.5c-19.3 0-35-27.4-35-61.3s15.8-61.2 35-61.2 35 27.4 35 61.3-15.7 61.2-35 61.2zm43.8-157.5c-14.5 0-26.3-15.7-26.3-35s11.8-35 26.3-35 26.2 15.8 26.2 35-11.8 35-26.3 35z',
-          matrix: [0.02066115702479339, 0, 0, 0.02066115702479339, -7.024793388429752, -5.743801652892562],
-        });
         // pumpkin shape from https://thenounproject.com/icon/pumpkin-5253388/
         var pumpkin = confetti.shapeFromPath({
           path: 'M449.4 142c-5 0-10 .3-15 1a183 183 0 0 0-66.9-19.1V87.5a17.5 17.5 0 1 0-35 0v36.4a183 183 0 0 0-67 19c-4.9-.6-9.9-1-14.8-1C170.3 142 105 219.6 105 315s65.3 173 145.7 173c5 0 10-.3 14.8-1a184.7 184.7 0 0 0 169 0c4.9.7 9.9 1 14.9 1 80.3 0 145.6-77.6 145.6-173s-65.3-173-145.7-173zm-220 138 27.4-40.4a11.6 11.6 0 0 1 16.4-2.7l54.7 40.3a11.3 11.3 0 0 1-7 20.3H239a11.3 11.3 0 0 1-9.6-17.5zM444 383.8l-43.7 17.5a17.7 17.7 0 0 1-13 0l-37.3-15-37.2 15a17.8 17.8 0 0 1-13 0L256 383.8a17.5 17.5 0 0 1 13-32.6l37.3 15 37.2-15c4.2-1.6 8.8-1.6 13 0l37.3 15 37.2-15a17.5 17.5 0 0 1 13 32.6zm17-86.3h-82a11.3 11.3 0 0 1-6.9-20.4l54.7-40.3a11.6 11.6 0 0 1 16.4 2.8l27.4 40.4a11.3 11.3 0 0 1-9.6 17.5z',
@@ -840,16 +835,11 @@
         var defaults = {
           scalar: 2,
           spread: 270,
-          particleCount: 20,
+          particleCount: 25,
           origin: { y: 0.4 },
           startVelocity: 35
         };
 
-        confetti({
-          ...defaults,
-          shapes: [ ghost ],
-          colors: ['#ffffff', '#888888', '#333333']
-        });
         confetti({
           ...defaults,
           shapes: [ pumpkin ],
