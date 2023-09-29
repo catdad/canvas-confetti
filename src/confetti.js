@@ -334,7 +334,7 @@
 
     context.beginPath();
 
-    if (canUsePaths && typeof fetti.shape.path === 'string' && typeof fetti.shape.scale === 'number') {
+    if (canUsePaths && fetti.shape.type === 'path' && typeof fetti.shape.path === 'string' && typeof fetti.shape.scale === 'number') {
       context.fill(transformPath2D(
         fetti.shape.path,
         fetti.x + fetti.wobble,
@@ -679,6 +679,7 @@
     var scale = Math.min(maxDesiredSize/width, maxDesiredSize/height);
 
     return {
+      type: 'path',
       path: path,
       width: width,
       height: height,
