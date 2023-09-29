@@ -339,8 +339,8 @@
         fetti.shape.path,
         fetti.x + fetti.wobble,
         fetti.y + fetti.wobble,
-        Math.abs(x2 - x1) * 0.15 * fetti.shape.scale,
-        Math.abs(y2 - y1) * 0.15 * fetti.shape.scale,
+        Math.abs(x2 - x1) * 0.1 * fetti.shape.scale,
+        Math.abs(y2 - y1) * 0.1 * fetti.shape.scale,
         Math.PI / 10 * fetti.wobble
       ));
     } else if (fetti.shape === 'circle') {
