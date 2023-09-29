@@ -334,13 +334,14 @@
 
     context.beginPath();
 
-    if (canUsePaths && fetti.shape.type === 'path' && typeof fetti.shape.path === 'string' && typeof fetti.shape.scale === 'number') {
+    if (canUsePaths && fetti.shape.type === 'path' && typeof fetti.shape.path === 'string' && Array.isArray(fetti.shape.matrix)) {
       context.fill(transformPath2D(
         fetti.shape.path,
-        fetti.x + fetti.wobble,
-        fetti.y + fetti.wobble,
-        Math.abs(x2 - x1) * 0.1 * fetti.shape.scale,
-        Math.abs(y2 - y1) * 0.1 * fetti.shape.scale,
+        fetti.shape.matrix,
+        fetti.x,
+        fetti.y,
+        Math.abs(x2 - x1) * 0.1,
+        Math.abs(y2 - y1) * 0.1,
         Math.PI / 10 * fetti.wobble
       ));
     } else if (fetti.shape === 'circle') {
@@ -622,46 +623,61 @@
     return defaultFire;
   }
 
-  function transformPath2D(pathString, x, y, scaleX, scaleY, rotation) {
+  function transformPath2D(pathString, pathMatrix, x, y, scaleX, scaleY, rotation) {
     var path2d = new Path2D(pathString);
 
-    // this would be ideal, but it does not work in workers
-    // var matrix = new DOMMatrix('translate(' + x + 'px, ' + y + 'px) rotate(' + rotation + 'rad) scale(' + (scaleX) + ', ' + (scaleY) + ')');
+    // TODO there are issues with paths like this:
+    // 'M 510 510 L 530 510 L 520 530 z'
+    // issue solved, keeping until I write a test
 
+    var t1 = new Path2D();
+    t1.addPath(path2d, new DOMMatrix(pathMatrix));
+
+    var t2 = new Path2D();
     // see https://developer.mozilla.org/en-US/docs/Web/API/DOMMatrix/DOMMatrix
-    var matrix = new DOMMatrix();
-    matrix.a = Math.cos(rotation) * scaleX;
-    matrix.b = Math.sin(rotation) * scaleX;
-    matrix.c = -Math.sin(rotation) * scaleY;
-    matrix.d = Math.cos(rotation) * scaleY;
-    matrix.e = x;
-    matrix.f = y;
+    t2.addPath(t1, new DOMMatrix([
+      Math.cos(rotation) * scaleX,
+      Math.sin(rotation) * scaleX,
+      -Math.sin(rotation) * scaleY,
+      Math.cos(rotation) * scaleY,
+      x,
+      y
+    ]));
 
-    var transformed = new Path2D();
-    transformed.addPath(path2d, matrix);
-
-    return transformed;
+    return t2;
   }
 
-  function createPathFetti(path, width, height) {
+  function createPathFetti(pathData) {
     if (!canUsePaths) {
       throw new Error('path confetti are not supported in this browser');
+    }
+
+    var path, matrix;
+
+    if (typeof pathData === 'string') {
+      path = pathData;
+    } else {
+      path = pathData.path;
+      matrix = pathData.matrix;
     }
 
     var path2d = new Path2D(path);
     var tempCanvas = document.createElement('canvas');
     var tempCtx = tempCanvas.getContext('2d');
 
-    if (!width || !height) {
+    if (!matrix) {
       // attempt to figure out the width of the path, up to 1000x1000
       var maxSize = 1000;
       var minX = maxSize;
       var minY = maxSize;
       var maxX = 0;
       var maxY = 0;
+      var width, height;
 
-      for (var x = 0; x < maxSize; x++) {
-        for (var y = 0; y < maxSize; y++) {
+      // do some line skipping... this is faster than checking
+      // every pixel and will be mostly still correct
+      for (var x = 0; x < maxSize; x += 2) {
+        for (var y = 0; y < maxSize; y += 2) {
           if (tempCtx.isPointInPath(path2d, x, y, 'nonzero')) {
             minX = Math.min(minX, x);
             minY = Math.min(minY, y);
@@ -671,19 +687,23 @@
         }
       }
 
-      width = width || maxX - minX;
-      height = height || maxY - minY;
-    }
+      width = maxX - minX;
+      height = maxY - minY;
 
-    var maxDesiredSize = 10;
-    var scale = Math.min(maxDesiredSize/width, maxDesiredSize/height);
+      var maxDesiredSize = 10;
+      var scale = Math.min(maxDesiredSize/width, maxDesiredSize/height);
+
+      matrix = [
+        scale, 0, 0, scale,
+        -Math.round((width/2) + minX) * scale,
+        -Math.round((height/2) + minY) * scale
+      ];
+    }
 
     return {
       type: 'path',
       path: path,
-      width: width,
-      height: height,
-      scale: scale
+      matrix: matrix
     };
   }
 
