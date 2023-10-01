@@ -576,6 +576,37 @@ test('stops and removes canvas immediately when `reset` is called', async t => {
 });
 
 /*
+ * Shape from path
+ */
+test('shapeFromPath: creates an object with a path and transform matrix', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const result = await page.evaluate(`
+    confetti.shapeFromPath('M0 0 L10 0 L10 10 L0 10z');
+  `);
+
+  t.deepEqual(result, {
+    type: 'path',
+    path: 'M0 0 L10 0 L10 10 L0 10z',
+    matrix: [ 1, 0, 0, 1, -5, -5 ]
+  });
+});
+
+test('shapeFromPath: crops the shape and centers in the middle of the actual path object', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const result = await page.evaluate(`
+    confetti.shapeFromPath('M100 100 L110 100 L110 110 L100 110z');
+  `);
+
+  t.deepEqual(result, {
+    type: 'path',
+    path: 'M100 100 L110 100 L110 110 L100 110z',
+    matrix: [ 1, 0, 0, 1, -105, -105 ]
+  });
+});
+
+/*
  * Custom canvas
  */
 
@@ -993,4 +1024,10 @@ test('exposed confetti method has a `reset` property', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   t.is(await page.evaluate(`typeof confettiAlias.reset`), 'function');
+});
+
+test('exposed confetti method has a `shapeFromPath` property', async t => {
+  const page = t.context.page = await fixturePage('fixtures/page.module.html');
+
+  t.is(await page.evaluate(`typeof confettiAlias.shapeFromPath`), 'function');
 });
