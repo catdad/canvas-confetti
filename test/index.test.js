@@ -578,7 +578,7 @@ test('stops and removes canvas immediately when `reset` is called', async t => {
 /*
  * Shape from path
  */
-test('shapeFromPath: creates an object with a path and transform matrix', async t => {
+test('[paths] `shapeFromPath` creates an object with a path and transform matrix', async t => {
   const page = t.context.page = await fixturePage();
 
   const result = await page.evaluate(`
@@ -592,7 +592,7 @@ test('shapeFromPath: creates an object with a path and transform matrix', async 
   });
 });
 
-test('shapeFromPath: crops the shape and centers in the middle of the actual path object', async t => {
+test('[paths] `shapeFromPath` crops the shape and centers in the middle of the actual path object', async t => {
   const page = t.context.page = await fixturePage();
 
   const result = await page.evaluate(`
@@ -636,7 +636,7 @@ const getCanvasSize = async (page) => {
   `);
 };
 
-test('can create instances of confetti in separate canvas', async t => {
+test('[custom canvas] can create instances of confetti in separate canvas', async t => {
   const page = t.context.page = await fixturePage();
   await injectCanvas(page);
 
@@ -653,7 +653,7 @@ test('can create instances of confetti in separate canvas', async t => {
   t.notDeepEqual(beforeSize, afterSize);
 });
 
-test('can use a custom canvas without resizing', async t => {
+test('[custom canvas] can use a custom canvas without resizing', async t => {
   const page = t.context.page = await fixturePage();
   await injectCanvas(page, { allowResize: false });
 
@@ -732,20 +732,20 @@ const resizeTest = async (t, createOpts, createName = 'confetti.create') => {
   t.deepEqual(await uniqueColors(third), ['#0000ff', '#ffffff']);
 };
 
-test('resizes the custom canvas when the window resizes', async t => {
+test('[custom canvas] resizes the custom canvas when the window resizes', async t => {
   await resizeTest(t, {
     resize: true
   });
 });
 
-test('resizes the custom canvas when the window resizes and a worker is used', async t => {
+test('[custom canvas] resizes the custom canvas when the window resizes and a worker is used', async t => {
   await resizeTest(t, {
     resize: true,
     useWorker: true
   });
 });
 
-test('can use a custom canvas with workers and resize it', async t => {
+test('[custom canvas] can use a custom canvas with workers and resize it', async t => {
   const page = t.context.page = await fixturePage();
   await injectCanvas(page, {
     allowResize: true,
@@ -765,7 +765,7 @@ test('can use a custom canvas with workers and resize it', async t => {
   t.notDeepEqual(beforeSize, afterSize);
 });
 
-test('shoots confetti repeatedly in defaut and custom canvas using requestAnimationFrame', async t => {
+test('[custom canvas] shoots confetti repeatedly in defaut and custom canvas using requestAnimationFrame', async t => {
   const page = t.context.page = await fixturePage();
   await injectCanvas(page);
   const time = 6 * 1000;
@@ -831,7 +831,7 @@ test('shoots confetti repeatedly in defaut and custom canvas using requestAnimat
   t.deepEqual(await uniqueColors(await reduceImg(img4)), ['#0000ff', '#ff0000', '#ffffff']);
 });
 
-test('can initialize the same canvas multiple times when using a worker', async t => {
+test('[custom canvas] can initialize the same canvas multiple times when using a worker', async t => {
   const page = t.context.page = await fixturePage();
   await page.evaluate(`
     var canvas = document.createElement('canvas');
@@ -872,7 +872,7 @@ test('can initialize the same canvas multiple times when using a worker', async 
   t.deepEqual(await uniqueColors(t.context.image), ['#ff0000', '#ff00ff', '#ffffff']);
 });
 
-test('can initialize the same canvas multiple times without using a worker', async t => {
+test('[custom canvas] can initialize the same canvas multiple times without using a worker', async t => {
   const page = t.context.page = await fixturePage();
   await page.evaluate(`
     var canvas = document.createElement('canvas');
@@ -914,7 +914,7 @@ test('can initialize the same canvas multiple times without using a worker', asy
   t.deepEqual(await uniqueColors(t.context.image), ['#ff00ff', '#ffffff']);
 });
 
-test('calling `reset` method clears all existing confetti but more can be launched after', async t => {
+test('[custom canvas] calling `reset` method clears all existing confetti but more can be launched after', async t => {
   const page = t.context.page = await fixturePage();
   await injectCanvas(page);
 
@@ -943,7 +943,7 @@ test('calling `reset` method clears all existing confetti but more can be launch
  * Browserify tests
  */
 
-test('works using the browserify bundle', async t => {
+test('[browserify] works using the browserify bundle', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.browserify.html');
 
   await page.evaluate(`void confetti({
@@ -967,7 +967,7 @@ test('works using the browserify bundle', async t => {
  * using minification close to that of jsDelivr
  */
 
-test('works using the terser minified and compressed code', async t => {
+test('[minified] works using the terser minified and compressed code', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.minified.html');
 
   await page.evaluate(`void confetti({
@@ -990,7 +990,7 @@ test('works using the terser minified and compressed code', async t => {
  * ESM tests
  */
 
-test('the esm module exposed confetti as the default', async t => {
+test('[esm] the esm module exposed confetti as the default', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   t.context.buffer = await confettiImage(page, {
@@ -1005,7 +1005,7 @@ test('the esm module exposed confetti as the default', async t => {
   t.deepEqual(pixels, ['#ff00ff', '#ffffff']);
 });
 
-test('the esm module exposed confetti.create as create', async t => {
+test('[esm] the esm module exposed confetti.create as create', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   await injectCanvas(page, { allowResize: true }, 'createAlias');
@@ -1020,13 +1020,13 @@ test('the esm module exposed confetti.create as create', async t => {
   t.deepEqual(pixels, ['#ff00ff', '#ffffff']);
 });
 
-test('exposed confetti method has a `reset` property', async t => {
+test('[esm] exposed confetti method has a `reset` property', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   t.is(await page.evaluate(`typeof confettiAlias.reset`), 'function');
 });
 
-test('exposed confetti method has a `shapeFromPath` property', async t => {
+test('[esm] exposed confetti method has a `shapeFromPath` property', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   t.is(await page.evaluate(`typeof confettiAlias.shapeFromPath`), 'function');
