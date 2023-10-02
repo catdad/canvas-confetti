@@ -357,6 +357,39 @@
         Math.abs(y2 - y1) * 0.1,
         Math.PI / 10 * fetti.wobble
       ));
+    } else if (fetti.shape.type === 'bitmap') {
+      var rotation = Math.PI / 10 * fetti.wobble;
+      var scaleX = Math.abs(x2 - x1) * 0.1;
+      var scaleY = Math.abs(y2 - y1) * 0.1;
+      var width = fetti.shape.bitmap.width * fetti.scalar;
+      var height = fetti.shape.bitmap.height * fetti.scalar;
+
+      // TODO this doesn't look great
+      // I think we are not setting the origin correctly
+      // requires that we apply fetti.shape.matrix
+      var matrix = new DOMMatrix([
+        Math.cos(rotation) * scaleX,
+        Math.sin(rotation) * scaleX,
+        -Math.sin(rotation) * scaleY,
+        Math.cos(rotation) * scaleY,
+        fetti.x,
+        fetti.y
+      ]);
+
+      var pattern = context.createPattern(fetti.shape.bitmap, 'no-repeat');
+      pattern.setTransform(matrix);
+
+      context.globalAlpha = (1 - progress);
+      context.fillStyle = pattern;
+      // TODO can this be smaller?
+      // probably requires fixing the transform matrix
+      context.fillRect(
+        fetti.x - width,
+        fetti.y - height,
+        width * 2,
+        height * 2,
+      );
+      context.globalAlpha = 1;
     } else if (fetti.shape === 'circle') {
       context.ellipse ?
         context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
@@ -722,6 +755,36 @@
     };
   }
 
+  function shapeFromText(text, opts) {
+    var maxDesiredSize = 10;
+    var fontSize = (opts && opts.fontSize) || maxDesiredSize;
+    // see https://nolanlawson.com/2022/04/08/the-struggle-of-using-native-emoji-on-the-web/
+    var fontFamily = (opts && opts.fontFamily) || '"Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", "system emoji", sans-serif';
+    var font = '' + fontSize + 'px ' + fontFamily;
+
+    var canvas = new OffscreenCanvas(fontSize, fontSize);
+    var ctx = canvas.getContext('2d');
+
+    ctx.font = font;
+    var size = ctx.measureText(text);
+    var width = Math.ceil(size.width);
+    var height = Math.ceil(size.actualBoundingBoxAscent + size.actualBoundingBoxDescent);
+
+    canvas = new OffscreenCanvas(width, height);
+    ctx = canvas.getContext('2d');
+    ctx.font = font;
+
+    ctx.fillText(text, 0, fontSize);
+
+    var scale = fontSize / maxDesiredSize;
+
+    return {
+      type: 'bitmap',
+      bitmap: canvas.transferToImageBitmap(),
+      matrix: [scale, 0, 0, scale, -width / 2 / scale, -height / 2 / scale]
+    };
+  }
+
   module.exports = function() {
     return getDefaultFire().apply(this, arguments);
   };
@@ -730,6 +793,7 @@
   };
   module.exports.create = confettiCannon;
   module.exports.shapeFromPath = createPathFetti;
+  module.exports.shapeFromText = shapeFromText;
 }((function () {
   if (typeof window !== 'undefined') {
     return window;

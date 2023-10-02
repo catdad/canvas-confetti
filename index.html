@@ -537,6 +537,28 @@
   </div>
 
   <div class="container">
+    <div class="group" data-name="emoji">
+      <div class="flex-rows">
+        <div class="left">
+          <h2><a href="#emoji" id="emoji" class="anchor">Emoji</a></h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            Emoji
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
     <div class="group" data-name="custom">
       <div class="flex-rows">
         <div class="left">
@@ -855,6 +877,43 @@
           shapes: [ heart ],
           colors: ['#f93963', '#a10864', '#ee0b93']
         });
+      },
+      emoji: function () {
+        var unicorn = confetti.shapeFromText('🦄');
+
+        var defaults = {
+          spread: 360,
+          ticks: 60,
+          gravity: 0,
+          decay: 0.96,
+          startVelocity: 20,
+          scalar: 1.5,
+          shapes: [unicorn]
+        };
+
+        function shoot() {
+          confetti({
+            ...defaults,
+            particleCount: 30
+          });
+
+          confetti({
+            ...defaults,
+            particleCount: 10,
+            flat: true
+          });
+
+          confetti({
+            ...defaults,
+            particleCount: 10,
+            scalar: 0.75,
+            shapes: ['circle']
+          });
+        }
+
+        setTimeout(shoot, 0);
+        setTimeout(shoot, 100);
+        setTimeout(shoot, 200);
       }
     };
 
