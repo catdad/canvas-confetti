@@ -780,6 +780,7 @@
 
     return {
       type: 'bitmap',
+      // TODO these probably need to be transfered for workers
       bitmap: canvas.transferToImageBitmap(),
       matrix: [scale, 0, 0, scale, -width / 2 / scale, -height / 2 / scale]
     };
