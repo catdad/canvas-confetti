@@ -624,6 +624,28 @@ test('[paths] `shapeFromPath` crops the shape and centers in the middle of the a
   });
 });
 
+test('[path] shoots confetti of a custom shape', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const shape = await page.evaluate(`
+    confetti.shapeFromPath('M0 10 L5 0 L10 10z');
+  `);
+
+  // these parameters should create an image
+  // that is the same every time
+  t.context.buffer = await confettiImage(page, {
+    startVelocity: 0,
+    gravity: 0,
+    scalar: 20,
+    flat: 1,
+    shapes: [shape],
+    colors: ['ff0000']
+  });
+  t.context.image = await readImage(t.context.buffer);
+
+  t.is(t.context.image.hash(), '9I0p03d03c0');
+});
+
 /*
  * Custom canvas
  */
