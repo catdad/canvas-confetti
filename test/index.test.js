@@ -409,6 +409,24 @@ test('shoots confetti to the right', async t => {
   t.deepEqual(pixels.left, ['#ffffff']);
 });
 
+test('shoots flat confetti', async t => {
+  const page = t.context.page = await fixturePage();
+
+  // these parameters should create an image
+  // that is the same every time
+  t.context.buffer = await confettiImage(page, {
+    startVelocity: 0,
+    gravity: 0,
+    scalar: 20,
+    flat: 1,
+    shapes: ['circle'],
+    colors: ['ff0000']
+  });
+  t.context.image = await readImage(t.context.buffer);
+
+  t.is(t.context.image.hash(), '8E0802208w0');
+});
+
 /*
  * Operational tests
  */
