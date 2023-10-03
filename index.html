@@ -678,9 +678,11 @@
         };
 
         function fire(particleRatio, opts) {
-          confetti(Object.assign({}, defaults, opts, {
+          confetti({
+            ...defaults,
+            ...opts,
             particleCount: Math.floor(count * particleRatio)
-          }));
+          });
         }
 
         fire(0.25, {
@@ -724,8 +726,8 @@
 
           var particleCount = 50 * (timeLeft / duration);
           // since particles fall down, start a bit higher than random
-          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+          confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+          confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
         }, 250);
       },
       snow: function snow() {
@@ -770,7 +772,6 @@
           gravity: 0,
           decay: 0.94,
           startVelocity: 30,
-          shapes: ['star'],
           colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8']
         };
 
