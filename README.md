@@ -84,7 +84,7 @@ This helper method lets you create a custom confetti shape using an [SVG Path st
 - Paths are limited to a single color, so keep that in mind.
 - All paths need a valid transform matrix. You can pass one in, or you can leave it out and use this helper to calculate the matrix for you. Do note that calculating the matrix is a bit expensive, so it is best to calculate it once for each path in development and cache that value, so that production confetti remain fast. The matrix is deterministic and will always be the same given the same path value.
 - For best forward compatibility, it is best to re-generate and re-cache the matrix if you update the `canvas-confetti` library.
-- Support for path-based confetti is limited to browsers which support [`Path2D`](https://developer.mozilla.org/en-US/docs/Web/API/Path2D), which should really be all major browser at this point. If `Path2D` is not supported because you somehow found a copy of IE and are interesred to see what happens, the library will all back to `square` confetti.
+- Support for path-based confetti is limited to browsers which support [`Path2D`](https://developer.mozilla.org/en-US/docs/Web/API/Path2D), which should really be all major browser at this point.
 
 This method will return a `Shape` -- it's really just a plain object with some properties, but shhh... we'll pretend it's a shape. Pass this `Shape` object into the `shapes` array directly.
 
