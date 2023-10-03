@@ -757,6 +757,7 @@
     // see https://nolanlawson.com/2022/04/08/the-struggle-of-using-native-emoji-on-the-web/
     var fontFamily = (opts && opts.fontFamily) || '"Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", "system emoji", sans-serif';
     var font = '' + fontSize + 'px ' + fontFamily;
+    var color = (opts && opts.color) || '#000000';
 
     var canvas = new OffscreenCanvas(fontSize, fontSize);
     var ctx = canvas.getContext('2d');
@@ -769,6 +770,7 @@
     canvas = new OffscreenCanvas(width, height);
     ctx = canvas.getContext('2d');
     ctx.font = font;
+    ctx.fillStyle = color;
 
     ctx.fillText(text, 0, fontSize);
 
