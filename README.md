@@ -30,7 +30,7 @@ You can then `require('canvas-confetti');` to use it in your project build. _Not
 You can also include this library in your HTML page directly from a CDN:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.1/dist/confetti.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.7.0/dist/confetti.browser.min.js"></script>
 ```
 
 _Note: you should use the latest version at the time that you include your project. You can see all versions [on the releases page](https://github.com/catdad/canvas-confetti/releases)._
@@ -72,10 +72,31 @@ The `confetti` parameter is a single optional `options` object, which has the fo
   - `origin.x` _Number (default: 0.5)_: The `x` position on the page, with `0` being the left edge and `1` being the right edge.
   - `origin.y` _Number (default: 0.5)_: The `y` position on the page, with `0` being the top edge and `1` being the bottom edge.
 - `colors` _Array&lt;String&gt;_: An array of color strings, in the HEX format... you know, like `#bada55`.
-- `shapes` _Array&lt;String&gt;_: An array of shapes for the confetti. The possible values are `square`, `circle`, and `star`. The default is to use both squares and circles in an even mix. To use a single shape, you can provide just one shape in the array, such as `['star']`. You can also change the mix by providing a value such as `['circle', 'circle', 'square']` to use two third circles and one third squares.
+- `shapes` _Array&lt;String|Shape&gt;_: An array of shapes for the confetti. There are 3 built-in values of `square`, `circle`, and `star`. The default is to use both squares and circles in an even mix. To use a single shape, you can provide just one shape in the array, such as `['star']`. You can also change the mix by providing a value such as `['circle', 'circle', 'square']` to use two third circles and one third squares. You can also create your own shapes using the `confetti.shapeFromPath` helper method.
 - `scalar` _Number (default: 1)_: Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
 - `zIndex` _Integer (default: 100)_: The confetti should be on top, after all. But if you have a crazy high page, you can set it even higher.
 - `disableForReducedMotion` _Boolean (default: false)_: Disables confetti entirely for users that [prefer reduced motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion). The `confetti()` promise will resolve immediately in this case.
+
+### `confetti.shapeFromPath({ path, matrix? })` -> `Shape`
+
+This helper method lets you create a custom confetti shape using an [SVG Path string](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d). Any valid path should work, though there are a few caveats:
+- All paths will be filed. If you were hoping to have a stroke path, that is not implemented.
+- Paths are limited to a single color, so keep that in mind.
+- All paths need a valid transform matrix. You can pass one in, or you can leave it out and use this helper to calculate the matrix for you. Do note that calculating the matrix is a bit expensive, so it is best to calculate it once for each path in development and cache that value, so that production confetti remain fast. The matrix is deterministic and will always be the same given the same path value.
+- For best forward compatibility, it is best to re-generate and re-cache the matrix if you update the `canvas-confetti` library.
+- Support for path-based confetti is limited to browsers which support [`Path2D`](https://developer.mozilla.org/en-US/docs/Web/API/Path2D), which should really be all major browser at this point.
+
+This method will return a `Shape` -- it's really just a plain object with some properties, but shhh... we'll pretend it's a shape. Pass this `Shape` object into the `shapes` array directly.
+
+As an example, here's how you might do a triangle confetti:
+
+```javascript
+var triangle = confetti.shapeFromPath({ path: 'M0 10 L5 0 L10 10z' });
+
+confetti({
+  shapes: [triangle]
+});
+```
 
 ### `confetti.create(canvas, [globalOptions])` → `function`
 
