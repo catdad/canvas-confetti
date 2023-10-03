@@ -293,7 +293,6 @@
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: (Math.random() * (0.75 - 0.25) + 0.25) * Math.PI,
-      tiltAngleSpeed: 0.1,
       color: opts.color,
       shape: opts.shape,
       tick: 0,
@@ -640,10 +639,6 @@
 
   function transformPath2D(pathString, pathMatrix, x, y, scaleX, scaleY, rotation) {
     var path2d = new Path2D(pathString);
-
-    // TODO there are issues with paths like this:
-    // 'M 510 510 L 530 510 L 520 530 z'
-    // issue solved, keeping until I write a test
 
     var t1 = new Path2D();
     t1.addPath(path2d, new DOMMatrix(pathMatrix));
