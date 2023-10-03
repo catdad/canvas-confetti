@@ -10,6 +10,8 @@
     global.URL &&
     global.URL.createObjectURL);
 
+  var canUsePaths = typeof Path2D === 'function' && typeof DOMMatrix === 'function';
+
   function noop() {}
 
   // create a promise if it exists, otherwise, just
@@ -341,9 +343,20 @@
     var y2 = fetti.wobbleY + (fetti.random * fetti.tiltSin);
 
     context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
+
     context.beginPath();
 
-    if (fetti.shape === 'circle') {
+    if (canUsePaths && fetti.shape.type === 'path' && typeof fetti.shape.path === 'string' && Array.isArray(fetti.shape.matrix)) {
+      context.fill(transformPath2D(
+        fetti.shape.path,
+        fetti.shape.matrix,
+        fetti.x,
+        fetti.y,
+        Math.abs(x2 - x1) * 0.1,
+        Math.abs(y2 - y1) * 0.1,
+        Math.PI / 10 * fetti.wobble
+      ));
+    } else if (fetti.shape === 'circle') {
       context.ellipse ?
         context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
         ellipse(context, fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI);
@@ -624,6 +637,86 @@
     return defaultFire;
   }
 
+  function transformPath2D(pathString, pathMatrix, x, y, scaleX, scaleY, rotation) {
+    var path2d = new Path2D(pathString);
+
+    var t1 = new Path2D();
+    t1.addPath(path2d, new DOMMatrix(pathMatrix));
+
+    var t2 = new Path2D();
+    // see https://developer.mozilla.org/en-US/docs/Web/API/DOMMatrix/DOMMatrix
+    t2.addPath(t1, new DOMMatrix([
+      Math.cos(rotation) * scaleX,
+      Math.sin(rotation) * scaleX,
+      -Math.sin(rotation) * scaleY,
+      Math.cos(rotation) * scaleY,
+      x,
+      y
+    ]));
+
+    return t2;
+  }
+
+  function createPathFetti(pathData) {
+    if (!canUsePaths) {
+      throw new Error('path confetti are not supported in this browser');
+    }
+
+    var path, matrix;
+
+    if (typeof pathData === 'string') {
+      path = pathData;
+    } else {
+      path = pathData.path;
+      matrix = pathData.matrix;
+    }
+
+    var path2d = new Path2D(path);
+    var tempCanvas = document.createElement('canvas');
+    var tempCtx = tempCanvas.getContext('2d');
+
+    if (!matrix) {
+      // attempt to figure out the width of the path, up to 1000x1000
+      var maxSize = 1000;
+      var minX = maxSize;
+      var minY = maxSize;
+      var maxX = 0;
+      var maxY = 0;
+      var width, height;
+
+      // do some line skipping... this is faster than checking
+      // every pixel and will be mostly still correct
+      for (var x = 0; x < maxSize; x += 2) {
+        for (var y = 0; y < maxSize; y += 2) {
+          if (tempCtx.isPointInPath(path2d, x, y, 'nonzero')) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+
+      width = maxX - minX;
+      height = maxY - minY;
+
+      var maxDesiredSize = 10;
+      var scale = Math.min(maxDesiredSize/width, maxDesiredSize/height);
+
+      matrix = [
+        scale, 0, 0, scale,
+        -Math.round((width/2) + minX) * scale,
+        -Math.round((height/2) + minY) * scale
+      ];
+    }
+
+    return {
+      type: 'path',
+      path: path,
+      matrix: matrix
+    };
+  }
+
   module.exports = function() {
     return getDefaultFire().apply(this, arguments);
   };
@@ -631,6 +724,7 @@
     getDefaultFire().reset();
   };
   module.exports.create = confettiCannon;
+  module.exports.shapeFromPath = createPathFetti;
 }((function () {
   if (typeof window !== 'undefined') {
     return window;
