@@ -88,6 +88,16 @@ This helper method lets you create a custom confetti shape using an [SVG Path st
 
 This method will return a `Shape` -- it's really just a plain object with some properties, but shhh... we'll pretend it's a shape. Pass this `Shape` object into the `shapes` array directly.
 
+As an example, here's how you might do a triangle confetti:
+
+```javascript
+var triangle = confetti.shapeFromPath({ path: 'M0 10 L5 0 L10 10z' });
+
+confetti({
+  shapes: [triangle]
+});
+```
+
 ### `confetti.create(canvas, [globalOptions])` → `function`
 
 This method creates an instance of the `confetti` function that uses a custom canvas. This is useful if you want to limit the area on your page in which confetti appear. By default, this method will not modify the canvas in any way (other than drawing to it).
