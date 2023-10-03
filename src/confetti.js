@@ -764,7 +764,7 @@
     ctx.font = font;
     var size = ctx.measureText(text);
     var width = Math.floor(size.width);
-    var height = Math.floor(size.actualBoundingBoxAscent + size.actualBoundingBoxDescent);
+    var height = Math.floor(size.fontBoundingBoxAscent + size.fontBoundingBoxDescent);
 
     canvas = new OffscreenCanvas(width, height);
     ctx = canvas.getContext('2d');
