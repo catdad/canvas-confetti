@@ -375,18 +375,19 @@
         fetti.y
       ]);
 
+      // apply the transform matrix from the confetti shape
+      matrix.multiplySelf(new DOMMatrix(fetti.shape.matrix));
+
       var pattern = context.createPattern(fetti.shape.bitmap, 'no-repeat');
       pattern.setTransform(matrix);
 
       context.globalAlpha = (1 - progress);
       context.fillStyle = pattern;
-      // TODO can this be smaller?
-      // probably requires fixing the transform matrix
       context.fillRect(
-        fetti.x - width,
-        fetti.y - height,
-        width * 2,
-        height * 2,
+        fetti.x - (width / 2),
+        fetti.y - (height / 2),
+        width,
+        height,
       );
       context.globalAlpha = 1;
     } else if (fetti.shape === 'circle') {
@@ -690,7 +691,7 @@
     return t2;
   }
 
-  function createPathFetti(pathData) {
+  function shapeFromPath(pathData) {
     if (!canUsePaths) {
       throw new Error('path confetti are not supported in this browser');
     }
@@ -762,8 +763,8 @@
 
     ctx.font = font;
     var size = ctx.measureText(text);
-    var width = Math.ceil(size.width);
-    var height = Math.ceil(size.actualBoundingBoxAscent + size.actualBoundingBoxDescent);
+    var width = Math.floor(size.width);
+    var height = Math.floor(size.actualBoundingBoxAscent + size.actualBoundingBoxDescent);
 
     canvas = new OffscreenCanvas(width, height);
     ctx = canvas.getContext('2d');
@@ -771,13 +772,13 @@
 
     ctx.fillText(text, 0, fontSize);
 
-    var scale = fontSize / maxDesiredSize;
+    var scale = maxDesiredSize / fontSize;
 
     return {
       type: 'bitmap',
       // TODO these probably need to be transfered for workers
       bitmap: canvas.transferToImageBitmap(),
-      matrix: [scale, 0, 0, scale, -width / 2 / scale, -height / 2 / scale]
+      matrix: [scale, 0, 0, scale, -width * scale / 2, -height * scale / 2]
     };
   }
 
@@ -788,7 +789,7 @@
     getDefaultFire().reset();
   };
   module.exports.create = confettiCannon;
-  module.exports.shapeFromPath = createPathFetti;
+  module.exports.shapeFromPath = shapeFromPath;
   module.exports.shapeFromText = shapeFromText;
 }((function () {
   if (typeof window !== 'undefined') {
