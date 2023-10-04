@@ -387,7 +387,7 @@
         fetti.x - (width / 2),
         fetti.y - (height / 2),
         width,
-        height,
+        height
       );
       context.globalAlpha = 1;
     } else if (fetti.shape === 'circle') {
