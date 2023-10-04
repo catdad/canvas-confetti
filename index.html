@@ -880,7 +880,8 @@
         });
       },
       emoji: function () {
-        var unicorn = confetti.shapeFromText('🦄');
+        var scalar = 1.5;
+        var unicorn = confetti.shapeFromText('🦄', { scalar });
 
         var defaults = {
           spread: 360,
@@ -888,8 +889,8 @@
           gravity: 0,
           decay: 0.96,
           startVelocity: 20,
-          scalar: 1.5,
-          shapes: [unicorn]
+          shapes: [unicorn],
+          scalar
         };
 
         function shoot() {
@@ -907,7 +908,7 @@
           confetti({
             ...defaults,
             particleCount: 10,
-            scalar: 0.75,
+            scalar: scalar / 2,
             shapes: ['circle']
           });
         }

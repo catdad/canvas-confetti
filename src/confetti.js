@@ -752,8 +752,10 @@
   }
 
   function shapeFromText(text, opts) {
-    var maxDesiredSize = 10;
-    var fontSize = (opts && opts.fontSize) || maxDesiredSize;
+    var scalar = (opts && opts.scalar) || 1;
+    // all other confetti are 10 pixels,
+    // so this pixel size is the de-facto 100% scale confetti
+    var fontSize = 10 * scalar;
     // see https://nolanlawson.com/2022/04/08/the-struggle-of-using-native-emoji-on-the-web/
     var fontFamily = (opts && opts.fontFamily) || '"Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", "system emoji", sans-serif';
     var font = '' + fontSize + 'px ' + fontFamily;
@@ -774,7 +776,7 @@
 
     ctx.fillText(text, 0, fontSize);
 
-    var scale = maxDesiredSize / fontSize;
+    var scale = 1 / scalar;
 
     return {
       type: 'bitmap',
