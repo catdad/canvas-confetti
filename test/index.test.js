@@ -761,8 +761,6 @@ test('[text] shapeFromText works with just a string parameter', async t => {
 test('[text] shapeFromText renders black text by default', async t => {
   const page = t.context.page = await fixturePage();
 
-  const fontFace = await loadFont(page);
-
   const { buffer } = await shapeFromTextImage(page, { text: 'pie', scalar: 3 });
 
   t.context.buffer = buffer;
@@ -773,8 +771,6 @@ test('[text] shapeFromText renders black text by default', async t => {
 
 test('[text] shapeFromText can optionally render text in a requested color', async t => {
   const page = t.context.page = await fixturePage();
-
-  const fontFace = await loadFont(page);
 
   const { buffer } = await shapeFromTextImage(page, { text: 'pie', color: '#00ff00', scalar: 3 });
 
