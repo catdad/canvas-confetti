@@ -77,6 +77,7 @@ const testPage = async () => {
 
   // eslint-disable-next-line no-console
   page.on('pageerror', err => console.error(err));
+  page.on('console', msg => console.log(msg.text()));
 
   return page;
 };
