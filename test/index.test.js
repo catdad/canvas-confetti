@@ -141,14 +141,14 @@ const base64ToBuffer = base64png => createBuffer(base64png.replace(/data:image\/
 async function confettiImage(page, opts = {}, funcName = 'confetti') {
   const serializedOpts = serializeConfettiOptions(opts);
   const base64png = await page.evaluate(`
-  ${funcName}(${serializedOpts});
-  new Promise(function (resolve, reject) {
-    setTimeout(function () {
-      var canvas = document.querySelector('canvas');
-      return resolve(canvas.toDataURL('image/png'));
-    }, 200);
-  });
-`);
+    ${funcName}(${serializedOpts});
+    new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        var canvas = document.querySelector('canvas');
+        return resolve(canvas.toDataURL('image/png'));
+      }, 200);
+    });
+  `);
 
   return base64ToBuffer(base64png);
 }
