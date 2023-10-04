@@ -672,14 +672,10 @@ const loadFont = async page => {
   return name;
 };
 
-test('[text] shapeFromText renders an emoji', async t => {
-  const page = t.context.page = await fixturePage();
-
-  const fontFace = await loadFont(page);
-
+const shapeFromTextImage = async (page, args) => {
   const { base64png, ...shape } = await page.evaluate(`
     Promise.resolve().then(async () => {
-      const { bitmap, ...shape } = confetti.shapeFromText({ text: '😀', fontFamily: '"${fontFace}"', scalar: 10 });
+      const { bitmap, ...shape } = confetti.shapeFromText(${JSON.stringify(args)});
 
       const canvas = document.createElement('canvas');
       canvas.width = bitmap.width;
@@ -694,8 +690,21 @@ test('[text] shapeFromText renders an emoji', async t => {
     });
   `);
 
-  t.context.buffer = base64ToBuffer(base64png);
-  t.context.image = await readImage(t.context.buffer);
+  return {
+    ...shape,
+    buffer: base64ToBuffer(base64png)
+  };
+};
+
+test('[text] shapeFromText renders an emoji', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const fontFace = await loadFont(page);
+
+  const { buffer, ...shape } = await shapeFromTextImage(page, { text: '😀', fontFamily: `"${fontFace}"`, scalar: 10 });
+
+  t.context.buffer = buffer;
+  t.context.image = await readImage(buffer);
 
   t.deepEqual({
     hash: t.context.image.hash(),
@@ -720,6 +729,32 @@ test('[text] shapeFromText works with just a string parameter', async t => {
   t.is(shape.type, 'bitmap');
   t.is(Array.isArray(shape.matrix), true);
   t.is(shape.matrix.length, 6);
+});
+
+test('[text] shapeFromText renders black text by default', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const fontFace = await loadFont(page);
+
+  const { buffer } = await shapeFromTextImage(page, { text: 'pie', scalar: 3 });
+
+  t.context.buffer = buffer;
+  t.context.image = await reduceImg(buffer);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#000000', '#ffffff']);
+});
+
+test('[text] shapeFromText can optionally render text in a requested color', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const fontFace = await loadFont(page);
+
+  const { buffer } = await shapeFromTextImage(page, { text: 'pie', color: '#00ff00', scalar: 3 });
+
+  t.context.buffer = buffer;
+  t.context.image = await reduceImg(buffer);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#00ff00', '#ffffff']);
 });
 
 /*
