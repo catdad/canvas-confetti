@@ -77,6 +77,7 @@ const testPage = async () => {
 
   // eslint-disable-next-line no-console
   page.on('pageerror', err => console.error(err));
+  // eslint-disable-next-line no-console
   page.on('console', msg => console.log(msg.text()));
 
   return page;
@@ -796,6 +797,7 @@ test('[text] shoots confetti of an emoji shape', async t => {
     scalar: 10,
     flat: 1,
     ticks: 1000,
+    // eslint-disable-next-line no-undef
     shapes: [() => confetti.shapeFromText({ text: '😀', fontFamily: __fontFamily, scalar: 10 })]
   });
   t.context.image = await readImage(t.context.buffer);
