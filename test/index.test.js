@@ -707,6 +707,21 @@ test('[text] shapeFromText renders an emoji', async t => {
   });
 });
 
+test('[text] shapeFromText works with just a string parameter', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const shape = await page.evaluate(`
+    confetti.shapeFromText("🍍");
+  `);
+
+  t.deepEqual(Object.keys(shape).sort(), ['type', 'bitmap', 'matrix'].sort());
+  // the actual contents will differ from OS to OS, so just validate
+  // the shape has some expected properties
+  t.is(shape.type, 'bitmap');
+  t.is(Array.isArray(shape.matrix), true);
+  t.is(shape.matrix.length, 6);
+});
+
 /*
  * Custom canvas
  */
