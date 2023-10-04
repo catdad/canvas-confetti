@@ -72,12 +72,12 @@ The `confetti` parameter is a single optional `options` object, which has the fo
   - `origin.x` _Number (default: 0.5)_: The `x` position on the page, with `0` being the left edge and `1` being the right edge.
   - `origin.y` _Number (default: 0.5)_: The `y` position on the page, with `0` being the top edge and `1` being the bottom edge.
 - `colors` _Array&lt;String&gt;_: An array of color strings, in the HEX format... you know, like `#bada55`.
-- `shapes` _Array&lt;String|Shape&gt;_: An array of shapes for the confetti. There are 3 built-in values of `square`, `circle`, and `star`. The default is to use both squares and circles in an even mix. To use a single shape, you can provide just one shape in the array, such as `['star']`. You can also change the mix by providing a value such as `['circle', 'circle', 'square']` to use two third circles and one third squares. You can also create your own shapes using the `confetti.shapeFromPath` helper method.
+- `shapes` _Array&lt;String|Shape&gt;_: An array of shapes for the confetti. There are 3 built-in values of `square`, `circle`, and `star`. The default is to use both squares and circles in an even mix. To use a single shape, you can provide just one shape in the array, such as `['star']`. You can also change the mix by providing a value such as `['circle', 'circle', 'square']` to use two third circles and one third squares. You can also create your own shapes using the `confetti.shapeFromPath` or `confetti.shapeFromText` helper methods.
 - `scalar` _Number (default: 1)_: Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
 - `zIndex` _Integer (default: 100)_: The confetti should be on top, after all. But if you have a crazy high page, you can set it even higher.
 - `disableForReducedMotion` _Boolean (default: false)_: Disables confetti entirely for users that [prefer reduced motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion). The `confetti()` promise will resolve immediately in this case.
 
-### `confetti.shapeFromPath({ path, matrix? })` -> `Shape`
+### `confetti.shapeFromPath({ path, matrix? })` → `Shape`
 
 This helper method lets you create a custom confetti shape using an [SVG Path string](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d). Any valid path should work, though there are a few caveats:
 - All paths will be filed. If you were hoping to have a stroke path, that is not implemented.
@@ -95,6 +95,31 @@ var triangle = confetti.shapeFromPath({ path: 'M0 10 L5 0 L10 10z' });
 
 confetti({
   shapes: [triangle]
+});
+```
+
+### `confetti.shapeFromText(text, { scalar?, color?, fontFamily? }?)` → `Shape`
+
+This is the highly anticipated feature to render emoji confetti! Use any standard unicode emoji. Or other text, but... maybe don't use other text.
+
+While any text should work, there are some caveats:
+- For flailing confetti, something that is mostly square works best. That is, a single character, especially an emoji.
+- Rather than rendering text every time a confetti is drawn, this helper actually rasterizes the text. Therefore, it does not scale well after it is created. If you plan to use the `scalar` value to scale your confetti, use the same `scalar` value here when creating the shape. This will make sure the confetti are not blurry.
+
+The options for this method are:
+- `text` _`String`_: the text to be rendered as a confetti
+- `options` _`Object, optional`_:
+  - `scalar` _`Number, optional, default: 1`_: a scale value relative to the default size. It matches the `scalar` value in the confetti options.
+  - `color` _`String, optional, default: #000000`_: the color used to render the text.
+  - `fontFamily` _`String, optional, default: native emoji`_: the font family name to use when rendering the text. The default follows [best practices for rendring the native OS emoji of the device](https://nolanlawson.com/2022/04/08/the-struggle-of-using-native-emoji-on-the-web/), falling back to `sans-serif`. If using a web font, make sure this [font is loaded](https://developer.mozilla.org/en-US/docs/Web/API/FontFace/load) before rendering your confetti.
+
+```javascript
+var scalar = 2;
+var pineapple = confetti.shapeFromText('🍍', { scalar });
+
+confetti({
+  shapes: [pineapple],
+  scalar
 });
 ```
 
