@@ -103,18 +103,44 @@ const createBuffer = (data, format) => {
   }
 };
 
+function serializeConfettiOptions(opts) {
+  let serializedOpts = opts ? JSON.stringify(opts) : '';
+
+  if (opts && opts.shapes && Array.isArray(opts.shapes)) {
+    const { shapes, ...rest } = opts;
+
+    const serializedShapes = shapes.map(shape => {
+      if (typeof shape === 'function') {
+        return `(${shape.toString()})()`;
+      }
+
+      return JSON.stringify(shape);
+    });
+
+    serializedOpts = `{
+      ...${JSON.stringify(rest)},
+      shapes: [${serializedShapes.join(', ')}]
+    }`;
+  }
+
+  return serializedOpts;
+}
+
 function confetti(opts, wait = false, funcName = 'confetti') {
+  const serializedOpts = serializeConfettiOptions(opts);
+
   return `
 ${wait ? '' : `${funcName}.Promise = null;`}
-${funcName}(${opts ? JSON.stringify(opts) : ''});
+${funcName}(${serializedOpts});
 `;
 }
 
 const base64ToBuffer = base64png => createBuffer(base64png.replace(/data:image\/png;base64,/, ''), 'base64');
 
 async function confettiImage(page, opts = {}, funcName = 'confetti') {
+  const serializedOpts = serializeConfettiOptions(opts);
   const base64png = await page.evaluate(`
-  ${funcName}(${JSON.stringify(opts)});
+  ${funcName}(${serializedOpts});
   new Promise(function (resolve, reject) {
     setTimeout(function () {
       var canvas = document.querySelector('canvas');
@@ -755,6 +781,29 @@ test('[text] shapeFromText can optionally render text in a requested color', asy
   t.context.image = await reduceImg(buffer);
 
   t.deepEqual(await uniqueColors(t.context.image), ['#00ff00', '#ffffff']);
+});
+
+// this test renders a black canvas in a headless browser
+// but works fine when it is not headless
+test.skip('[text] shoots confetti of an emoji shape', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const fontFace = await loadFont(page);
+  await page.evaluate(`window.__fontFamily = '"${fontFace}"'`);
+
+  // these parameters should create an image
+  // that is the same every time
+  t.context.buffer = await confettiImage(page, {
+    startVelocity: 0,
+    gravity: 0,
+    scalar: 10,
+    flat: 1,
+    ticks: 1000,
+    shapes: [() => confetti.shapeFromText({ text: '😀', fontFamily: __fontFamily, scalar: 10 })]
+  });
+  t.context.image = await readImage(t.context.buffer);
+
+  t.is(t.context.image.hash(), '9CppCqpCmtC');
 });
 
 /*
