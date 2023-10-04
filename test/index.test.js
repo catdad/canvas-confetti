@@ -110,6 +110,8 @@ ${funcName}(${opts ? JSON.stringify(opts) : ''});
 `;
 }
 
+const base64ToBuffer = base64png => createBuffer(base64png.replace(/data:image\/png;base64,/, ''), 'base64');
+
 async function confettiImage(page, opts = {}, funcName = 'confetti') {
   const base64png = await page.evaluate(`
   ${funcName}(${JSON.stringify(opts)});
@@ -121,8 +123,7 @@ async function confettiImage(page, opts = {}, funcName = 'confetti') {
   });
 `);
 
-  const imageData = base64png.replace(/data:image\/png;base64,/, '');
-  return createBuffer(imageData, 'base64');
+  return base64ToBuffer(base64png);
 }
 
 function hex(n) {
@@ -647,6 +648,66 @@ test('[path] shoots confetti of a custom shape', async t => {
 });
 
 /*
+ * Shape from text
+ */
+
+const loadFont = async page => {
+  // Noto Color Emoji
+  const url = 'https://fonts.gstatic.com/s/notocoloremoji/v25/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabsE4tq3luCC7p-aXxcn.9.woff2';
+  const name = 'Web Font';
+
+  await page.evaluate(`
+    Promise.resolve().then(async () => {
+      const fontFile = new FontFace(
+        "${name}",
+        "url(${url})",
+      );
+
+      document.fonts.add(fontFile);
+
+      await fontFile.load();
+    });
+  `, );
+
+  return name;
+};
+
+test('[text] shapeFromText renders an emoji', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const fontFace = await loadFont(page);
+
+  const { base64png, ...shape } = await page.evaluate(`
+    Promise.resolve().then(async () => {
+      const { bitmap, ...shape } = confetti.shapeFromText({ text: '😀', fontFamily: '"${fontFace}"', scalar: 10 });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
+
+      return {
+        ...shape,
+        base64png: canvas.toDataURL('image/png')
+      };
+    });
+  `);
+
+  t.context.buffer = base64ToBuffer(base64png);
+  t.context.image = await readImage(t.context.buffer);
+
+  t.deepEqual({
+    hash: t.context.image.hash(),
+    ...shape
+  }, {
+    type: 'bitmap',
+    matrix: [ 0.1, 0, 0, 0.1, -6.25, -5.8500000000000005 ],
+    hash: '8647FpWTCBH'
+  });
+});
+
+/*
  * Custom canvas
  */
 
@@ -1070,4 +1131,10 @@ test('[esm] exposed confetti method has a `shapeFromPath` property', async t => 
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   t.is(await page.evaluate(`typeof confettiAlias.shapeFromPath`), 'function');
+});
+
+test('[esm] exposed confetti method has a `shapeFromText` property', async t => {
+  const page = t.context.page = await fixturePage('fixtures/page.module.html');
+
+  t.is(await page.evaluate(`typeof confettiAlias.shapeFromText`), 'function');
 });

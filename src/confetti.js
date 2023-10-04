@@ -751,7 +751,7 @@
     };
   }
 
-  function shapeFromText(textData, text, opts) {
+  function shapeFromText(textData) {
     var text,
         scalar = 1,
         color = '#000000',
