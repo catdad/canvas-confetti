@@ -25,3 +25,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') && github.event_name != 'pull_request'
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: test-screenshots
+          path: shots/
