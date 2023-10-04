@@ -751,15 +751,26 @@
     };
   }
 
-  function shapeFromText(text, opts) {
-    var scalar = (opts && opts.scalar) || 1;
+  function shapeFromText(textData, text, opts) {
+    var text,
+        scalar = 1,
+        color = '#000000',
+        // see https://nolanlawson.com/2022/04/08/the-struggle-of-using-native-emoji-on-the-web/
+        fontFamily = '"Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", "system emoji", sans-serif';
+
+    if (typeof textData === 'string') {
+      text = textData;
+    } else {
+      text = textData.text;
+      scalar = 'scalar' in textData ? textData.scalar : scalar;
+      fontFamily = 'fontFamily' in textData ? textData.fontFamily : fontFamily;
+      color = 'color' in textData ? textData.color : color;
+    }
+
     // all other confetti are 10 pixels,
     // so this pixel size is the de-facto 100% scale confetti
     var fontSize = 10 * scalar;
-    // see https://nolanlawson.com/2022/04/08/the-struggle-of-using-native-emoji-on-the-web/
-    var fontFamily = (opts && opts.fontFamily) || '"Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", "system emoji", sans-serif';
     var font = '' + fontSize + 'px ' + fontFamily;
-    var color = (opts && opts.color) || '#000000';
 
     var canvas = new OffscreenCanvas(fontSize, fontSize);
     var ctx = canvas.getContext('2d');
