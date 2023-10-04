@@ -782,7 +782,7 @@ test('[text] shapeFromText can optionally render text in a requested color', asy
 
 // this test renders a black canvas in a headless browser
 // but works fine when it is not headless
-test.skip('[text] shoots confetti of an emoji shape', async t => {
+test('[text] shoots confetti of an emoji shape', async t => {
   const page = t.context.page = await fixturePage();
 
   const fontFace = await loadFont(page);
