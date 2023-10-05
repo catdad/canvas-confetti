@@ -363,9 +363,6 @@
       var width = fetti.shape.bitmap.width * fetti.scalar;
       var height = fetti.shape.bitmap.height * fetti.scalar;
 
-      // TODO this doesn't look great
-      // I think we are not setting the origin correctly
-      // requires that we apply fetti.shape.matrix
       var matrix = new DOMMatrix([
         Math.cos(rotation) * scaleX,
         Math.sin(rotation) * scaleX,
