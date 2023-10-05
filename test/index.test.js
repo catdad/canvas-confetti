@@ -18,8 +18,7 @@ const height = 500;
 const args = process.env.CI ? [
   '--no-sandbox', '--disable-setuid-sandbox'
 ] : [];
-const headless = process.env.CI ? true :
-  process.env['CONFETTI_SHOW'] ? false : true;
+const headless = (process.env.CI || !('CONFETTI_SHOW' in process.env)) ? '--headless=new' : '';
 
 const mkdir = async (dir) => {
   return promisify(fs.mkdir)(dir)
@@ -61,8 +60,7 @@ const testBrowser = (() => {
     }
 
     return puppeteer.launch({
-      headless,
-      args: [ '--disable-background-timer-throttling' ].concat(args)
+      args: [ '--disable-background-timer-throttling', headless ].concat(args)
     }).then(thisBrowser => {
       browser = thisBrowser;
       return Promise.resolve(browser);
@@ -784,7 +782,7 @@ test('[text] shapeFromText can optionally render text in a requested color', asy
 // this test renders a black canvas in a headless browser
 // but works fine when it is not headless
 // eslint-disable-next-line ava/no-skip-test
-(headless ? test.skip : test)('[text] shoots confetti of an emoji shape', async t => {
+test('[text] shoots confetti of an emoji shape', async t => {
   const page = t.context.page = await fixturePage();
 
   const fontFace = await loadFont(page);
