@@ -8,8 +8,9 @@
   <meta name="keywords" content="canvas,confetti,component,module,animation,javascript,catdad">
 
   <meta name="theme-color" content="#393939">
+  <link id="favicon" rel="shortcut icon" type="image/png" />
 
-  <title>🎊</title>
+  <title>canvas confetti</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
 
@@ -971,6 +972,21 @@
         editors.push(editor);
       });
     };
+  </script>
+
+  <script>
+    // render favicon live, because why not
+    addEventListener("load", (event) => {
+      const image = confetti.shapeFromText('🎊', { scalar: 512/10 });
+      const canvas = new OffscreenCanvas(image.bitmap.width, image.bitmap.height);
+      const ctx = canvas.getContext('bitmaprenderer');
+      ctx.transferFromImageBitmap(image.bitmap);
+
+      canvas.convertToBlob().then(blob => {
+        const icon = document.getElementById('favicon');
+        icon.setAttribute('href', URL.createObjectURL(blob));
+      });
+    });
   </script>
 
   <script src="/analytics.js" async></script>
