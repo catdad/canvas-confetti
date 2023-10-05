@@ -1,6 +1,6 @@
 {
   "name": "canvas-confetti",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "performant confetti animation in the browser",
   "main": "src/confetti.js",
   "module": "dist/confetti.module.mjs",
@@ -34,7 +34,7 @@
     "eslint": "^4.16.0",
     "eslint-plugin-ava": "9.0.0",
     "jimp": "^0.2.28",
-    "puppeteer": "^1.0.0",
+    "puppeteer": "^19.11.1",
     "rootrequire": "^1.0.0",
     "send": "^0.16.1",
     "terser": "^3.14.1"

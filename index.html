@@ -8,8 +8,9 @@
   <meta name="keywords" content="canvas,confetti,component,module,animation,javascript,catdad">
 
   <meta name="theme-color" content="#393939">
+  <link id="favicon" rel="shortcut icon" type="image/png" />
 
-  <title>🎊</title>
+  <title>canvas confetti</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
 
@@ -537,6 +538,30 @@
   </div>
 
   <div class="container">
+    <div class="group" data-name="emoji">
+      <div class="flex-rows">
+        <div class="left">
+          <h2><a href="#emoji" id="emoji" class="anchor">Emoji</a></h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            Don't know any custom shapes? That's okay, just use emoji instead! That's what they
+            are for anyway. I mean... why do they even exist if we weren't supposed to make
+            confetti out of them? Think about it.
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
     <div class="group" data-name="custom">
       <div class="flex-rows">
         <div class="left">
@@ -856,6 +881,44 @@
           shapes: [ heart ],
           colors: ['#f93963', '#a10864', '#ee0b93']
         });
+      },
+      emoji: function () {
+        var scalar = 2;
+        var unicorn = confetti.shapeFromText({ text: '🦄', scalar });
+
+        var defaults = {
+          spread: 360,
+          ticks: 60,
+          gravity: 0,
+          decay: 0.96,
+          startVelocity: 20,
+          shapes: [unicorn],
+          scalar
+        };
+
+        function shoot() {
+          confetti({
+            ...defaults,
+            particleCount: 30
+          });
+
+          confetti({
+            ...defaults,
+            particleCount: 5,
+            flat: true
+          });
+
+          confetti({
+            ...defaults,
+            particleCount: 15,
+            scalar: scalar / 2,
+            shapes: ['circle']
+          });
+        }
+
+        setTimeout(shoot, 0);
+        setTimeout(shoot, 100);
+        setTimeout(shoot, 200);
       }
     };
 
@@ -909,6 +972,21 @@
         editors.push(editor);
       });
     };
+  </script>
+
+  <script>
+    // render favicon live, because why not
+    addEventListener("load", (event) => {
+      const image = confetti.shapeFromText('🎊', { scalar: 512/10 });
+      const canvas = new OffscreenCanvas(image.bitmap.width, image.bitmap.height);
+      const ctx = canvas.getContext('bitmaprenderer');
+      ctx.transferFromImageBitmap(image.bitmap);
+
+      canvas.convertToBlob().then(blob => {
+        const icon = document.getElementById('favicon');
+        icon.setAttribute('href', URL.createObjectURL(blob));
+      });
+    });
   </script>
 
   <script src="/analytics.js" async></script>

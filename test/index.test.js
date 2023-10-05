@@ -77,6 +77,8 @@ const testPage = async () => {
 
   // eslint-disable-next-line no-console
   page.on('pageerror', err => console.error(err));
+  // eslint-disable-next-line no-console
+  page.on('console', msg => console.log(msg.text()));
 
   return page;
 };
@@ -103,26 +105,53 @@ const createBuffer = (data, format) => {
   }
 };
 
+function serializeConfettiOptions(opts) {
+  let serializedOpts = opts ? JSON.stringify(opts) : '';
+
+  if (opts && opts.shapes && Array.isArray(opts.shapes)) {
+    const { shapes, ...rest } = opts;
+
+    const serializedShapes = shapes.map(shape => {
+      if (typeof shape === 'function') {
+        return `(${shape.toString()})()`;
+      }
+
+      return JSON.stringify(shape);
+    });
+
+    serializedOpts = `{
+      ...${JSON.stringify(rest)},
+      shapes: [${serializedShapes.join(', ')}]
+    }`;
+  }
+
+  return serializedOpts;
+}
+
 function confetti(opts, wait = false, funcName = 'confetti') {
+  const serializedOpts = serializeConfettiOptions(opts);
+
   return `
 ${wait ? '' : `${funcName}.Promise = null;`}
-${funcName}(${opts ? JSON.stringify(opts) : ''});
+${funcName}(${serializedOpts});
 `;
 }
 
-async function confettiImage(page, opts = {}, funcName = 'confetti') {
-  const base64png = await page.evaluate(`
-  ${funcName}(${JSON.stringify(opts)});
-  new Promise(function (resolve, reject) {
-    setTimeout(function () {
-      var canvas = document.querySelector('canvas');
-      return resolve(canvas.toDataURL('image/png'));
-    }, 200);
-  });
-`);
+const base64ToBuffer = base64png => createBuffer(base64png.replace(/data:image\/png;base64,/, ''), 'base64');
 
-  const imageData = base64png.replace(/data:image\/png;base64,/, '');
-  return createBuffer(imageData, 'base64');
+async function confettiImage(page, opts = {}, funcName = 'confetti') {
+  const serializedOpts = serializeConfettiOptions(opts);
+  const base64png = await page.evaluate(`
+    ${funcName}(${serializedOpts});
+    new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        var canvas = document.querySelector('canvas');
+        return resolve(canvas.toDataURL('image/png'));
+      }, 200);
+    });
+  `);
+
+  return base64ToBuffer(base64png);
 }
 
 function hex(n) {
@@ -647,6 +676,137 @@ test('[path] shoots confetti of a custom shape', async t => {
 });
 
 /*
+ * Shape from text
+ */
+
+const loadFont = async page => {
+  // Noto Color Emoji
+  const url = 'https://fonts.gstatic.com/s/notocoloremoji/v25/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabsE4tq3luCC7p-aXxcn.9.woff2';
+  const name = 'Web Font';
+
+  await page.evaluate(`
+    Promise.resolve().then(async () => {
+      const fontFile = new FontFace(
+        "${name}",
+        "url(${url})",
+      );
+
+      document.fonts.add(fontFile);
+
+      await fontFile.load();
+    });
+  `, );
+
+  return name;
+};
+
+const shapeFromTextImage = async (page, args) => {
+  const { base64png, ...shape } = await page.evaluate(`
+    Promise.resolve().then(async () => {
+      const { bitmap, ...shape } = confetti.shapeFromText(${JSON.stringify(args)});
+
+      const canvas = document.createElement('canvas');
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
+
+      return {
+        ...shape,
+        base64png: canvas.toDataURL('image/png')
+      };
+    });
+  `);
+
+  return {
+    ...shape,
+    buffer: base64ToBuffer(base64png)
+  };
+};
+
+test('[text] shapeFromText renders an emoji', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const fontFace = await loadFont(page);
+
+  const { buffer, ...shape } = await shapeFromTextImage(page, { text: '😀', fontFamily: `"${fontFace}"`, scalar: 10 });
+
+  t.context.buffer = buffer;
+  t.context.image = await readImage(buffer);
+
+  t.deepEqual({
+    hash: t.context.image.hash(),
+    ...shape
+  }, {
+    type: 'bitmap',
+    matrix: [ 0.1, 0, 0, 0.1, -6.25, -5.8500000000000005 ],
+    hash: '8647FpWTCBH'
+  });
+});
+
+test('[text] shapeFromText works with just a string parameter', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const shape = await page.evaluate(`
+    confetti.shapeFromText("🍍");
+  `);
+
+  t.deepEqual(Object.keys(shape).sort(), ['type', 'bitmap', 'matrix'].sort());
+  // the actual contents will differ from OS to OS, so just validate
+  // the shape has some expected properties
+  t.is(shape.type, 'bitmap');
+  t.is(Array.isArray(shape.matrix), true);
+  t.is(shape.matrix.length, 6);
+});
+
+test('[text] shapeFromText renders black text by default', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const { buffer } = await shapeFromTextImage(page, { text: 'pie', scalar: 3 });
+
+  t.context.buffer = buffer;
+  t.context.image = await reduceImg(buffer);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#000000', '#ffffff']);
+});
+
+test('[text] shapeFromText can optionally render text in a requested color', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const { buffer } = await shapeFromTextImage(page, { text: 'pie', color: '#00ff00', scalar: 3 });
+
+  t.context.buffer = buffer;
+  t.context.image = await reduceImg(buffer);
+
+  t.deepEqual(await uniqueColors(t.context.image), ['#00ff00', '#ffffff']);
+});
+
+// this test renders a black canvas in a headless browser
+// but works fine when it is not headless
+// eslint-disable-next-line ava/no-skip-test
+(headless ? test.skip : test)('[text] shoots confetti of an emoji shape', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const fontFace = await loadFont(page);
+  await page.evaluate(`window.__fontFamily = '"${fontFace}"'`);
+
+  // these parameters should create an image
+  // that is the same every time
+  t.context.buffer = await confettiImage(page, {
+    startVelocity: 0,
+    gravity: 0,
+    scalar: 10,
+    flat: 1,
+    ticks: 1000,
+    // eslint-disable-next-line no-undef
+    shapes: [() => confetti.shapeFromText({ text: '😀', fontFamily: __fontFamily, scalar: 10 })]
+  });
+  t.context.image = await readImage(t.context.buffer);
+
+  t.is(t.context.image.hash(), '9CppCqpCmtC');
+});
+
+/*
  * Custom canvas
  */
 
@@ -1070,4 +1230,10 @@ test('[esm] exposed confetti method has a `shapeFromPath` property', async t => 
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   t.is(await page.evaluate(`typeof confettiAlias.shapeFromPath`), 'function');
+});
+
+test('[esm] exposed confetti method has a `shapeFromText` property', async t => {
+  const page = t.context.page = await fixturePage('fixtures/page.module.html');
+
+  t.is(await page.evaluate(`typeof confettiAlias.shapeFromText`), 'function');
 });
