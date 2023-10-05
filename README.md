@@ -98,7 +98,7 @@ confetti({
 });
 ```
 
-### `confetti.shapeFromText(text, { scalar?, color?, fontFamily? }?)` → `Shape`
+### `confetti.shapeFromText({ text, scalar?, color?, fontFamily? })` → `Shape`
 
 This is the highly anticipated feature to render emoji confetti! Use any standard unicode emoji. Or other text, but... maybe don't use other text.
 
@@ -107,7 +107,7 @@ While any text should work, there are some caveats:
 - Rather than rendering text every time a confetti is drawn, this helper actually rasterizes the text. Therefore, it does not scale well after it is created. If you plan to use the `scalar` value to scale your confetti, use the same `scalar` value here when creating the shape. This will make sure the confetti are not blurry.
 
 The options for this method are:
-- `options` _`Object, optional`_:
+- `options` _`Object`_:
   - `text` _`String`_: the text to be rendered as a confetti. If you can't make up your mind, I suggest "🐈".
   - `scalar` _`Number, optional, default: 1`_: a scale value relative to the default size. It matches the `scalar` value in the confetti options.
   - `color` _`String, optional, default: #000000`_: the color used to render the text.
