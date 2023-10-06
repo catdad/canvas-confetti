@@ -2,6 +2,7 @@ const path = require('path');
 const http = require('http');
 const send = require('send');
 const root = require('rootrequire');
+const { networkInterfaces } = require('os');
 
 const PORT = 9001;
 
@@ -25,7 +26,13 @@ http.createServer(function (req, res) {
 
   send(req, file).pipe(res);
 }).listen(PORT, () => {
-  console.log(`listening at http://localhost:${PORT}`);
+  console.log('listening at:');
+  console.log(`  http://localhost:${PORT}`);
+
+  Object.values(networkInterfaces())
+    .reduce((memo, value) => [...memo, ...value], [])
+    .filter(value => value.family === 'IPv4')
+    .forEach(({ address }) => console.log(`  http://${address}:${PORT}`));
 });
 
 
