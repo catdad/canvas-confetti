@@ -14,6 +14,11 @@
 
   var canUsePaths = typeof Path2D === 'function' && typeof DOMMatrix === 'function';
   var canDrawBitmap = (function () {
+    // this mostly supports ssr
+    if (!global.OffscreenCanvas) {
+      return false;
+    }
+
     var canvas = new OffscreenCanvas(1, 1);
     var ctx = canvas.getContext('2d');
     ctx.fillRect(0, 0, 1, 1);
