@@ -1,3 +1,5 @@
+/* globals Map */
+
 (function main(global, module, isWorker, workerSize) {
   var canUseWorker = !!(
     global.Worker &&
