@@ -1,3 +1,5 @@
+/* globals Map */
+
 (function main(global, module, isWorker, workerSize) {
   var canUseWorker = !!(
     global.Worker &&
@@ -11,6 +13,25 @@
     global.URL.createObjectURL);
 
   var canUsePaths = typeof Path2D === 'function' && typeof DOMMatrix === 'function';
+  var canDrawBitmap = (function () {
+    // this mostly supports ssr
+    if (!global.OffscreenCanvas) {
+      return false;
+    }
+
+    var canvas = new OffscreenCanvas(1, 1);
+    var ctx = canvas.getContext('2d');
+    ctx.fillRect(0, 0, 1, 1);
+    var bitmap = canvas.transferToImageBitmap();
+
+    try {
+      ctx.createPattern(bitmap, 'no-repeat');
+    } catch (e) {
+      return false;
+    }
+
+    return true;
+  })();
 
   function noop() {}
 
@@ -28,6 +49,36 @@
 
     return null;
   }
+
+  var bitmapMapper = (function (skipTransform, map) {
+    // see https://github.com/catdad/canvas-confetti/issues/209
+    // creating canvases is actually pretty expensive, so we should create a
+    // 1:1 map for bitmap:canvas, so that we can animate the confetti in
+    // a performant manner, but also not store them forever so that we don't
+    // have a memory leak
+    return {
+      transform: function(bitmap) {
+        if (skipTransform) {
+          return bitmap;
+        }
+
+        if (map.has(bitmap)) {
+          return map.get(bitmap);
+        }
+
+        var canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(bitmap, 0, 0);
+
+        map.set(bitmap, canvas);
+
+        return canvas;
+      },
+      clear: function () {
+        map.clear();
+      }
+    };
+  })(canDrawBitmap, new Map());
 
   var raf = (function () {
     var TIME = Math.floor(1000 / 60);
@@ -101,6 +152,9 @@
             worker.removeEventListener('message', workerDone);
 
             prom = null;
+
+            bitmapMapper.clear();
+
             done();
             resolve();
           }
@@ -375,7 +429,7 @@
       // apply the transform matrix from the confetti shape
       matrix.multiplySelf(new DOMMatrix(fetti.shape.matrix));
 
-      var pattern = context.createPattern(fetti.shape.bitmap, 'no-repeat');
+      var pattern = context.createPattern(bitmapMapper.transform(fetti.shape.bitmap), 'no-repeat');
       pattern.setTransform(matrix);
 
       context.globalAlpha = (1 - progress);
@@ -435,6 +489,7 @@
         animationFrame = destroy = null;
 
         context.clearRect(0, 0, size.width, size.height);
+        bitmapMapper.clear();
 
         done();
         resolve();
