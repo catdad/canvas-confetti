@@ -13,12 +13,15 @@ const PORT = 9999;
 const width = 500;
 const height = 500;
 
+const args = ['--disable-background-timer-throttling'];
+
 // Docker-based CIs need this disabled
 // https://github.com/Quramy/puppeteer-example/blob/c28a5aa52fe3968c2d6cfca362ec28c36963be26/README.md#with-docker-based-ci-services
-const args = process.env.CI ? [
-  '--no-sandbox', '--disable-setuid-sandbox'
-] : [];
-const headless = (process.env.CI || !('CONFETTI_SHOW' in process.env)) ? '--headless=new' : '';
+if (process.env.CI) {
+  args.push('--no-sandbox', '--disable-setuid-sandbox');
+}
+
+const headless = (process.env.CI || !('CONFETTI_SHOW' in process.env)) ? 'new' : false;
 
 const mkdir = async (dir) => {
   return promisify(fs.mkdir)(dir)
@@ -60,7 +63,8 @@ const testBrowser = (() => {
     }
 
     return puppeteer.launch({
-      args: [ '--disable-background-timer-throttling', headless ].concat(args)
+      headless,
+      args
     }).then(thisBrowser => {
       browser = thisBrowser;
       return Promise.resolve(browser);
