@@ -36,7 +36,7 @@
         return fontFile.load();
       }));
 
-      return fontName;
+      return `"${fontName}"`;
     };
 
     const connectTest = ({ fontFamily }) => {
@@ -87,7 +87,7 @@
 
     const drawTransformedEmoji = async ({ fontFamily, canvas, ctx, offsetX = 0, offsetY = 0 }) => {
       ['🦄', '🍑', '🤣', '🐈'].forEach((text, idx) => {
-        const shape1 = confetti.shapeFromText({ text, scalar: 1, fontFamily});
+        const shape1 = confetti.shapeFromText({ text, scalar: 1, fontFamily });
         const shape2 = confetti.shapeFromText({ text, scalar: 2, fontFamily });
         const shape5 = confetti.shapeFromText({ text, scalar: 5, fontFamily });
 
@@ -163,7 +163,10 @@
     };
 
     Promise.resolve().then(async () => {
+      // const fontFamily = null;
       const fontFamily = await loadFonts();
+      console.log('loaded font:', fontFamily);
+
       const canvas = document.querySelector('#debug-canvas');
       const ctx = canvas.getContext('2d');
 
