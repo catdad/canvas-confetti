@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug emoji confetti</title>
+</head>
+<body>
+  <script>
+    // this page is a demo that is not built, so fudge the module.exports support
+    // define a global `module` so that the actual source file can use it
+    window.module = {};
+  </script>
+  <script src="../src/confetti.js"></script>
+  <script>
+    // define the `module.exports` as the `confetti` global, the way that the
+    // cdn distributed file would
+    window.confetti = module.exports;
+  </script>
+
+  <p><button id="test-confetti">Emoji confetti test</button></p>
+  <canvas id="debug-canvas" width="700" height="500" style="outline: 1px solid red"></canvas>
+
+  <script>
+    const loadFonts = async () => {
+      const fontName = 'Noto Color Emoji';
+
+      await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => {
+        const fontFile = new FontFace(
+          fontName,
+          `url(https://fonts.gstatic.com/s/notocoloremoji/v25/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabsE4tq3luCC7p-aXxcn.${n}.woff2)`
+        );
+
+        document.fonts.add(fontFile);
+
+        return fontFile.load();
+      }));
+
+      return fontName;
+    };
+
+    const connectTest = ({ fontFamily }) => {
+      const button = document.getElementById('test-confetti');
+
+      const scalar = 2;
+
+      // make this a getter so that the shapes don't initialize on page load
+      const getShapes = ((shapes) => () => {
+        if (shapes.length) {
+          return shapes;
+        }
+
+        shapes = [
+          ['🦄', '🍑', '🤣', '🐈', 'bg'].map(text => confetti.shapeFromText({ text, scalar })),
+          ['🦄', '🍑', '🤣', '🐈', 'bg'].map(text => confetti.shapeFromText({ text, scalar, fontFamily }))
+        ];
+
+        return shapes;
+      })([]);
+
+      button.onclick = () => {
+        const [shapesDefault, shapesFont] = getShapes();
+
+        confetti({
+          particleCount: 10,
+          shapes: shapesDefault,
+          scalar,
+          origin: { y: 0.7, x: 0.25 }
+        });
+        confetti({
+          particleCount: 10,
+          shapes: shapesFont,
+          scalar,
+          origin: { y: 0.7, x: 0.75 }
+        });
+      };
+    };
+
+    const drawBitmapToCanvas = (bitmap) => {
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      const ctx = canvas.getContext('2d');
+
+      ctx.drawImage(bitmap, 0, 0);
+
+      return canvas;
+    };
+
+    const drawTransformedEmoji = async ({ fontFamily, canvas, ctx }) => {
+      ['🦄', '🍑', '🤣', '🐈'].forEach((text, idx) => {
+        const shape1 = confetti.shapeFromText({ text, scalar: 1, fontFamily});
+        const shape2 = confetti.shapeFromText({ text, scalar: 2, fontFamily });
+        const shape5 = confetti.shapeFromText({ text, scalar: 5, fontFamily });
+
+        const y = idx * 100 + 50;
+
+        ctx.drawImage(shape1.bitmap, 0, y);
+        ctx.drawImage(shape2.bitmap, 100, y);
+        ctx.drawImage(shape5.bitmap, 200, y);
+
+        [[shape1, 1], [shape2, 2], [shape5, 5]].forEach(([shape, scale], j) => {
+          const x = 300 + (j * 100);
+
+          const rotation = 3.2;
+          const scaleX = scale * 0.8;
+          const scaleY = scale * 1.4;
+
+          var matrix = new DOMMatrix([
+            Math.cos(rotation) * scaleX,
+            Math.sin(rotation) * scaleX,
+            -Math.sin(rotation) * scaleY,
+            Math.cos(rotation) * scaleY,
+            x,
+            y
+          ]);
+          matrix.multiplySelf(new DOMMatrix(shape.matrix));
+
+          const pattern = (() => {
+            try {
+              // most browsers support this, it's spec
+              return ctx.createPattern(shape.bitmap, 'no-repeat');
+            } catch (e) {
+              // safari doesn't, because of course it doesn't
+              // so draw the bitmap to a canvas first and create a
+              // pattern from that canvas
+              console.log('failed to create bitmap pattern:', e);
+              return ctx.createPattern(drawBitmapToCanvas(shape.bitmap), 'no-repeat');
+            }
+          })();
+
+          pattern.setTransform(matrix);
+
+          ctx.fillStyle = pattern;
+          ctx.fillRect(x - 100, y - 100, 300, 300);
+        });
+      });
+    };
+
+    const drawDebugEmoji = async ({ fontFamily, canvas, ctx, offsetX = 10, offsetY = 10 }) => {
+      const text = '🦄';
+
+      const draw = ({ offsetX, offsetY, fontFamily }) => {
+        const opts = { text, scalar: 15 };
+
+        if (fontFamily) {
+          opts.fontFamily = fontFamily;
+        }
+
+        const shape = confetti.shapeFromText(opts);
+
+        ctx.drawImage(shape.bitmap, offsetX, offsetY);
+
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'orange';
+        ctx.strokeRect(offsetX, offsetY, shape.bitmap.width, shape.bitmap.height);
+      };
+
+      draw({ offsetX: 10, offsetY: 10 });
+      draw({ offsetX: 250, offsetY: 10, fontFamily });
+    };
+
+    Promise.resolve().then(async () => {
+      const fontFamily = await loadFonts();
+      const canvas = document.querySelector('#debug-canvas');
+      const ctx = canvas.getContext('2d');
+
+      connectTest({ fontFamily, canvas, ctx });
+
+      // await drawTransformedEmoji({ fontFamily, canvas, ctx });
+      await drawDebugEmoji({ fontFamily, canvas, ctx });
+    });
+  </script>
+</body>
+</html>
