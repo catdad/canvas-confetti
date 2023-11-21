@@ -808,7 +808,7 @@
         scalar = 1,
         color = '#000000',
         // see https://nolanlawson.com/2022/04/08/the-struggle-of-using-native-emoji-on-the-web/
-        fontFamily = '"Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", "system emoji", sans-serif';
+        fontFamily = '"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", "Twemoji Mozilla", "system emoji", sans-serif';
 
     if (typeof textData === 'string') {
       text = textData;
