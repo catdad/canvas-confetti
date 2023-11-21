@@ -165,7 +165,6 @@
     Promise.resolve().then(async () => {
       // const fontFamily = null;
       const fontFamily = await loadFonts();
-      console.log('loaded font:', fontFamily);
 
       const canvas = document.querySelector('#debug-canvas');
       const ctx = canvas.getContext('2d');
@@ -174,6 +173,8 @@
 
       await drawDebugEmoji({ fontFamily, canvas, ctx });
       await drawTransformedEmoji({ fontFamily, canvas, ctx, offsetY: 200 });
+    }).catch(e => {
+      console.log('something went wrong:', e);
     });
   </script>
 </body>
