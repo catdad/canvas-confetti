@@ -829,15 +829,21 @@
 
     ctx.font = font;
     var size = ctx.measureText(text);
-    var width = Math.floor(size.width);
-    var height = Math.floor(size.fontBoundingBoxAscent + size.fontBoundingBoxDescent);
+    var width = Math.ceil(size.actualBoundingBoxRight + size.actualBoundingBoxLeft);
+    var height = Math.ceil(size.actualBoundingBoxAscent + size.actualBoundingBoxDescent);
+
+    var padding = 2;
+    var x = size.actualBoundingBoxLeft + padding;
+    var y = size.actualBoundingBoxAscent + padding;
+    width += padding + padding;
+    height += padding + padding;
 
     canvas = new OffscreenCanvas(width, height);
     ctx = canvas.getContext('2d');
     ctx.font = font;
     ctx.fillStyle = color;
 
-    ctx.fillText(text, 0, fontSize);
+    ctx.fillText(text, x, y);
 
     var scale = 1 / scalar;
 
