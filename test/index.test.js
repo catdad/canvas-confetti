@@ -739,8 +739,8 @@ test('[text] shapeFromText renders an emoji', async t => {
     ...shape
   }, {
     type: 'bitmap',
-    matrix: [ 0.1, 0, 0, 0.1, -6.25, -5.8500000000000005 ],
-    hash: '8647FpWTCBH'
+    matrix: [ 0.1, 0, 0, 0.1, -5.7, -5.550000000000001 ],
+    hash: 'c4y5z8b83AC'
   });
 });
 
