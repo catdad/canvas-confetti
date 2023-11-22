@@ -24,12 +24,16 @@
 
   <script>
     const loadFonts = async () => {
+      const isSafari = navigator.vendor === 'Apple Computer, Inc.';
       const fontName = 'Noto Color Emoji';
 
       await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => {
+        const safari = `url(https://fonts.gstatic.com/s/notocoloremoji/v25/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.${n}.woff2)`;
+        const realBrowser = `url(https://fonts.gstatic.com/s/notocoloremoji/v25/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabsE4tq3luCC7p-aXxcn.${n}.woff2)`;
+
         const fontFile = new FontFace(
           fontName,
-          `url(https://fonts.gstatic.com/s/notocoloremoji/v25/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabsE4tq3luCC7p-aXxcn.${n}.woff2)`
+          isSafari ? safari : realBrowser
         );
 
         document.fonts.add(fontFile);
@@ -43,7 +47,7 @@
     const connectTest = ({ fontFamily }) => {
       const button = document.getElementById('test-confetti');
 
-      const scalar = 2;
+      const scalar = 3;
 
       // make this a getter so that the shapes don't initialize on page load
       const getShapes = ((shapes) => () => {
