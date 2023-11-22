@@ -20,6 +20,7 @@
 
   <p><button id="test-confetti">Emoji confetti test</button></p>
   <canvas id="debug-canvas" width="700" height="700" style="outline: 1px solid red"></canvas>
+  <p id="test-text"></p>
 
   <script>
     const loadFonts = async () => {
@@ -162,12 +163,30 @@
       return Math.max(height1, height2);
     };
 
+    const renderTestText = ({ fontFamily }) => {
+      const fontSize = '20px';
+      const text = document.getElementById('test-text');
+
+      const withFont = document.createElement('div');
+      Object.assign(withFont.style, { fontFamily, fontSize });
+      withFont.appendChild(document.createTextNode(`plain text in ${fontFamily}: 🦄 🍑 🤣`));
+
+      const withSystemUI = document.createElement('div');
+      Object.assign(withSystemUI.style, { fontFamily: '"system ui"', fontSize });
+      withSystemUI.appendChild(document.createTextNode(`plain text in "system ui": 🦄 🍑 🤣`));
+
+      text.appendChild(withFont);
+      text.appendChild(withSystemUI);
+    };
+
     Promise.resolve().then(async () => {
       // const fontFamily = null;
       const fontFamily = await loadFonts();
 
       const canvas = document.querySelector('#debug-canvas');
       const ctx = canvas.getContext('2d');
+
+      renderTestText({ fontFamily });
 
       connectTest({ fontFamily, canvas, ctx });
 
