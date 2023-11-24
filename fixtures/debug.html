@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug emoji confetti</title>
+</head>
+<body>
+  <script>
+    // this page is a demo that is not built, so fudge the module.exports support
+    // define a global `module` so that the actual source file can use it
+    window.module = {};
+  </script>
+  <script src="../src/confetti.js"></script>
+  <script>
+    // define the `module.exports` as the `confetti` global, the way that the
+    // cdn distributed file would
+    window.confetti = module.exports;
+  </script>
+
+  <p><button id="test-confetti">Emoji confetti test</button></p>
+  <canvas id="debug-canvas" width="600" height="650" style="outline: 1px solid red"></canvas>
+  <p id="test-text"></p>
+
+  <script>
+    const loadFonts = async () => {
+      const isSafari = navigator.vendor === 'Apple Computer, Inc.';
+      const fontName = 'Noto Color Emoji';
+
+      await Promise.all([0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => {
+        const safari = `url(https://fonts.gstatic.com/s/notocoloremoji/v25/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.${n}.woff2)`;
+        const realBrowser = `url(https://fonts.gstatic.com/s/notocoloremoji/v25/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabsE4tq3luCC7p-aXxcn.${n}.woff2)`;
+
+        const fontFile = new FontFace(
+          fontName,
+          isSafari ? safari : realBrowser
+        );
+
+        document.fonts.add(fontFile);
+
+        return fontFile.load();
+      }));
+
+      return `"${fontName}"`;
+    };
+
+    const connectTest = ({ fontFamily }) => {
+      const button = document.getElementById('test-confetti');
+
+      const scalar = 3;
+
+      // make this a getter so that the shapes don't initialize on page load
+      const getShapes = ((shapes) => () => {
+        if (shapes.length) {
+          return shapes;
+        }
+
+        shapes = [
+          ['🦄', '🍑', '🤣', '🐈', 'bg'].map(text => confetti.shapeFromText({ text, scalar })),
+          ['🦄', '🍑', '🤣', '🐈', 'bg'].map(text => confetti.shapeFromText({ text, scalar, fontFamily }))
+        ];
+
+        return shapes;
+      })([]);
+
+      button.onclick = () => {
+        const [shapesDefault, shapesFont] = getShapes();
+
+        confetti({
+          particleCount: 10,
+          shapes: shapesDefault,
+          scalar,
+          origin: { y: 0.7, x: 0.25 }
+        });
+        confetti({
+          particleCount: 10,
+          shapes: shapesFont,
+          scalar,
+          origin: { y: 0.7, x: 0.75 }
+        });
+      };
+    };
+
+    const drawBitmapToCanvas = (bitmap) => {
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      const ctx = canvas.getContext('2d');
+
+      ctx.drawImage(bitmap, 0, 0);
+
+      return canvas;
+    };
+
+    const drawTransformedEmoji = async ({ fontFamily, canvas, ctx, offsetX = 0, offsetY = 0 }) => {
+      ['🦄', '🍑', '🤣', '🐈'].forEach((text, idx) => {
+        const shape1 = confetti.shapeFromText({ text, scalar: 1, fontFamily });
+        const shape2 = confetti.shapeFromText({ text, scalar: 2, fontFamily });
+        const shape5 = confetti.shapeFromText({ text, scalar: 5, fontFamily });
+
+        const y = idx * 100 + 50 + offsetY;
+
+        ctx.drawImage(shape1.bitmap, 0, y);
+        ctx.drawImage(shape2.bitmap, 100, y);
+        ctx.drawImage(shape5.bitmap, 200, y);
+
+        [[shape1, 1], [shape2, 2], [shape5, 5]].forEach(([shape, scale], j) => {
+          const x = 300 + (j * 100) + offsetX;
+
+          const rotation = 3.2;
+          const scaleX = scale * 0.8;
+          const scaleY = scale * 1.4;
+
+          var matrix = new DOMMatrix([
+            Math.cos(rotation) * scaleX,
+            Math.sin(rotation) * scaleX,
+            -Math.sin(rotation) * scaleY,
+            Math.cos(rotation) * scaleY,
+            x,
+            y
+          ]);
+          matrix.multiplySelf(new DOMMatrix(shape.matrix));
+
+          const pattern = (() => {
+            try {
+              // most browsers support this, it's spec
+              return ctx.createPattern(shape.bitmap, 'no-repeat');
+            } catch (e) {
+              // safari doesn't, because of course it doesn't
+              // so draw the bitmap to a canvas first and create a
+              // pattern from that canvas
+              console.log('failed to create bitmap pattern:', e);
+              return ctx.createPattern(drawBitmapToCanvas(shape.bitmap), 'no-repeat');
+            }
+          })();
+
+          pattern.setTransform(matrix);
+
+          ctx.fillStyle = pattern;
+          ctx.fillRect(x - 100, y - 100, 300, 300);
+        });
+      });
+    };
+
+    const drawDebugEmoji = async ({ fontFamily, canvas, ctx, offsetX = 0, offsetY = 0 }) => {
+      const text = '🦄';
+
+      const draw = ({ offsetX, offsetY, fontFamily }) => {
+        const opts = { text, scalar: 15 };
+
+        if (fontFamily) {
+          opts.fontFamily = fontFamily;
+        }
+
+        const shape = confetti.shapeFromText(opts);
+
+        ctx.drawImage(shape.bitmap, offsetX, offsetY);
+
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'orange';
+        ctx.strokeRect(offsetX, offsetY, shape.bitmap.width, shape.bitmap.height);
+
+        return { width: shape.bitmap.width, height: shape.bitmap.height };
+      };
+
+      const { width, height: height1 } = draw({ offsetX: 10 + offsetX, offsetY: 10 + offsetY });
+      const { height: height2 } = draw({ offsetX: 20 + width + offsetX, offsetY: 10 + offsetY, fontFamily });
+
+      return Math.max(height1, height2);
+    };
+
+    const renderTestText = ({ fontFamily }) => {
+      const fontSize = '20px';
+      const text = document.getElementById('test-text');
+
+      const withFont = document.createElement('div');
+      Object.assign(withFont.style, { fontFamily, fontSize });
+      withFont.appendChild(document.createTextNode(`plain text in ${fontFamily}: 🦄 🍑 🤣`));
+
+      const withSystemUI = document.createElement('div');
+      Object.assign(withSystemUI.style, { fontFamily: '"system ui"', fontSize });
+      withSystemUI.appendChild(document.createTextNode(`plain text in "system ui": 🦄 🍑 🤣`));
+
+      text.appendChild(withFont);
+      text.appendChild(withSystemUI);
+    };
+
+    Promise.resolve().then(async () => {
+      // const fontFamily = null;
+      const fontFamily = await loadFonts();
+
+      const canvas = document.querySelector('#debug-canvas');
+      const ctx = canvas.getContext('2d');
+
+      renderTestText({ fontFamily });
+
+      connectTest({ fontFamily, canvas, ctx });
+
+      await drawDebugEmoji({ fontFamily, canvas, ctx });
+      await drawTransformedEmoji({ fontFamily, canvas, ctx, offsetY: 200 });
+    }).catch(e => {
+      console.log('something went wrong:', e);
+    });
+  </script>
+</body>
+</html>
