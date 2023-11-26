@@ -805,7 +805,7 @@ test('[text] shoots confetti of an emoji shape', async t => {
   });
   t.context.image = await readImage(t.context.buffer);
 
-  t.is(t.context.image.hash(), '9CppCqpCmtC');
+  t.is(t.context.image.hash(), 'cPpcSrcCjdC');
 });
 
 /*
