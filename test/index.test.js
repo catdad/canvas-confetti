@@ -655,7 +655,7 @@ test('[paths] `shapeFromPath` crops the shape and centers in the middle of the a
   });
 });
 
-test('[path] shoots confetti of a custom shape', async t => {
+test('[paths] shoots confetti of a custom shape', async t => {
   const page = t.context.page = await fixturePage();
 
   const shape = await page.evaluate(`
