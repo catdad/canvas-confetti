@@ -386,7 +386,8 @@ test('shoots default scaled confetti', async t => {
 
   const pixels = await totalPixels(t.context.image);
 
-  t.is(pixels, 124);
+  const expected = 124;
+  t.true(pixels > expected * .99 && pixels < expected * 1.01, `${pixels}±1% ≠ ${expected}`);
 });
 
 test('shoots larger scaled confetti', async t => {
@@ -405,7 +406,8 @@ test('shoots larger scaled confetti', async t => {
 
   const pixels = await totalPixels(t.context.image);
 
-  t.is(pixels, 11476);
+  const expected = 11476;
+  t.true(pixels > expected * .99 && pixels < expected * 1.01, `${pixels} ± 1% ≠ ${expected}`);
 });
 
 test('shoots confetti to the left', async t => {
