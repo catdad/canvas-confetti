@@ -377,13 +377,17 @@ test('shoots default scaled confetti', async t => {
   t.context.buffer = await confettiImage(page, {
     colors: ['#0000ff'],
     shapes: ['circle'],
-    particleCount: 10
+    particleCount: 1,
+    startVelocity: 0,
+    gravity: 0,
+    flat: true
   });
   t.context.image = await removeOpacity(t.context.buffer);
 
   const pixels = await totalPixels(t.context.image);
 
-  t.is(pixels > 100 && pixels < 500, true);
+  const expected = 124;
+  t.true(pixels > expected * .99 && pixels < expected * 1.01, `${pixels}±1% ≠ ${expected}`);
 });
 
 test('shoots larger scaled confetti', async t => {
@@ -393,13 +397,17 @@ test('shoots larger scaled confetti', async t => {
     colors: ['#0000ff'],
     shapes: ['circle'],
     scalar: 10,
-    particleCount: 10
+    particleCount: 1,
+    startVelocity: 0,
+    gravity: 0,
+    flat: true
   });
   t.context.image = await removeOpacity(t.context.buffer);
 
   const pixels = await totalPixels(t.context.image);
 
-  t.is(pixels > 2000, true);
+  const expected = 11476;
+  t.true(pixels > expected * .99 && pixels < expected * 1.01, `${pixels} ± 1% ≠ ${expected}`);
 });
 
 test('shoots confetti to the left', async t => {
