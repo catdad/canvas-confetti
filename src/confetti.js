@@ -682,7 +682,7 @@
           global.removeEventListener('resize', onResize);
         }
 
-        if (isLibCanvas && canvas) {
+        if (isLibCanvas && canvas && document.body.contains(canvas)) {
           document.body.removeChild(canvas);
           canvas = null;
           initialized = false;
