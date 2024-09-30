@@ -281,18 +281,11 @@
     return colors.map(hexToRgb);
   }
 
-  function hexToRgb(str) {
-    var val = String(str).replace(/[^0-9a-f]/gi, '');
-
-    if (val.length < 6) {
-        val = val[0]+val[0]+val[1]+val[1]+val[2]+val[2];
-    }
-
-    return {
-      r: toDecimal(val.substring(0,2)),
-      g: toDecimal(val.substring(2,4)),
-      b: toDecimal(val.substring(4,6))
-    };
+  function hexToRgb(color) {
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.fillStyle = color; // Set the fill style to the input color
+    const [r, g, b] = ctx.fillStyle.match(/\w\w/g).map(hex => parseInt(hex, 16)); // Convert to RGB
+    return { r, g, b };
   }
 
   function getOrigin(options) {
