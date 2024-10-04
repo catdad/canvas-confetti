@@ -684,7 +684,7 @@
 
         if (isLibCanvas && canvas) {
           if (document.body.contains(canvas)) {
-            document.body.removeChild(canvas); 
+            document.body.removeChild(canvas);
           }
           canvas = null;
           initialized = false;
@@ -866,7 +866,9 @@
   module.exports.create = confettiCannon;
   module.exports.shapeFromPath = shapeFromPath;
   module.exports.shapeFromText = shapeFromText;
-}((function () {
+  }
+
+((function () {
   if (typeof window !== 'undefined') {
     return window;
   }

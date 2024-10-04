@@ -50,7 +50,7 @@
     [data-theme="light"][auto-theme] {
       --theme-switch: var(--switch-auto-black);
     }
-    
+
     html {
       scroll-behavior: smooth;
     }
@@ -566,6 +566,24 @@
   </div>
 
   <div class="container">
+    <div class="group" data-name="tornado">
+      <div class="flex-rows">
+        <div class="left">
+          <h2 id="tornado"><a class="anchor" href="#tornado"> Tornado Confetti </a></h2>
+          <button class="run">Run
+            <span class = "icon"><svg class="icon"><use xlink:href="#run"></use></svg>
+            </span>
+        </div>
+        <div class="description">
+          Experience the magic of tornado confetti! Each piece flips and spins as it falls, revealing two complementary colors. It's like having a party in multiple dimensions!
+        </div>
+      </div>
+      <div class="editor">
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
     <div class="group" data-name="custom">
       <div class="flex-rows">
         <div class="left">
@@ -802,6 +820,41 @@
         setTimeout(shoot, 100);
         setTimeout(shoot, 200);
       },
+      tornado: function tornado() {
+  const defaults = {
+    particleCount: 200,
+    spread: 20,
+    origin: { y: 0.8 },
+    angle: 0,
+    startVelocity: 30,
+    gravity: -1,
+    ticks: 300,
+    shapes: ['circle'],
+    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
+  };
+
+  let angle = 0;
+  const interval = setInterval(() => {
+    const particleCount = 5;
+    angle += 10;
+    const radians = angle * (Math.PI / 180);
+    const x = 0.5 + Math.cos(radians) * 0.2;
+    const y = 0.8 + Math.sin(radians) * 0.2;
+
+    confetti({
+      ...defaults,
+      particleCount,
+      origin: { x, y },
+      angle: angle + 90,
+      gravity: -0.5 - Math.random(),
+      drift: Math.random() - 0.5,
+    });
+
+    if (angle >= 3600) {
+      clearInterval(interval);
+    }
+  }, 20);
+},
       continuous: function continuous() {
         var end = Date.now() + (15 * 1000);
 
