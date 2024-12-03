@@ -129,7 +129,7 @@ You can also create confetti from images! The same caveats apply as for `confett
 
 The options for this method are:
 - `options` _`Object`_:
-  - `src` _`String`_: the URL of the image to render. This must be "origin-clean", which means you may get problems if the image is hosted at a different origi). If the resource can be fetched cross-origin, you can do something like `URL.createObjectURL(await (await fetch(src)).blob())`, or if all else fails, data URIs will always work.
+  - `src` _`String`_: the URL of the image to render. This must be "origin-clean", which means you may get problems if the image is hosted at a different origin. If the resource can be fetched cross-origin, you can do something like `URL.createObjectURL(await (await fetch(src)).blob())`, or if all else fails, data URIs will always work.
   - `scalar` _`Number, optional, default: 1`_: a scale value relative to the default size of 10px. It should typically match the `scalar` value in the confetti options. If the source image is not a square, this will apply to the width rather than the height (e.g. rendering a 50x20 image at a scalar of `2` will render a 20x8 confetti).
 
 The `x`, `y`, `width`, and `height` options are used to specify cordinates within the source image to render. These can be used to render a single section of a spritesheet.
