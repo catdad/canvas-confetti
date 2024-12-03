@@ -819,7 +819,7 @@ test('[text] shoots confetti of an emoji shape', async t => {
 const shapeFromImageImage = async (page, args) => {
   const { base64png, ...shape } = await page.evaluate(`
     Promise.resolve().then(async () => {
-      const { bitmap, ...shape } = await confetti.shapeFromImage(${JSON.stringify(args)});
+      const [{ bitmap, ...shape }] = await confetti.shapesFromImage(${JSON.stringify(args)});
 
       const canvas = document.createElement('canvas');
       canvas.width = bitmap.width;
@@ -840,7 +840,7 @@ const shapeFromImageImage = async (page, args) => {
   };
 };
 
-test('[image] shapeFromImage renders an image', async t => {
+test('[image] shapesFromImage renders an image', async t => {
   const page = t.context.page = await fixturePage();
 
   const { buffer, ...shape } = await shapeFromImageImage(page, { src: 'data:image/gif;base64,R0lGODlhBQAFAIABAP8AAAAAACH5BAEKAAEALAAAAAAFAAUAAAIIjA+RwKxuUigAOw', scalar: 2 });
@@ -865,7 +865,7 @@ test('[image] shoots confetti of an image', async t => {
   const page = t.context.page = await fixturePage();
 
   await page.evaluate(`Promise.resolve().then(async () => {
-    window.__image = await confetti.shapeFromImage({ src: 'data:image/gif;base64,R0lGODlhBQAFAIABAP8AAAAAACH5BAEKAAEALAAAAAAFAAUAAAIIjA+RwKxuUigAOw', scalar: 2 });
+    window.__image = (await confetti.shapesFromImage({ src: 'data:image/gif;base64,R0lGODlhBQAFAIABAP8AAAAAACH5BAEKAAEALAAAAAAFAAUAAAIIjA+RwKxuUigAOw', scalar: 2 }))[0];
   })`);
 
   // these parameters should create an image
@@ -1316,8 +1316,8 @@ test('[esm] exposed confetti method has a `shapeFromText` property', async t => 
   t.is(await page.evaluate(`typeof confettiAlias.shapeFromText`), 'function');
 });
 
-test('[esm] exposed confetti method has a `shapeFromImage` property', async t => {
+test('[esm] exposed confetti method has a `shapesFromImage` property', async t => {
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
-  t.is(await page.evaluate(`typeof confettiAlias.shapeFromImage`), 'function');
+  t.is(await page.evaluate(`typeof confettiAlias.shapesFromImage`), 'function');
 });

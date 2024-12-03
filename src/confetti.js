@@ -857,38 +857,35 @@
     };
   }
 
-  function shapeFromImage(imageData) {
-    var src = imageData.src;
-    var scalar = 'scalar' in imageData ? imageData.scalar : 1;
-
-    var scale = 1 / scalar;
+  function shapesFromImage(imageData) {
+    var scalar = imageData.scalar != null ? imageData.scalar : 1;
+    var size = 10 * scalar;
 
     var img = new Image();
-    img.src = src;
+    img.src = imageData.src;
 
     return promise(function (resolve) {
       img.addEventListener('load', function() {
-        var size = 10 * scalar;
+        var sprites = imageData.sprites != null
+          ? imageData.sprites
+          : [{ x: 0, y: 0, width: img.naturalWidth, height: img.naturalHeight }];
 
-        var sx = 'x' in imageData ? imageData.x : 0;
-        var sy = 'y' in imageData ? imageData.y : 0;
-        var sWidth = 'width' in imageData ? imageData.width : img.naturalWidth;
-        var sHeight = 'height' in imageData ? imageData.height : img.naturalHeight;
+        var baselineWidth = Math.max.apply(null, sprites.map(function(rect) { return rect.width; }));
 
-        var x = 0;
-        var y = 0;
-        var width = size;
-        var height = size * sHeight / sWidth;
+        resolve(sprites.map(function(sprite) {
+          var width = size * sprite.width / baselineWidth;
+          var height = size * sprite.height / baselineWidth;
+          var scale = 1 / scalar;
 
-        var canvas = new OffscreenCanvas(width, height);
-        var ctx = canvas.getContext('2d');
-        ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, width, height);
+          var canvas = new OffscreenCanvas(width, height);
+          canvas.getContext('2d').drawImage(img, sprite.x, sprite.y, sprite.width, sprite.height, 0, 0, width, height);
 
-        resolve({
-          type: 'bitmap',
-          bitmap: canvas.transferToImageBitmap(),
-          matrix: [scale, 0, 0, scale, -width * scale / 2, -height * scale / 2]
-        });
+          return {
+            type: 'bitmap',
+            bitmap: canvas.transferToImageBitmap(),
+            matrix: [scale, 0, 0, scale, -width * scale / 2, -height * scale / 2]
+          };
+        }));
       });
     });
   }
@@ -902,7 +899,7 @@
   module.exports.create = confettiCannon;
   module.exports.shapeFromPath = shapeFromPath;
   module.exports.shapeFromText = shapeFromText;
-  module.exports.shapeFromImage = shapeFromImage;
+  module.exports.shapesFromImage = shapesFromImage;
 }((function () {
   if (typeof window !== 'undefined') {
     return window;
