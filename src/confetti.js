@@ -278,7 +278,7 @@
   }
 
   function colorsToRgb(colors) {
-    return colors.map(hexToRgb);
+    return colors.map(colorToRgb);
   }
 
   function hexToRgb(color) {
