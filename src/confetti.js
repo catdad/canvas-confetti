@@ -281,11 +281,20 @@
     return colors.map(colorToRgb);
   }
 
-  function hexToRgb(color) {
-    const ctx = document.createElement("canvas").getContext("2d");
-    ctx.fillStyle = color; // Set the fill style to the input color
-    const [r, g, b] = ctx.fillStyle.match(/\w\w/g).map(hex => parseInt(hex, 16)); // Convert to RGB
-    return { r, g, b };
+  var canvas = typeof OffscreenCanvas === 'function' ? new OffscreenCanvas(0, 0) : document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  var colorCache = Object.create(null);
+
+  function colorToRgb(color) {
+    if (colorCache[color] != null) return colorCache[color];
+
+    ctx.fillStyle = color;
+    var match = ctx.fillStyle.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+
+    if (match == null) throw new Error('Unsupported color value: ' + color);
+
+    var rgb = match.slice(1).map(function(hex) { return parseInt(hex, 16); });
+    return colorCache[color] = { r: rgb[0], g: rgb[1], b: rgb[2] };
   }
 
   function getOrigin(options) {
