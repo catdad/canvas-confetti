@@ -244,6 +244,25 @@
       '#ffa62d',
       '#ff36ff'
     ],
+    enableDoubleSided: false,
+    frontColors: [
+      '#4ddcff',
+      '#ba74ff',
+      '#ff7e95',
+      '#aaff7a',
+      '#fdff76',
+      '#ffb84d',
+      '#ff66ff'
+    ],
+    backColors: [
+      '#990099',
+      '#b35900',
+      '#bdbd00',
+      '#5fbf3a',
+      '#cc3f5e',
+      '#6b36c2',
+      '#1399cc'
+    ],
     // probably should be true, but back-compat
     disableForReducedMotion: false,
     scalar: 1
@@ -348,6 +367,9 @@
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: (Math.random() * (0.75 - 0.25) + 0.25) * Math.PI,
       color: opts.color,
+      colorFront: opts.colorFront,
+      colorBack: opts.colorBack,
+      enableDoubleSided: opts.enableDoubleSided,
       shape: opts.shape,
       tick: 0,
       totalTicks: opts.ticks,
@@ -396,7 +418,12 @@
     var x2 = fetti.wobbleX + (fetti.random * fetti.tiltCos);
     var y2 = fetti.wobbleY + (fetti.random * fetti.tiltSin);
 
-    context.fillStyle = 'rgba(' + fetti.color.r + ', ' + fetti.color.g + ', ' + fetti.color.b + ', ' + (1 - progress) + ')';
+    var color = fetti.color
+    if (fetti.enableDoubleSided){
+      color = fetti.tiltCos >= 0 ? fetti.colorFront : fetti.colorBack;
+    };
+
+    context.fillStyle = 'rgba(' + color.r + ', ' + color.g + ', ' + color.b + ', ' + (1 - progress) + ')';
 
     context.beginPath();
 
@@ -565,6 +592,9 @@
       var gravity = prop(options, 'gravity', Number);
       var drift = prop(options, 'drift', Number);
       var colors = prop(options, 'colors', colorsToRgb);
+      var enableDoubleSided = prop(options, 'enableDoubleSided', Boolean);
+      var frontColors = prop(options, 'frontColors', colorsToRgb);
+      var backColors = prop(options, 'backColors', colorsToRgb);
       var ticks = prop(options, 'ticks', Number);
       var shapes = prop(options, 'shapes');
       var scalar = prop(options, 'scalar');
@@ -586,6 +616,9 @@
             spread: spread,
             startVelocity: startVelocity,
             color: colors[temp % colors.length],
+            colorFront: frontColors[temp % frontColors.length],
+            colorBack: backColors[temp % backColors.length],
+            enableDoubleSided: enableDoubleSided,
             shape: shapes[randomInt(0, shapes.length)],
             ticks: ticks,
             decay: decay,
