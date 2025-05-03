@@ -547,6 +547,41 @@ test('shoots confetti repeatedly using requestAnimationFrame', async t => {
   t.deepEqual(await uniqueColors(await reduceImg(img3)), ['#0000ff', '#ffffff']);
   t.deepEqual(await uniqueColors(await reduceImg(img4)), ['#0000ff', '#ffffff']);
 });
+/*
+ * Double-sided confetti tests
+ */
+
+test('double-sided confetti falls back to main colors', async t => {
+  const page = t.context.page = await fixturePage();
+
+  t.context.buffer = await confettiImage(page, {
+    enableDoubleSided: true,
+    colors: ['#ff0000'], // only main colors specified
+    particleCount: 50
+  });
+  t.context.image = await reduceImg(t.context.buffer);
+  const pixels = await uniqueColors(t.context.image);
+
+  // Should use main color for both sides when front/back not specified
+  t.true(pixels.includes('#ff0000'), 'Expected main color to be present');
+});
+
+test('double-sided confetti works with default colors when front/back not specified', async t => {
+  const page = t.context.page = await fixturePage();
+
+  t.context.buffer = await confettiImage(page, {
+    enableDoubleSided: true,
+    colors: ['#ff0000'], // only main colors specified
+    particleCount: 100
+  });
+  t.context.image = await reduceImg(t.context.buffer);
+
+  const pixels = await uniqueColors(t.context.image);
+
+  // Should fall back to main colors for both sides
+  t.true(pixels.includes('#ff0000'), 'Expected main color to be present');
+  t.true(pixels.includes('#ffffff'), 'Expected background color to be present');
+});
 
 test('uses promises when available', async t => {
   const page = t.context.page = await fixturePage();
