@@ -555,6 +555,7 @@
     var initialized = (canvas && worker) ? !!canvas.__confetti_initialized : false;
     var preferLessMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion)').matches;
     var animationObj;
+    var resizeScheduled = false;
 
     function fireLocal(options, size, done) {
       var particleCount = prop(options, 'particleCount', onlyPositiveInt);
@@ -649,23 +650,31 @@
 
       function onResize() {
         if (worker) {
-          // TODO this really shouldn't be immediate, because it is expensive
-          var obj = {
-            getBoundingClientRect: function () {
-              if (!isLibCanvas) {
-                return canvas.getBoundingClientRect();
-              }
-            }
-          };
-
-          resizer(obj);
-
-          worker.postMessage({
-            resize: {
-              width: obj.width,
-              height: obj.height
-            }
-          });
+          // Batch resize calls via requestAnimationFrame
+          if (!resizeScheduled) {
+            resizeScheduled = true;
+            raf.frame(function () {
+              // Prepare an object for computing size
+              var obj = {
+                getBoundingClientRect: function () {
+                  if (!isLibCanvas) {
+                    return canvas.getBoundingClientRect();
+                  }
+                }
+              };
+              // Update internal size
+              resizer(obj);
+              // Notify worker of new dimensions
+              worker.postMessage({
+                resize: {
+                  width: obj.width,
+                  height: obj.height
+                }
+              });
+              // Allow next resize
+              resizeScheduled = false;
+            });
+          }
           return;
         }
 
@@ -684,7 +693,7 @@
 
         if (isLibCanvas && canvas) {
           if (document.body.contains(canvas)) {
-            document.body.removeChild(canvas); 
+            document.body.removeChild(canvas);
           }
           canvas = null;
           initialized = false;
