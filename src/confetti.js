@@ -856,6 +856,39 @@
     };
   }
 
+  function shapesFromImage(imageData) {
+    var scalar = imageData.scalar != null ? imageData.scalar : 1;
+    var size = 10 * scalar;
+
+    var img = new Image();
+    img.src = imageData.src;
+
+    return promise(function (resolve) {
+      img.addEventListener('load', function() {
+        var sprites = imageData.sprites != null
+          ? imageData.sprites
+          : [{ x: 0, y: 0, width: img.naturalWidth, height: img.naturalHeight }];
+
+        var baselineWidth = Math.max.apply(null, sprites.map(function(rect) { return rect.width; }));
+
+        resolve(sprites.map(function(sprite) {
+          var width = size * sprite.width / baselineWidth;
+          var height = size * sprite.height / baselineWidth;
+          var scale = 1 / scalar;
+
+          var canvas = new OffscreenCanvas(width, height);
+          canvas.getContext('2d').drawImage(img, sprite.x, sprite.y, sprite.width, sprite.height, 0, 0, width, height);
+
+          return {
+            type: 'bitmap',
+            bitmap: canvas.transferToImageBitmap(),
+            matrix: [scale, 0, 0, scale, -width * scale / 2, -height * scale / 2]
+          };
+        }));
+      });
+    });
+  }
+
   module.exports = function() {
     return getDefaultFire().apply(this, arguments);
   };
@@ -865,6 +898,7 @@
   module.exports.create = confettiCannon;
   module.exports.shapeFromPath = shapeFromPath;
   module.exports.shapeFromText = shapeFromText;
+  module.exports.shapesFromImage = shapesFromImage;
 }((function () {
   if (typeof window !== 'undefined') {
     return window;

@@ -816,6 +816,74 @@ test('[text] shoots confetti of an emoji shape', async t => {
   t.is(t.context.image.hash(), 'cPpcSrcCjdC');
 });
 
+const shapeFromImageImage = async (page, args) => {
+  const { base64png, ...shape } = await page.evaluate(`
+    Promise.resolve().then(async () => {
+      const [{ bitmap, ...shape }] = await confetti.shapesFromImage(${JSON.stringify(args)});
+
+      const canvas = document.createElement('canvas');
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height);
+
+      return {
+        ...shape,
+        base64png: canvas.toDataURL('image/png')
+      };
+    });
+  `);
+
+  return {
+    ...shape,
+    buffer: base64ToBuffer(base64png)
+  };
+};
+
+test('[image] shapesFromImage renders an image', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const { buffer, ...shape } = await shapeFromImageImage(page, { src: 'data:image/gif;base64,R0lGODlhBQAFAIABAP8AAAAAACH5BAEKAAEALAAAAAAFAAUAAAIIjA+RwKxuUigAOw', scalar: 2 });
+
+  t.context.buffer = buffer;
+  t.context.image = await readImage(buffer);
+
+  t.deepEqual({
+    hash: t.context.image.hash(),
+    ...shape
+  }, {
+    type: 'bitmap',
+    matrix: [0.5, 0, 0, 0.5, -5, -5],
+    hash: '80anMEa00G0'
+  });
+});
+
+// this test renders a black canvas in a headless browser
+// but works fine when it is not headless
+// eslint-disable-next-line ava/no-skip-test
+test('[image] shoots confetti of an image', async t => {
+  const page = t.context.page = await fixturePage();
+
+  await page.evaluate(`Promise.resolve().then(async () => {
+    window.__image = (await confetti.shapesFromImage({ src: 'data:image/gif;base64,R0lGODlhBQAFAIABAP8AAAAAACH5BAEKAAEALAAAAAAFAAUAAAIIjA+RwKxuUigAOw', scalar: 2 }))[0];
+  })`);
+
+  // these parameters should create an image
+  // that is the same every time
+  t.context.buffer = await confettiImage(page, {
+    startVelocity: 0,
+    gravity: 0,
+    scalar: 10,
+    flat: 1,
+    ticks: 1000,
+    // eslint-disable-next-line no-undef
+    shapes: [() => __image]
+  });
+  t.context.image = await readImage(t.context.buffer);
+
+  t.is(t.context.image.hash(), '9D_pL$p_Sr_');
+});
+
 /*
  * Custom canvas
  */
@@ -1246,4 +1314,10 @@ test('[esm] exposed confetti method has a `shapeFromText` property', async t => 
   const page = t.context.page = await fixturePage('fixtures/page.module.html');
 
   t.is(await page.evaluate(`typeof confettiAlias.shapeFromText`), 'function');
+});
+
+test('[esm] exposed confetti method has a `shapesFromImage` property', async t => {
+  const page = t.context.page = await fixturePage('fixtures/page.module.html');
+
+  t.is(await page.evaluate(`typeof confettiAlias.shapesFromImage`), 'function');
 });

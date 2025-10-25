@@ -566,6 +566,54 @@
   </div>
 
   <div class="container">
+    <div class="group" data-name="image">
+      <div class="flex-rows">
+        <div class="left">
+          <h2><a href="#image" id="image" class="anchor">Image</a></h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon">
+                <use xlink:href="#run"></use>
+              </svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            Don't fancy using emoji? You can use any image you want!
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="group" data-name="spritesheet">
+      <div class="flex-rows">
+        <div class="left">
+          <h2><a href="#spritesheet" id="spritesheet" class="anchor">Spritesheet</a></h2>
+          <button class="run">
+            Run
+            <span class="icon">
+              <svg class="icon">
+                <use xlink:href="#run"></use>
+              </svg>
+            </span>
+          </button>
+        </div>
+        <div class="description">
+          <p>
+            You can even cut out multiple images from a single spritesheet!
+          </p>
+        </div>
+      </div>
+      <div class="editor"></div>
+    </div>
+  </div>
+
+  <div class="container">
     <div class="group" data-name="custom">
       <div class="flex-rows">
         <div class="left">
@@ -923,6 +971,52 @@
         setTimeout(shoot, 0);
         setTimeout(shoot, 100);
         setTimeout(shoot, 200);
+      },
+      image: function image() {
+        async function run() {
+          const scalar = 2;
+
+          const shapes = await confetti.shapesFromImage({
+            src: 'data:image/gif;base64,R0lGODlhBQAFAIABAP8AAAAAACH5BAEKAAEALAAAAAAFAAUAAAIIjA+RwKxuUigAOw',
+            scalar,
+          });
+
+          confetti({ shapes, scalar });
+        }
+
+        run();
+      },
+      spritesheet: function spritesheet() {
+        const spritesheetSvg = `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs><polygon id="bow" points="0,0 0,25 30,0 30,25"/></defs>
+  <use href="#bow" x="0" y="0" fill="red"/>
+  <use href="#bow" x="35" y="0" fill="cyan"/>
+  <use href="#bow" x="0" y="30" fill="orange"/>
+  <use href="#bow" x="35" y="30" fill="fuchsia"/>
+</svg>`;
+
+        const src = `data:image/svg+xml,${encodeURIComponent(spritesheetSvg)}`;
+
+        const scalar = 2;
+
+        const origins = [
+          { x: 0, y: 0 },
+          { x: 35, y: 0 },
+          { x: 0, y: 30 },
+          { x: 35, y: 30 },
+        ];
+
+        async function run() {
+          const shapes = await confetti.shapesFromImage({
+            src,
+            scalar,
+            sprites: origins.map((origin) => ({ width: 30, height: 25, ...origin })),
+          });
+
+          confetti({ shapes, scalar });
+        }
+
+        run();
       }
     };
 

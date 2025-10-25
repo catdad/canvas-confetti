@@ -123,6 +123,62 @@ confetti({
 });
 ```
 
+### `confetti.shapesFromImage({ src, scalar?, sprites? })` → `Promise<Array<Shape>>`
+
+You can also create confetti from images! The same caveats apply as for `confetti.shapeFromText`.
+
+The options for this method are:
+- `options` _`Object`_:
+  - `src` _`String`_: the URL of the image to render. This must be "origin-clean", which means you may get problems if the image is hosted at a different origin. If the resource can be fetched cross-origin, you can do something like `URL.createObjectURL(await (await fetch(src)).blob())`, or if all else fails, data URIs will always work.
+  - `scalar` _`Number, optional, default: 1`_: a scale value relative to the default size of 10px. It should typically match the `scalar` value in the confetti options. If the source image is not a square, this will apply to the width rather than the height (e.g. rendering a 50x20 image at a scalar of `2` will render a 20x8 confetti). If multiple sprites with different widths are used, the resulting width will be the width of the largest sprite.
+  - `sprites` _`Array<Object>, optional`_. If present, this will be used to cut out individual regions from the image; if omitted, the entire image will be used. Each element of `sprites` has the following properties:
+    - `x` _`Number`_: the x position within the image to start rendering from.
+    - `y` _`Number`_: the y position within the image to start rendering from.
+    - `width` _`Number`_: the width within the image to render.
+    - `height` _`Number`_: the height within the image to render.
+
+```javascript
+const scalar = 2;
+
+const shapes = await confetti.shapesFromImage({
+  src: 'data:image/gif;base64,R0lGODlhBQAFAIABAP8AAAAAACH5BAEKAAEALAAAAAAFAAUAAAIIjA+RwKxuUigAOw',
+  scalar,
+});
+
+confetti({ shapes, scalar });
+```
+
+#### Using a spritesheet
+
+```javascript
+const spritesheetSvg = `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs><polygon id="bow" points="0,0 0,25 30,0 30,25"/></defs>
+  <use href="#bow" x="0" y="0" fill="red"/>
+  <use href="#bow" x="35" y="0" fill="cyan"/>
+  <use href="#bow" x="0" y="30" fill="orange"/>
+  <use href="#bow" x="35" y="30" fill="fuchsia"/>
+</svg>`;
+
+const src = `data:image/svg+xml,${encodeURIComponent(spritesheetSvg)}`;
+
+const scalar = 2;
+
+const origins = [
+  { x: 0, y: 0 },
+  { x: 35, y: 0 },
+  { x: 0, y: 30 },
+  { x: 35, y: 30 },
+];
+
+const shapes = await confetti.shapesFromImage({
+  src,
+  scalar,
+  sprites: origins.map((origin) => ({ width: 30, height: 25, ...origin })),
+});
+
+confetti({ shapes, scalar });
+```
+
 ### `confetti.create(canvas, [globalOptions])` → `function`
 
 This method creates an instance of the `confetti` function that uses a custom canvas. This is useful if you want to limit the area on your page in which confetti appear. By default, this method will not modify the canvas in any way (other than drawing to it).
