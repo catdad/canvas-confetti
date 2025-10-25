@@ -55,6 +55,10 @@
       scroll-behavior: smooth;
     }
 
+    html {
+        scroll-behavior: smooth;
+      }
+
     html, body {
       margin: 0;
       padding: 0;
@@ -237,7 +241,44 @@
       top: 0;
       transform: scale(0.75, 0.75);
     }
+    
+    .scrollTopBtn{
+      position: fixed;
+      z-index:100;
+      border-radius: 50%;
+      border-color: var(--secondary-color);
+      background-color: var(--secondary-color);
+      right: 3rem;
+      bottom: 3rem;
+      width: 40px;
+      height: 40px;
+      display: none;
+      cursor: pointer;
+    }
 
+    .scrollTopBtn:hover{
+      background-color: var(--secondary-variant-color);
+      border-color: var(--secondary-variant-color);
+    }
+
+    .scrollTopBtn svg{
+      width: 40px;
+      height: 40px;
+    }
+
+    @media screen and (max-width: 767px) {
+      .scrollTopBtn {
+        bottom: 2rem;
+        right: 1rem;
+        width: 30px;
+        height: 30px;
+      }
+      .scrollTopBtn svg{
+        width: 30px;
+        height: 30px;
+      }
+    }
+    
     footer {
       font-size: 0.9rem;
       text-align: center;
@@ -590,6 +631,10 @@
       </div>
     </div>
   </div>
+  
+  <div class="scrollTopBtn" id="scrollToTop">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="white" class="bi bi-arrow-up-circle" viewBox="0 0 16 16"> <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/> </svg>
+  </div>  
 
   <footer>
     <a href="https://github.com/catdad">
@@ -976,6 +1021,27 @@
         editors.push(editor);
       });
     };
+
+    // Function to show/hide the "Scroll to Top" button
+    function toggleScrollTopButton() {
+        if (document.documentElement.scrollTop > 100) {
+            document.getElementById('scrollToTop').style.display = 'block';
+        } else {
+            document.getElementById('scrollToTop').style.display = 'none';
+        }
+    }
+
+    // Trigger on scroll event
+    window.addEventListener('scroll', toggleScrollTopButton);
+
+    // Function to scroll back to the top
+    function scrollToTop() {
+        document.documentElement.scrollTo({
+            top: 0
+        });
+    }
+
+    document.getElementById('scrollToTop').addEventListener('click', scrollToTop);
   </script>
 
   <script>
