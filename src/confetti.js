@@ -19,12 +19,11 @@
       return false;
     }
 
-    var canvas = new OffscreenCanvas(1, 1);
-    var ctx = canvas.getContext('2d');
-    ctx.fillRect(0, 0, 1, 1);
-    var bitmap = canvas.transferToImageBitmap();
-
     try {
+      var canvas = new OffscreenCanvas(1, 1);
+      var ctx = canvas.getContext('2d');
+      ctx.fillRect(0, 0, 1, 1);
+      var bitmap = canvas.transferToImageBitmap();
       ctx.createPattern(bitmap, 'no-repeat');
     } catch (e) {
       return false;
