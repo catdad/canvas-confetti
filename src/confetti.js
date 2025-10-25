@@ -277,21 +277,23 @@
   }
 
   function colorsToRgb(colors) {
-    return colors.map(hexToRgb);
+    return colors.map(colorToRgb);
   }
 
-  function hexToRgb(str) {
-    var val = String(str).replace(/[^0-9a-f]/gi, '');
+  var canvas = typeof OffscreenCanvas === 'function' ? new OffscreenCanvas(0, 0) : document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  var colorCache = Object.create(null);
 
-    if (val.length < 6) {
-        val = val[0]+val[0]+val[1]+val[1]+val[2]+val[2];
-    }
+  function colorToRgb(color) {
+    if (colorCache[color] != null) return colorCache[color];
 
-    return {
-      r: toDecimal(val.substring(0,2)),
-      g: toDecimal(val.substring(2,4)),
-      b: toDecimal(val.substring(4,6))
-    };
+    ctx.fillStyle = color;
+    var match = ctx.fillStyle.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+
+    if (match == null) throw new Error('Unsupported color value: ' + color);
+
+    var rgb = match.slice(1).map(function(hex) { return parseInt(hex, 16); });
+    return colorCache[color] = { r: rgb[0], g: rgb[1], b: rgb[2] };
   }
 
   function getOrigin(options) {
