@@ -245,7 +245,12 @@
     ],
     // probably should be true, but back-compat
     disableForReducedMotion: false,
-    scalar: 1
+    scalar: 1,
+    /* New feature 3-D wobble/tilt control  */
+    tiltRange:  [-Math.PI * 0.5,  Math.PI * 0.5], // [min,max] radians
+    tiltSpeed:  [0.05, 0.40],                     // radians per frame
+    wobbleRange:[0,10],                           // “radius” units
+    wobbleSpeed:[0.05,0.11]                       // per-frame
   };
 
   function convert(val, transform) {
@@ -341,8 +346,13 @@
     return {
       x: opts.x,
       y: opts.y,
-      wobble: Math.random() * 10,
-      wobbleSpeed: Math.min(0.11, Math.random() * 0.1 + 0.05),
+      //New 3-D wobble/tilt control
+      wobble:      Math.random() * (opts.wobbleRange[1] - opts.wobbleRange[0]) + opts.wobbleRange[0],
+      wobbleSpeed: Math.random() * (opts.wobbleSpeed[1] - opts.wobbleSpeed[0]) + opts.wobbleSpeed[0],
+      tiltAngle:   Math.random() * (opts.tiltRange[1] - opts.tiltRange[0])   + opts.tiltRange[0],
+      tiltIncrement: Math.random() * (opts.tiltSpeed[1] - opts.tiltSpeed[0]) + opts.tiltSpeed[0],
+      //wobble: Math.random() * 10,
+      //wobbleSpeed: Math.min(0.11, Math.random() * 0.1 + 0.05),
       velocity: (opts.startVelocity * 0.5) + (Math.random() * opts.startVelocity),
       angle2D: -radAngle + ((0.5 * radSpread) - (Math.random() * radSpread)),
       tiltAngle: (Math.random() * (0.75 - 0.25) + 0.25) * Math.PI,
@@ -377,12 +387,15 @@
       fetti.tiltSin = 0;
       fetti.tiltCos = 0;
       fetti.random = 1;
+      // New 3-d wobble/tilt control
+      fetti.tiltIncrement = 0;
     } else {
       fetti.wobble += fetti.wobbleSpeed;
       fetti.wobbleX = fetti.x + ((10 * fetti.scalar) * Math.cos(fetti.wobble));
       fetti.wobbleY = fetti.y + ((10 * fetti.scalar) * Math.sin(fetti.wobble));
 
-      fetti.tiltAngle += 0.1;
+      //fetti.tiltAngle += 0.1;
+      fetti.tiltAngle += (fetti.tiltIncrement || 0.1);
       fetti.tiltSin = Math.sin(fetti.tiltAngle);
       fetti.tiltCos = Math.cos(fetti.tiltAngle);
       fetti.random = Math.random() + 2;
@@ -568,6 +581,13 @@
       var shapes = prop(options, 'shapes');
       var scalar = prop(options, 'scalar');
       var flat = !!prop(options, 'flat');
+
+      // NEW 3-D wobble/tilt control
+      var tiltRange   = prop(options, 'tiltRange');
+      var tiltSpeed   = prop(options, 'tiltSpeed');
+      var wobbleRange = prop(options, 'wobbleRange');
+      var wobbleSpeed = prop(options, 'wobbleSpeed');
+
       var origin = getOrigin(options);
 
       var temp = particleCount;
@@ -591,7 +611,12 @@
             gravity: gravity,
             drift: drift,
             scalar: scalar,
-            flat: flat
+            flat: flat,
+            // NEW 3-D wobble/tilt control
+            tiltRange:   tiltRange,
+            tiltSpeed:   tiltSpeed,
+            wobbleRange: wobbleRange,
+            wobbleSpeed: wobbleSpeed
           })
         );
       }
