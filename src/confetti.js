@@ -13,25 +13,6 @@
     global.URL.createObjectURL);
 
   var canUsePaths = typeof Path2D === 'function' && typeof DOMMatrix === 'function';
-  var canDrawBitmap = (function () {
-    // this mostly supports ssr
-    if (!global.OffscreenCanvas) {
-      return false;
-    }
-
-    try {
-      var canvas = new OffscreenCanvas(1, 1);
-      var ctx = canvas.getContext('2d');
-      ctx.fillRect(0, 0, 1, 1);
-      var bitmap = canvas.transferToImageBitmap();
-      ctx.createPattern(bitmap, 'no-repeat');
-    } catch (e) {
-      return false;
-    }
-
-    return true;
-  })();
-
   function noop() {}
 
   // create a promise if it exists, otherwise, just
@@ -48,36 +29,6 @@
 
     return null;
   }
-
-  var bitmapMapper = (function (skipTransform, map) {
-    // see https://github.com/catdad/canvas-confetti/issues/209
-    // creating canvases is actually pretty expensive, so we should create a
-    // 1:1 map for bitmap:canvas, so that we can animate the confetti in
-    // a performant manner, but also not store them forever so that we don't
-    // have a memory leak
-    return {
-      transform: function(bitmap) {
-        if (skipTransform) {
-          return bitmap;
-        }
-
-        if (map.has(bitmap)) {
-          return map.get(bitmap);
-        }
-
-        var canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-        var ctx = canvas.getContext('2d');
-        ctx.drawImage(bitmap, 0, 0);
-
-        map.set(bitmap, canvas);
-
-        return canvas;
-      },
-      clear: function () {
-        map.clear();
-      }
-    };
-  })(canDrawBitmap, new Map());
 
   var raf = (function () {
     var TIME = Math.floor(1000 / 60);
@@ -151,8 +102,6 @@
             worker.removeEventListener('message', workerDone);
 
             prom = null;
-
-            bitmapMapper.clear();
 
             done();
             resolve();
@@ -413,8 +362,6 @@
       var rotation = Math.PI / 10 * fetti.wobble;
       var scaleX = Math.abs(x2 - x1) * 0.1;
       var scaleY = Math.abs(y2 - y1) * 0.1;
-      var width = fetti.shape.bitmap.width * fetti.scalar;
-      var height = fetti.shape.bitmap.height * fetti.scalar;
 
       var matrix = new DOMMatrix([
         Math.cos(rotation) * scaleX,
@@ -428,18 +375,13 @@
       // apply the transform matrix from the confetti shape
       matrix.multiplySelf(new DOMMatrix(fetti.shape.matrix));
 
-      var pattern = context.createPattern(bitmapMapper.transform(fetti.shape.bitmap), 'no-repeat');
-      pattern.setTransform(matrix);
-
+      context.save();
       context.globalAlpha = (1 - progress);
-      context.fillStyle = pattern;
-      context.fillRect(
-        fetti.x - (width / 2),
-        fetti.y - (height / 2),
-        width,
-        height
-      );
-      context.globalAlpha = 1;
+      context.transform(matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f);
+      context.drawImage(fetti.shape.bitmap, 0, 0);
+      context.restore();
+
+      return fetti.tick < fetti.totalTicks;
     } else if (fetti.shape === 'circle') {
       context.ellipse ?
         context.ellipse(fetti.x, fetti.y, Math.abs(x2 - x1) * fetti.ovalScalar, Math.abs(y2 - y1) * fetti.ovalScalar, Math.PI / 10 * fetti.wobble, 0, 2 * Math.PI) :
@@ -488,7 +430,6 @@
         animationFrame = destroy = null;
 
         context.clearRect(0, 0, size.width, size.height);
-        bitmapMapper.clear();
 
         done();
         resolve();
