@@ -942,6 +942,33 @@ const resizeTest = async (t, createOpts, createName = 'confetti.create') => {
   t.deepEqual(await uniqueColors(third), ['#0000ff', '#ffffff']);
 };
 
+test('[worker] does not throw in the worker when the window reports a 0x0 size', async t => {
+  const page = t.context.page = await fixturePage();
+
+  const errors = await page.evaluate(`new Promise(function (resolve) {
+    var errors = [];
+    var NativeWorker = window.Worker;
+    window.Worker = function (url) {
+      var worker = new NativeWorker(url);
+      worker.addEventListener('error', function (e) { errors.push(e.message); });
+      return worker;
+    };
+
+    var root = document.documentElement;
+    confetti({ particleCount: 10, ticks: 200 });
+
+    setTimeout(function () {
+      Object.defineProperty(root, 'clientWidth', { configurable: true, get: function () { return 0; } });
+      Object.defineProperty(root, 'clientHeight', { configurable: true, get: function () { return 0; } });
+      window.dispatchEvent(new Event('resize'));
+
+      setTimeout(function () { resolve(errors); }, 500);
+    }, 100);
+  })`);
+
+  t.deepEqual(errors, []);
+});
+
 test('[custom canvas] resizes the custom canvas when the window resizes', async t => {
   await resizeTest(t, {
     resize: true

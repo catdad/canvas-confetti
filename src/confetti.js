@@ -500,7 +500,12 @@
           size.height = canvas.height = workerSize.height;
         }
 
-        if (!size.width && !size.height) {
+        // In the worker, size only ever comes from workerSize (resize
+        // messages from the main thread): an OffscreenCanvas can't be
+        // measured, so resizer() would throw. A 0x0 workerSize (the page
+        // reported no size, e.g. a hidden iframe or tab) just draws nothing
+        // until the next resize message.
+        if (!isWorker && !size.width && !size.height) {
           resizer(canvas);
           size.width = canvas.width;
           size.height = canvas.height;
